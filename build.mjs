@@ -14,7 +14,7 @@
  */
 
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, rmSync, writeFileSync, copyFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -277,23 +277,26 @@ function notFoundPage() {
 
 // ---------------------------------------------------------------- write ----
 
+// Everything is rendered first and written only if all of it succeeded: a
+// failed build (e.g. an unrendered key) must leave the previous docs/ intact.
+const files = {};
+for (const lang of LANGS) {
+  const prefix = lang === 'en' ? '' : 'he/';
+  files[`${prefix}index.html`] = homePage(lang);
+  files[`${prefix}privacy.html`] = legalPage(lang, 'privacy', 'privacyPolicy', privacyPolicy);
+  files[`${prefix}terms.html`] = legalPage(lang, 'terms', 'termsOfService', termsOfService);
+  files[`${prefix}support.html`] = supportPage(lang);
+}
+files['404.html'] = notFoundPage();
+files['CNAME'] = `${DOMAIN}\n`;
+files['.nojekyll'] = '';
+files['style.css'] = readFileSync(join(ROOT, 'src', 'style.css'), 'utf8');
+
 rmSync(OUT, { recursive: true, force: true });
-const write = (path, content) => {
+for (const [path, content] of Object.entries(files)) {
   const full = join(OUT, path);
   mkdirSync(dirname(full), { recursive: true });
   writeFileSync(full, content);
-};
-
-for (const lang of LANGS) {
-  const prefix = lang === 'en' ? '' : 'he/';
-  write(`${prefix}index.html`, homePage(lang));
-  write(`${prefix}privacy.html`, legalPage(lang, 'privacy', 'privacyPolicy', privacyPolicy));
-  write(`${prefix}terms.html`, legalPage(lang, 'terms', 'termsOfService', termsOfService));
-  write(`${prefix}support.html`, supportPage(lang));
 }
-write('404.html', notFoundPage());
-write('CNAME', `${DOMAIN}\n`);
-write('.nojekyll', '');
-copyFileSync(join(ROOT, 'src', 'style.css'), join(OUT, 'style.css'));
 
 console.log(`Built docs/ from ${REPO} @ ${COMMIT} (${REF})`);
