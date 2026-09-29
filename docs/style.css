@@ -1,0 +1,110 @@
+/* Gymon brand, from app/tailwind.config.js (`brand-*`) and the app's dark
+   ground. Fonts: the app's stack — Epilogue for Latin, Assistant for Hebrew
+   (Epilogue has no Hebrew glyphs, so the browser falls through per character). */
+:root {
+  --bg: #0b0f14;
+  --surface: #111a24;
+  --line: #1d2a38;
+  --text: #e9f3fb;        /* brand-50 */
+  --muted: #a9bccb;
+  --accent: #4ba2e1;      /* brand-300 */
+  --accent-strong: #9bcaed; /* brand-200 */
+  --font: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.top, main, footer {
+  max-width: 720px;
+  margin: 0 auto;
+  padding-inline: 16px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 18px;
+  text-decoration: none;
+}
+
+.lang {
+  color: var(--accent-strong);
+  font-size: 15px;
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+main { padding-block: 24px 40px; }
+
+h1 { font-size: 28px; line-height: 1.25; margin: 8px 0 4px; }
+h2 { font-size: 19px; line-height: 1.35; margin: 36px 0 8px; }
+h3 { font-size: 16px; line-height: 1.4; margin: 0 0 4px; color: var(--accent-strong); }
+
+p { margin: 0 0 12px; overflow-wrap: anywhere; }
+ul, ol { margin: 0 0 12px; padding-inline-start: 22px; }
+li { margin-bottom: 6px; overflow-wrap: anywhere; }
+
+a { color: var(--accent); text-underline-offset: 2px; }
+a:hover { color: var(--accent-strong); }
+b { font-weight: 600; }
+
+.updated { color: var(--muted); font-size: 14px; }
+.emph { font-weight: 600; }
+
+.sub {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px 4px;
+  margin-bottom: 10px;
+}
+
+.email { font-size: 18px; font-weight: 600; }
+
+.home { padding-block: 24px; }
+.home h1 { font-size: 36px; }
+.tagline { color: var(--muted); font-size: 18px; margin-bottom: 28px; }
+.links { list-style: none; padding: 0; }
+.links li { margin-bottom: 10px; }
+.links a {
+  display: block;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+.links a:hover { border-color: var(--accent); }
+
+footer {
+  padding-block: 20px 32px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 8px; }
+footer a { color: var(--muted); }
+footer a[aria-current="page"] { color: var(--text); }
