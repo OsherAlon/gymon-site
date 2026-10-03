@@ -188,3 +188,174 @@
     --tw-prose-td-borders: var(--color-border);
   }
 }
+
+/*
+ * Article hero (src/components/ArticleHero.astro) — scroll-LINKED, never
+ * scroll-blocking. Default = the static END state (also what Firefox stable,
+ * Safari < 26 and prefers-reduced-motion get). The motion is layered on top only
+ * where `animation-timeline: scroll()` exists and motion is allowed. Animates
+ * transform, opacity and clip-path only: no layout, no CLS, no JavaScript.
+ * Values carried over from the 21st.dev ScrollExpandMedia it replaces:
+ * box 300×400 → min(1550px, 95vw) × min(800px, 85% of the area under the bar)
+ * (mobile: min(950px, 95vw) × min(600px, …)); title/date slide 150vw (mobile 180vw);
+ * shade black/70 × 0.85 → 0.2; background 1 → 0; text white + soft shadow.
+ */
+.ah {
+  --ah-w: min(1550px, 95vw);
+  --ah-h: min(800px, calc(0.85 * (100svh - var(--topbar-h))));
+  --ah-slide: 150vw;
+  --ah-run: 70svh; /* scroll distance the effect runs over */
+  position: relative;
+}
+@media (max-width: 767px) {
+  .ah {
+    --ah-w: min(950px, 95vw);
+    --ah-h: min(600px, calc(0.85 * (100svh - var(--topbar-h))));
+    --ah-slide: 180vw;
+    --ah-run: 40svh; /* shorter on mobile so the text arrives sooner */
+  }
+}
+.ah-stage {
+  position: relative;
+  overflow: clip;
+  padding-block: calc(var(--topbar-h) + 24px) 24px;
+}
+.ah-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0; /* end state: the site-wide background has faded out */
+}
+.ah-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.ah-bg-tint {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.1);
+}
+.ah-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: var(--ah-h);
+}
+.ah-box {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: var(--ah-w);
+  height: var(--ah-h);
+  translate: -50% -50%;
+  filter: drop-shadow(0 0 25px rgb(0 0 0 / 0.3));
+}
+[dir='rtl'] .ah-box {
+  translate: 50% -50%;
+}
+.ah-clip,
+.ah-box > .ah-img,
+.ah-box > .ah-shade {
+  position: absolute;
+  inset: 0;
+}
+.ah-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  clip-path: inset(0 round 1rem);
+}
+.ah-shade {
+  border-radius: 0.75rem;
+  background: rgb(0 0 0 / 0.7);
+  opacity: 0.2;
+  clip-path: inset(0 round 1rem);
+}
+.ah-title,
+.ah-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 2px 14px rgb(0 0 0 / 0.5);
+}
+.ah-title {
+  gap: 1rem;
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+@media (min-width: 768px) {
+  .ah-title { font-size: 3rem; line-height: 1; }
+}
+@media (min-width: 1024px) {
+  .ah-title { font-size: 3.75rem; line-height: 1; }
+}
+.ah-meta {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(50% + 200px + 1rem);
+}
+.ah-date { font-size: 1.5rem; line-height: 2rem; }
+.ah-scroll { font-weight: 500; }
+/* End state: the title and date have slid out of view. */
+.ah-slide-start { translate: calc(-1 * var(--ah-slide)) 0; }
+.ah-slide-end { translate: var(--ah-slide) 0; }
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ah {
+      height: calc(100svh + var(--ah-run));
+    }
+    .ah-stage {
+      position: sticky;
+      inset-block-start: 0;
+      height: 100svh;
+      display: grid;
+      align-content: center;
+      padding-block: var(--topbar-h) 0;
+    }
+    .ah-bg,
+    .ah-img,
+    .ah-shade,
+    .ah-slide-start,
+    .ah-slide-end {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: scroll(root block);
+      animation-range: 0 var(--ah-run);
+    }
+    .ah-bg { animation-name: ah-bg; }
+    .ah-img { animation-name: ah-open; }
+    .ah-shade { animation-name: ah-open, ah-shade; }
+    .ah-slide-start { animation-name: ah-slide-start; }
+    .ah-slide-end { animation-name: ah-slide-end; }
+  }
+}
+@keyframes ah-bg {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* The box is laid out at its END size; the visible window opens from 300×400. */
+@keyframes ah-open {
+  from { clip-path: inset(calc(50% - 200px) calc(50% - 150px) round 1rem); }
+  to { clip-path: inset(0 round 1rem); }
+}
+@keyframes ah-shade {
+  from { opacity: 0.85; }
+  to { opacity: 0.2; }
+}
+@keyframes ah-slide-start {
+  from { translate: 0 0; }
+  to { translate: calc(-1 * var(--ah-slide)) 0; }
+}
+@keyframes ah-slide-end {
+  from { translate: 0 0; }
+  to { translate: var(--ah-slide) 0; }
+}

@@ -144,12 +144,18 @@ advice" note from `src/copy.mjs`.
 
 ### Article page
 
-Each article opens with the ScrollExpandMedia hero (`src/components/ui/scroll-expansion-hero.tsx`):
-the article's `image` grows from a 300×400 box to full width as the page is scrolled (or with
-PageDown / Space / Arrow keys), over **one site-wide background image**. To change that background,
-replace `public/blog/hero-bg.jpg` — or put the new file in `public/blog/` and point
-`BLOG_HERO_BG` in `src/lib/blog.ts` at it. The whole article text is in the server HTML; without
-JS, or with reduced motion, the content is shown directly.
+Each article opens with a **scroll-linked** hero (`src/components/ArticleHero.astro`, styles under
+"Article hero" in `src/styles/global.css`). The article's `image` opens from a 300×400 window to
+near-full width over **one site-wide background image**, and the short `heroTitle` slides apart.
+It is driven by the page's normal scroll through CSS scroll-driven animations, with no JavaScript,
+and it never holds or blocks scrolling. Right after it come the full title (the page's only `<h1>`),
+the description and the article, all always visible.
+
+Browsers without scroll-driven animations (Firefox stable, Safari before 26) and readers with
+reduced motion get the static end state: the expanded image, then the article.
+
+To change the background, replace `public/blog/hero-bg.jpg`, or put the new file in `public/blog/`
+and point `BLOG_HERO_BG` in `src/lib/blog.ts` at it.
 
 ### Preview article
 

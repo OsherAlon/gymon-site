@@ -3,7 +3,7 @@ import { render } from 'astro:content';
 import BlogLayout from '@/layouts/BlogLayout.astro';
 import { articleUrl, blogCopy, BLOG_HERO_BG, formatDate, languagesOf, type Article } from '@/lib/blog';
 import { urlFor } from '@/lib/legal';
-import ScrollExpandMedia from '@/components/ui/scroll-expansion-hero';
+import ArticleHero from '@/components/ArticleHero.astro';
 import type { Lang } from '@/lib/source';
 
 interface Props {
@@ -32,39 +32,34 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
   noindex={data.mock}
   mainClass="-mt-(--topbar-h)"
 >
-  {/*
-    ScrollExpandMedia hero (hydrated for the scroll effect). Everything inside
-    it — the title h1, meta, body and disclaimer — is in the server HTML.
-  */}
-  <ScrollExpandMedia
-    client:load
-    topOffset={72}
-    mediaSrc={data.image}
-    bgImageSrc={BLOG_HERO_BG}
-    alt={data.imageAlt}
-    title={heroTitle}
+  {/* Scroll-linked hero (CSS only, never blocks scrolling); the article follows it, always visible. */}
+  <ArticleHero
+    image={data.image}
+    imageAlt={data.imageAlt}
+    bgImage={BLOG_HERO_BG}
+    heroTitle={heroTitle}
     date={`${formatDate(lang, data.createdAt)} · ${t.readTime(data.readTime)}`}
-    scrollToExpand={t.scrollToRead}
-  >
-    <article class="mx-auto w-full max-w-3xl">
-      <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm">
-        <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
-      </a>
-      <header class="mt-6 space-y-3">
-        <h1 class="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">{data.title}</h1>
-        <p class="text-muted-foreground text-lg">{data.description}</p>
-        <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-          <span>{t.by} {data.author}</span>
-          <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
-          <time datetime={data.createdAt.toISOString().slice(0, 10)}>{formatDate(lang, data.createdAt)}</time>
-          <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
-          <span>{t.readTime(data.readTime)}</span>
-        </div>
-      </header>
-      <div class="prose prose-gymon mt-8 max-w-none">
-        <Content />
+    scrollLabel={t.scrollToRead}
+  />
+  <article class="mx-auto w-full max-w-3xl px-8 pt-10 md:px-16">
+    {/* Answer first: the full title (the page's only h1), then the description. */}
+    <header class="space-y-3">
+      <h1 class="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">{data.title}</h1>
+      <p class="text-muted-foreground text-lg">{data.description}</p>
+      <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+        <span>{t.by} {data.author}</span>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <time datetime={data.createdAt.toISOString().slice(0, 10)}>{formatDate(lang, data.createdAt)}</time>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <span>{t.readTime(data.readTime)}</span>
       </div>
-      <p class="text-muted-foreground mt-10 border-t pt-4 text-sm">{t.disclaimer}</p>
-    </article>
-  </ScrollExpandMedia>
+    </header>
+    <div class="prose prose-gymon mt-8 max-w-none">
+      <Content />
+    </div>
+    <p class="text-muted-foreground mt-10 border-t pt-4 text-sm">{t.disclaimer}</p>
+    <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground mt-6 inline-flex min-h-11 items-center gap-1 text-sm">
+      <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
+    </a>
+  </article>
 </BlogLayout>
