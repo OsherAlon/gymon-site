@@ -1,0 +1,6 @@
+---
+import LegacyLayout from '@/layouts/LegacyLayout.astro';
+import { homePage } from '@/lib/legal';
+const { title, main } = homePage('en');
+---
+<LegacyLayout lang="en" page="index" title={title} main={main} />

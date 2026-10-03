@@ -20,7 +20,7 @@ export const copy = {
       title: 'Gymon',
       tagline: 'Gymon is an app for tracking personal workouts.',
     },
-    nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support' },
+    nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support', blog: 'Blog' },
     support: {
       title: 'Support',
       contactTitle: 'Contact',
@@ -44,6 +44,17 @@ export const copy = {
       documentsTitle: 'Documents',
     },
     notFound: { title: 'Page not found', body: 'This page does not exist.' },
+    blog: {
+      title: 'Blog',
+      heading: 'Blog',
+      subheading: 'Training, strength and recovery — practical notes from the Gymon team.',
+      by: 'by',
+      readTime: (n) => `${n} min read`,
+      dateLocale: 'en-US',
+      back: 'All articles',
+      disclaimer: 'General information only, not medical advice. Anyone with a medical condition, an injury or pain should consult a qualified professional before starting or changing a training routine.',
+      empty: 'No articles yet.',
+    },
   },
   he: {
     langName: 'עברית',
@@ -52,7 +63,7 @@ export const copy = {
       title: 'Gymon',
       tagline: 'Gymon היא אפליקציה למעקב אחר אימוני כושר אישיים.',
     },
-    nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה' },
+    nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג' },
     support: {
       title: 'תמיכה',
       contactTitle: 'יצירת קשר',
@@ -72,5 +83,16 @@ export const copy = {
       documentsTitle: 'מסמכים',
     },
     notFound: { title: 'הדף לא נמצא', body: 'הדף הזה לא קיים.' },
+    blog: {
+      title: 'בלוג',
+      heading: 'בלוג',
+      subheading: 'אימונים, כוח והתאוששות — הערות מעשיות מצוות Gymon.',
+      by: 'מאת',
+      readTime: (n) => `${n} דקות קריאה`,
+      dateLocale: 'he-IL',
+      back: 'כל המאמרים',
+      disclaimer: 'מידע כללי בלבד, ולא ייעוץ רפואי. במקרה של מצב רפואי, פציעה או כאב, יש להתייעץ עם איש מקצוע מוסמך לפני התחלה או שינוי של שגרת אימונים.',
+      empty: 'עדיין אין מאמרים.',
+    },
   },
 };

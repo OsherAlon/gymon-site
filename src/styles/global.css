@@ -1,0 +1,132 @@
+/*
+ * Tailwind v4 + shadcn-style tokens for the Tailwind pages (the blog).
+ * The original pages (home, privacy, terms, support, 404) do NOT load this —
+ * they keep `/style.css` (public/style.css) so their look does not change.
+ *
+ * Token values are Gymon's existing dark look, from public/style.css:
+ *   --bg #0b0f14 · --surface #111a24 · --line #1d2a38 · --text #e9f3fb
+ *   --muted #a9bccb · --accent #4ba2e1 · --accent-strong #9bcaed
+ */
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-background: #0b0f14;
+  --color-foreground: #e9f3fb;
+  --color-card: #111a24;
+  --color-card-foreground: #e9f3fb;
+  --color-muted: #111a24;
+  --color-muted-foreground: #a9bccb;
+  /* shadcn's `accent` is a subtle hover surface, not the brand colour. */
+  --color-accent: #16212d;
+  --color-accent-foreground: #e9f3fb;
+  --color-primary: #4ba2e1;
+  --color-primary-foreground: #0b0f14;
+  --color-border: #1d2a38;
+  --color-ring: #4ba2e1;
+  --color-brand: #4ba2e1;
+  --color-brand-strong: #9bcaed;
+
+  --font-sans: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+  }
+  /* Hebrew: Epilogue has no Hebrew glyphs and the blog heading uses
+     `font-mono`, whose stack has none either — keep Assistant first. */
+  :lang(he) {
+    font-family: 'Assistant', 'Epilogue', system-ui, sans-serif;
+  }
+}
+
+/*
+ * Page chrome — a verbatim copy of the header/footer rules in public/style.css,
+ * so the blog's header and footer match the other pages exactly. Keep in sync.
+ */
+@layer components {
+  .top,
+  .chrome-main,
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-inline: 16px;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .brand {
+    color: var(--color-foreground);
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .lang {
+    color: var(--color-brand-strong);
+    font-size: 15px;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+  footer {
+    padding-block: 20px 32px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+  }
+  footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 8px;
+  }
+  footer a {
+    color: var(--color-muted-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  footer a:hover {
+    color: var(--color-brand-strong);
+  }
+  footer a[aria-current='page'] {
+    color: var(--color-foreground);
+  }
+}
+
+/* Article body: Tailwind Typography, recoloured to Gymon's palette.
+   In the utilities layer so it wins over the plugin's own `prose-invert` values. */
+@layer utilities {
+  .prose-gymon {
+    --tw-prose-invert-body: #d3e1ec;
+    --tw-prose-invert-headings: var(--color-foreground);
+    --tw-prose-invert-lead: var(--color-muted-foreground);
+    --tw-prose-invert-links: var(--color-brand);
+    --tw-prose-invert-bold: var(--color-foreground);
+    --tw-prose-invert-counters: var(--color-muted-foreground);
+    --tw-prose-invert-bullets: var(--color-brand);
+    --tw-prose-invert-hr: var(--color-border);
+    --tw-prose-invert-quotes: var(--color-foreground);
+    --tw-prose-invert-quote-borders: var(--color-brand);
+    --tw-prose-invert-captions: var(--color-muted-foreground);
+    --tw-prose-invert-code: var(--color-brand-strong);
+    --tw-prose-invert-th-borders: var(--color-border);
+    --tw-prose-invert-td-borders: var(--color-border);
+  }
+}

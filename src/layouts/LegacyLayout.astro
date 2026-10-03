@@ -1,0 +1,35 @@
+---
+/**
+ * The original pages (home, privacy, terms, support, 404) — same markup and
+ * the same `/style.css` as before the move to Astro. No Tailwind here: its
+ * preflight would change how the legal pages look.
+ */
+import SiteHead from '@/components/SiteHead.astro';
+import SiteChrome from '@/components/SiteChrome.astro';
+import type { Lang } from '@/lib/source';
+import type { Page } from '@/lib/legal';
+
+interface Props {
+  lang: Lang;
+  page: Page;
+  title: string;
+  main: string;
+  notFound?: boolean;
+}
+
+const { lang, page, title, main, notFound = false } = Astro.props;
+---
+<html lang={lang} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+<head>
+<SiteHead lang={lang} page={page} title={title} notFound={notFound}>
+<link rel="stylesheet" href="/style.css">
+</SiteHead>
+</head>
+<body>
+<SiteChrome lang={lang} page={page}>
+<main>
+<Fragment set:html={main} />
+</main>
+</SiteChrome>
+</body>
+</html>

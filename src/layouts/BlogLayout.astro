@@ -1,0 +1,35 @@
+---
+/**
+ * Layout for the Tailwind pages (the blog). Same <head> and the same header /
+ * footer markup as the original pages; styles come from src/styles/global.css.
+ */
+import '@/styles/global.css';
+import SiteHead from '@/components/SiteHead.astro';
+import SiteChrome from '@/components/SiteChrome.astro';
+import type { Lang } from '@/lib/source';
+import type { Page } from '@/lib/legal';
+
+interface Props {
+  lang: Lang;
+  page: Page;
+  title: string;
+  description?: string;
+  langs?: readonly Lang[];
+  otherHref?: string;
+  noindex?: boolean;
+}
+
+const { lang, page, title, description, langs, otherHref, noindex } = Astro.props;
+---
+<html lang={lang} dir={lang === 'he' ? 'rtl' : 'ltr'}>
+<head>
+<SiteHead lang={lang} page={page} title={title} description={description} langs={langs} noindex={noindex} />
+</head>
+<body class="min-h-dvh">
+<SiteChrome lang={lang} page={page} otherHref={otherHref}>
+<main class="relative pb-10">
+<slot />
+</main>
+</SiteChrome>
+</body>
+</html>

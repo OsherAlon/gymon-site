@@ -1,0 +1,54 @@
+---
+import { render } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import { articleUrl, blogCopy, formatDate, languagesOf, type Article } from '@/lib/blog';
+import { urlFor } from '@/lib/legal';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+const { data } = article;
+const lang = data.lang as Lang;
+const t = blogCopy(lang);
+const { Content } = await render(article);
+const langs = await languagesOf(data.slug);
+const other: Lang = lang === 'en' ? 'he' : 'en';
+// The language switch goes to the translation if there is one, else to that language's blog index.
+const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(other, 'blog');
+---
+<BlogLayout
+  lang={lang}
+  page={`blog/${data.slug}`}
+  title={`${data.title} · Gymon`}
+  description={data.description}
+  langs={langs}
+  otherHref={otherHref}
+  noindex={data.mock}
+>
+  <article class="mx-auto w-full max-w-3xl px-4 pt-6">
+    <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm">
+      <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
+    </a>
+    <header class="mt-6 space-y-3">
+      <h1 class="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">{data.title}</h1>
+      <p class="text-muted-foreground text-lg">{data.description}</p>
+      <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+        <span>{t.by} {data.author}</span>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <time datetime={data.createdAt.toISOString().slice(0, 10)}>{formatDate(lang, data.createdAt)}</time>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <span>{t.readTime(data.readTime)}</span>
+      </div>
+    </header>
+    <div class="bg-muted mt-8 aspect-video overflow-hidden rounded-lg border">
+      <img src={data.image} alt={data.imageAlt ?? ''} class="size-full object-cover" width="1600" height="900" />
+    </div>
+    <div class="prose prose-invert prose-gymon mt-8 max-w-none">
+      <Content />
+    </div>
+    <p class="text-muted-foreground mt-10 border-t pt-4 text-sm">{t.disclaimer}</p>
+  </article>
+</BlogLayout>

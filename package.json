@@ -1,0 +1,31 @@
+{
+  "name": "gymon-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --port 4391",
+    "build": "astro build",
+    "preview": "astro preview --port 4391",
+    "serve": "node scripts/serve.mjs",
+    "verify": "node verify.mjs",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.0.0",
+    "@tailwindcss/typography": "^0.5.20",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.5",
+    "clsx": "^2.1.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^6.0.3"
+  }
+}

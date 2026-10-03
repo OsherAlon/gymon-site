@@ -1,0 +1,32 @@
+---
+/**
+ * Header + footer, identical markup on every page. Styled by `/style.css` on
+ * the original pages and by the copy of those rules in `src/styles/global.css`
+ * on the blog pages.
+ */
+import { copy, SUPPORT_EMAIL } from '../copy.mjs';
+import { urlFor, type Page } from '@/lib/legal';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  lang: Lang;
+  page: Page;
+  /** Where the language switch points (an article may lack a translation). */
+  otherHref?: string;
+}
+
+const { lang, page, otherHref } = Astro.props;
+const t = (copy as any)[lang];
+const other: Lang = lang === 'en' ? 'he' : 'en';
+const navPages = ['privacy', 'terms', 'support'] as const;
+const setLang = `try{localStorage.setItem('lang','${other}')}catch(e){}`;
+---
+<header class="top">
+<a class="brand" href={urlFor(lang, 'index')}>Gymon</a>
+<a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
+</header>
+<slot />
+<footer>
+<nav>{navPages.map((p) => <Fragment><a href={urlFor(lang, p)} aria-current={p === page ? 'page' : undefined}>{t.nav[p]}</a>{'\n'}</Fragment>)}</nav>
+<p><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></p>
+</footer>
