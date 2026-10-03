@@ -123,6 +123,15 @@ Hebrew articles: gender-neutral language (no second-person singular — "יש ל
 forms), and no medical promises. Every article page ends with a "general information, not medical
 advice" note from `src/copy.mjs`.
 
+### Article page
+
+Each article opens with the ScrollExpandMedia hero (`src/components/ui/scroll-expansion-hero.tsx`):
+the article's `image` grows from a 300×400 box to full width as the page is scrolled (or with
+PageDown / Space / Arrow keys), over **one site-wide background image**. To change that background,
+replace `public/blog/hero-bg.svg` — or put the new file in `public/blog/` and point
+`BLOG_HERO_BG` in `src/lib/blog.ts` at it. The whole article text is in the server HTML; without
+JS, or with reduced motion, the content is shown directly.
+
 ### Mock articles
 
 The six articles in `src/content/blog/mock/{en,he}/` are placeholders (`mock: true`, `noindex`).

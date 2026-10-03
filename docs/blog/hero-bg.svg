@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+<!-- Placeholder for the site-wide blog hero background. Replace with the final photo (see BLOG_HERO_BG in src/lib/blog.ts). -->
+<defs>
+<linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fafafa"/><stop offset="1" stop-color="#dcdcde"/></linearGradient>
+<radialGradient id="r" cx=".3" cy=".25" r=".7"><stop offset="0" stop-color="#ffffff" stop-opacity=".9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
+</defs>
+<rect width="1920" height="1080" fill="url(#g)"/>
+<rect width="1920" height="1080" fill="url(#r)"/>
+<path d="M0 760 C 420 640, 760 820, 1180 700 S 1700 640, 1920 690 L1920 1080 L0 1080 Z" fill="#cfcfd2" opacity=".55"/>
+<path d="M0 860 C 520 760, 980 930, 1400 820 S 1800 790, 1920 820 L1920 1080 L0 1080 Z" fill="#bdbdc1" opacity=".5"/>
+</svg>
