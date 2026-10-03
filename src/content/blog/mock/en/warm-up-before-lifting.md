@@ -1,5 +1,6 @@
 ---
 title: "A warm-up that does its job in ten minutes"
+heroTitle: "Ten-Minute Warm-Up"
 description: "A good warm-up prepares the body for the specific work ahead. A short structure that works for most strength sessions."
 image: /blog/mock/warm-up-before-lifting.svg
 imageAlt: "Abstract wave in violet"

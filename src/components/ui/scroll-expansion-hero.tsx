@@ -6,8 +6,11 @@ import { motion } from 'framer-motion';
  *
  * Behaviour, constants and classes are the original's. Adaptations, and why:
  * - `next/image` → `<img loading="eager" decoding="async">` (no Next.js here).
- * - The split title is one `<h1>` holding two `motion.span`s (the original had two
- *   `<h2>`s): the article title must be a single h1 in the server HTML.
+ * - The split title is a decorative `<div aria-hidden>` with two `motion.span`s (the
+ *   original had two `<h2>`s). It shows a SHORT hero title; the page's single h1
+ *   with the full title is in the content (children), so SEO and screen readers
+ *   get the full title once.
+ * - Title / date colour: white (the app's dark-screen ink) instead of text-blue-200.
  * - Background / overlay use `initial={false}`, so the server HTML is already the
  *   progress-0 frame (the original's `initial={{opacity:0}}` would ship an
  *   invisible background to anyone without JS).
@@ -264,36 +267,37 @@ const ScrollExpandMedia = ({
 
                 <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
                   {date && (
-                    <p className="text-2xl text-blue-200 [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
+                    <p className="text-2xl text-white [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
                       {date}
                     </p>
                   )}
                   {scrollToExpand && (
-                    <p className="text-blue-200 font-medium text-center [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(${textTranslateX}vw)` }}>
+                    <p className="text-white font-medium text-center [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(${textTranslateX}vw)` }}>
                       {scrollToExpand}
                     </p>
                   )}
                 </div>
               </div>
 
-              <h1
+              <div
+                aria-hidden="true"
                 className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${
                   textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
                 }`}
               >
                 <motion.span
-                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
+                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-white transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.span>{' '}
                 <motion.span
-                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
+                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}
                 </motion.span>
-              </h1>
+              </div>
             </div>
 
             <motion.section

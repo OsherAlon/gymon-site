@@ -1,5 +1,6 @@
 ---
 title: "חימום שעושה את העבודה בעשר דקות"
+heroTitle: "חימום בעשר דקות"
 description: "חימום טוב מכין את הגוף לעבודה הספציפית שלפניו. מבנה קצר שמתאים לרוב אימוני הכוח."
 image: /blog/mock/warm-up-before-lifting.svg
 imageAlt: "גל מופשט בסגול"

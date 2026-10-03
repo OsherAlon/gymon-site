@@ -1,5 +1,6 @@
 ---
 title: "Deload weeks: stepping back to keep moving forward"
+heroTitle: "Deload Weeks"
 description: "A planned lighter week can help hard training stay sustainable. When a deload makes sense, and two simple ways to run one."
 image: /blog/mock/deload-weeks.svg
 imageAlt: "Abstract valley shape in slate grey"

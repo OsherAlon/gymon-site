@@ -18,6 +18,8 @@ const blog = defineCollection({
   }),
   schema: z.object({
     title: z.string().min(1),
+    /** Optional short title (2–4 words) for the article hero. Falls back to the first 3 words of `title`. */
+    heroTitle: z.string().min(1).optional(),
     description: z.string().min(1),
     /** Path under public/ (e.g. `/blog/my-slug.jpg`) or an absolute https URL. */
     image: z.string().min(1),

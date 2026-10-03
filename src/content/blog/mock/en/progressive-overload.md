@@ -1,5 +1,6 @@
 ---
 title: "Progressive overload, explained without the jargon"
+heroTitle: "Progressive Overload"
 description: "Getting stronger comes down to asking a little more of the body over time. Here is what that means in practice, and how to do it without rushing."
 image: /blog/mock/progressive-overload.svg
 imageAlt: "Abstract rising steps in Gymon blue"

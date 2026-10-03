@@ -106,6 +106,7 @@ other language's blog index.
 ```markdown
 ---
 title: "Progressive overload, explained without the jargon"
+heroTitle: "Progressive Overload"
 description: "One or two sentences. Shown on the card and as the meta description."
 image: /blog/progressive-overload.jpg
 imageAlt: "What the image shows"
@@ -123,7 +124,8 @@ Lists, **bold**, links and > quotes are styled.
 
 | Field | Required | Rules |
 |---|---|---|
-| `title` | yes | Plain text. Quote it if it holds `:` |
+| `title` | yes | Plain text. Quote it if it holds `:`. The page's single `<h1>` (SEO) |
+| `heroTitle` | no | 2–4 words for the big animated hero. It splits as first word / the rest. Without it, the hero uses the first 3 words of `title` |
 | `description` | yes | Plain text, ~1–2 sentences |
 | `image` | yes | Path under `public/` (e.g. `/blog/<slug>.jpg`, file at `public/blog/<slug>.jpg`) or an `https://` URL. 16:9 |
 | `imageAlt` | no | Alt text for the article hero image |
