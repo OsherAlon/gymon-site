@@ -1,4 +1,4 @@
-import { workflow, node, trigger, sticky, newCredential, ifElse, languageModel, tool, outputParser, fromAi, expr } from '@n8n/workflow-sdk';
+import { workflow, node, trigger, sticky, newCredential, ifElse, languageModel, outputParser, expr } from '@n8n/workflow-sdk';
 
 const T_ARTICLES = { __rl: true, mode: 'id', value: 't7r8sTFqvaGTXQZ9', cachedResultName: 'gymon_blog_articles' };
 const T_VERSIONS = { __rl: true, mode: 'id', value: '6Q3AzxAZ066QgsoI', cachedResultName: 'gymon_blog_versions' };
@@ -10,7 +10,8 @@ const CRED_GMAIL = { gmailOAuth2: { id: '2MntuHdkPCPZn4Fb', name: 'osheralon5@gm
 const CRED_TAVILY = { tavilyApi: { id: 'c35RkiJeUqxZ9eXO', name: 'osheralon5@gmail.com' } };
 const CRED_CLOUDINARY = { cloudinaryApi: { id: '9N3ayVo3Ijc7tDs4', name: 'osheralon5@gmail.com_DEV AI' } };
 
-const MODEL_WRITE = 'anthropic/claude-opus-5.5';
+const MODEL_WRITE = 'anthropic/claude-sonnet-5.5';
+const MODEL_REWRITE = 'anthropic/claude-sonnet-5.5';
 const MODEL_EDIT = 'anthropic/claude-sonnet-5.5';
 const MODEL_FAST = 'anthropic/claude-haiku-4.5';
 const IMAGE_MODEL = { __rl: true, mode: 'id', value: 'models/gemini-3-pro-image-preview' };
@@ -163,50 +164,76 @@ const fetchSource = node({
   config: {
     name: 'Fetch source article',
     onError: 'continueRegularOutput',
-    parameters: { resource: 'extract', operation: 'urls', urls: [expr('{{ $json.source_url }}')], options: { extract_depth: 'basic', format: 'markdown' } },
+    parameters: {
+      resource: 'extract',
+      operation: 'urls',
+      urls: [expr('{{ $json.source_url }}')],
+      options: { query: expr('{{ $json.topic }}'), chunks_per_source: 5, extract_depth: 'basic', format: 'markdown' },
+    },
     credentials: CRED_TAVILY,
   },
   output: [{ results: [{ url: 'https://example.org/a', raw_content: '…' }] }],
 });
 
-const writerModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Opus — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 12000 } }, credentials: CRED_OPENROUTER },
+const searchQueries = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Search queries (max 3)', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_QUERIES__ } },
+  output: [{ query: 'rest interval length strength meta-analysis' }],
 });
 
-const tavilySearch = tool({
-  type: '@tavily/n8n-nodes-tavily.tavilyTool',
+const searchWeb = node({
+  type: '@tavily/n8n-nodes-tavily.tavily',
   version: 1,
   config: {
-    name: 'tavily_search',
+    name: 'Search evidence',
+    onError: 'continueRegularOutput',
     parameters: {
       resource: 'search',
       operation: 'query',
-      descriptionType: 'manual',
-      toolDescription: 'Search the web for authoritative evidence (reviews, meta-analyses, position stands, peer-reviewed studies). Input: one English search query.',
-      query: fromAi('query', 'One English search query'),
-      options: { search_depth: 'advanced', max_results: 6, time_range: 'year', include_answer: 'basic' },
+      query: expr('{{ $json.query }}'),
+      options: { search_depth: 'basic', max_results: 5, time_range: 'year' },
     },
     credentials: CRED_TAVILY,
   },
+  output: [{ results: [{ url: 'https://example.org/b', title: 'Meta-analysis', content: '…', score: 0.8 }] }],
 });
 
-const tavilyExtract = tool({
-  type: '@tavily/n8n-nodes-tavily.tavilyTool',
+const pickPages = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Pick pages to read', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PICK__ } },
+  output: [{ urls: ['https://example.org/b', 'https://example.org/c'], digest: [{ url: 'https://example.org/b', title: 'Meta-analysis', snippet: '…', score: 1 }] }],
+});
+
+const readPages = node({
+  type: '@tavily/n8n-nodes-tavily.tavily',
   version: 1,
   config: {
-    name: 'tavily_extract',
+    name: 'Read top 2 pages',
+    onError: 'continueRegularOutput',
     parameters: {
       resource: 'extract',
       operation: 'urls',
-      descriptionType: 'manual',
-      toolDescription: 'Read the full text of one web page. Input: one URL taken from a search result or from the source.',
-      urls: [fromAi('url', 'One URL to read')],
-      options: { extract_depth: 'basic', format: 'markdown' },
+      urls: [expr('{{ $json.urls[0] }}'), expr('{{ $json.urls[1] }}')],
+      options: { query: expr("{{ $('Topic plan').first().json.topic }}"), chunks_per_source: 4, extract_depth: 'basic', format: 'markdown' },
     },
     credentials: CRED_TAVILY,
   },
+  output: [{ results: [{ url: 'https://example.org/b', raw_content: '…' }] }],
+});
+
+const researchPack = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Research pack', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PACK__ } },
+  output: [{ research: '### Source article…', allowed_urls: ['https://example.org/a'], research_chars: 12000 }],
+});
+
+const writerModel = languageModel({
+  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
+  version: 1,
+  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 6000 } }, credentials: CRED_OPENROUTER },
 });
 
 const writerParser = outputParser({
@@ -216,17 +243,17 @@ const writerParser = outputParser({
 });
 
 const writeArticle = node({
-  type: '@n8n/n8n-nodes-langchain.agent',
-  version: 3.1,
+  type: '@n8n/n8n-nodes-langchain.chainLlm',
+  version: 1.7,
   config: {
     name: 'Write article (EN)',
     parameters: {
       promptType: 'define',
       text: expr(__WRITER_USER__),
       hasOutputParser: true,
-      options: { systemMessage: __WRITER_SYSTEM__, maxIterations: 14 },
+      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __WRITER_SYSTEM__ }] },
     },
-    subnodes: { model: writerModel, tools: [tavilySearch, tavilyExtract], outputParser: writerParser },
+    subnodes: { model: writerModel, outputParser: writerParser },
   },
   output: [{ output: { title: 'How long to rest between sets for strength', description: '…', image_alt: '…', body_md: 'Intro…\n\n## Section', sources: [{ title: 'Meta-analysis', url: 'https://example.org/a' }] } }],
 });
@@ -234,7 +261,7 @@ const writeArticle = node({
 const hebrewModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Opus — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 12000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 8000 } }, credentials: CRED_OPENROUTER },
 });
 
 const hebrewParser = outputParser({
@@ -1005,7 +1032,7 @@ const needsRewrite = ifElse({
 const rewriteModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Opus — rewrite', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 14000 } }, credentials: CRED_OPENROUTER },
 });
 
 const rewriteParser = outputParser({
@@ -1188,6 +1215,11 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(hasTopic.onTrue(
     topicPlan
       .to(fetchSource)
+      .to(searchQueries)
+      .to(searchWeb)
+      .to(pickPages)
+      .to(readPages)
+      .to(researchPack)
       .to(writeArticle)
       .to(hebrewVersion)
       .to(complianceCheck)

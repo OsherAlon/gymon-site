@@ -134,6 +134,9 @@ rep = {
     '__CODE_EMAIL__': lit(read('code/build_email.js')),
     '__CODE_PAGE__': lit(read('code/review_page.js')),
     '__CODE_FILES__': lit(read('code/build_files.js')),
+    '__CODE_QUERIES__': lit(read('code/search_queries.js')),
+    '__CODE_PICK__': lit(read('code/pick_pages.js')),
+    '__CODE_PACK__': lit(read('code/research_pack.js')),
     '__TOPIC_SYSTEM__': lit(read('prompts/topic_system.md')),
     '__WRITER_SYSTEM__': lit(read('prompts/writer_system.md')),
     '__HEBREW_SYSTEM__': lit(read('prompts/hebrew_system.md')),
@@ -155,10 +158,9 @@ rep = {
         "{{ (() => { const s = String($json.output.slug || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || ('article-' + $now.toFormat('yyMMddHHmm')); "
         "return ($('Shortlist candidates').first().json.used_slugs || []).includes(s) ? s + '-' + $now.toFormat('yyMMdd') : s; })() }}"),
     '__WRITER_USER__': lit(
-        f"Plan\nTopic: {{{{ {P}.topic }}}}\nAngle: {{{{ {P}.angle }}}}\nPrimary keyword: {{{{ {P}.primary_keyword_en }}}}\n"
-        f"Suggested searches:\n- {{{{ ({P}.search_queries || []).join('\\n- ') }}}}\n\n"
-        f"Source: {{{{ {P}.source_title }}}}\n{{{{ {P}.source_url }}}}\n\n"
-        "Source text (may be cut off or empty):\n{{ String(($json.results && $json.results[0] && $json.results[0].raw_content) || '').slice(0, 12000) }}"),
+        f"Plan\nTopic: {{{{ {P}.topic }}}}\nAngle: {{{{ {P}.angle }}}}\nPrimary keyword: {{{{ {P}.primary_keyword_en }}}}\n\n"
+        "Allowed URLs (link only to these):\n{{ $json.allowed_urls.join('\\n') }}\n\n"
+        "RESEARCH PACK\n\n{{ $json.research }}"),
     '__WRITER_EXAMPLE__': lit(json.dumps({
         'title': 'How Long to Rest Between Sets for Strength', 'description': 'One or two sentences for the card and meta description.',
         'image_alt': 'A loaded barbell on a rack in a dark gym', 'body_md': 'Opening paragraph…\n\n## Section\n\nText with a [linked claim](https://example.org).',
@@ -171,10 +173,12 @@ rep = {
                                         ensure_ascii=False, indent=2)),
     '__CHECK_USER__': lit(
         f"ENGLISH\nTitle: {{{{ {W}.title }}}}\nDescription: {{{{ {W}.description }}}}\n\n{{{{ {W}.body_md }}}}\n\n"
-        "HEBREW\nTitle: {{ $json.output.title }}\nDescription: {{ $json.output.description }}\n\n{{ $json.output.body_md }}"),
+        "HEBREW\nTitle: {{ $json.output.title }}\nDescription: {{ $json.output.description }}\n\n{{ $json.output.body_md }}\n\n"
+        "Allowed URLs:\n{{ $('Research pack').item.json.allowed_urls.join('\\n') }}"),
     '__RECHECK_USER__': lit(
         "ENGLISH\nTitle: {{ $json.title_en }}\nDescription: {{ $json.description_en }}\n\n{{ $json.body_en }}\n\n"
-        "HEBREW\nTitle: {{ $json.title_he }}\nDescription: {{ $json.description_he }}\n\n{{ $json.body_he }}"),
+        "HEBREW\nTitle: {{ $json.title_he }}\nDescription: {{ $json.description_he }}\n\n{{ $json.body_he }}\n\n"
+        f"Allowed URLs:\n{{{{ {A}.source_url }}}}\n{{{{ (JSON.parse({A}.sources_json || '[]')).map(s => s.url).join('\\n') }}}}"),
     '__CHECK_EXAMPLE__': lit(json.dumps({'gendered_hebrew': ['"נסה להוסיף" — masculine singular imperative'], 'medical_promises': ['"prevents injuries" — prevention promise'],
                                         'unsupported_claims': ['"increases strength by 20%" — no link'], 'other': ['mentions a competitor app'], 'verdict': 'needs_attention'},
                                        ensure_ascii=False, indent=2)),
@@ -213,7 +217,7 @@ rep = {
     '__NOTE_OVERVIEW__': lit(
         "## Gymon Blog — Articles\n"
         "**Generate (Sun + Wed 09:00, or Run once):** 13 English RSS feeds → shortlist (no reused sources) → Sonnet picks a topic → "
-        "Opus researches with Tavily and writes EN → Opus adapts to gender-neutral HE → Haiku flags issues → Gemini hero image → Cloudinary (16:9 JPEG) → "
+        "Tavily: source + 3 searches + 2 pages (capped) → Sonnet writes EN → Sonnet adapts to gender-neutral HE → Haiku flags issues → Gemini hero image → Cloudinary (16:9 JPEG) → "
         "Data table `gymon_blog_articles` → review email to gymon.official@gmail.com.\n\n"
         "**Review page** `GET /webhook/gymon-blog/review?id=&t=` (token per article).\n"
         "**Approve** `POST /webhook/gymon-blog/approve` → one commit (en.md + he.md + jpg) to `OsherAlon/gymon-site` branch `blog/incoming`.\n"

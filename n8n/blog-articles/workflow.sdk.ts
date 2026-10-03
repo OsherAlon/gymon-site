@@ -1,4 +1,4 @@
-import { workflow, node, trigger, sticky, newCredential, ifElse, languageModel, tool, outputParser, fromAi, expr } from '@n8n/workflow-sdk';
+import { workflow, node, trigger, sticky, newCredential, ifElse, languageModel, outputParser, expr } from '@n8n/workflow-sdk';
 
 const T_ARTICLES = { __rl: true, mode: 'id', value: 't7r8sTFqvaGTXQZ9', cachedResultName: 'gymon_blog_articles' };
 const T_VERSIONS = { __rl: true, mode: 'id', value: '6Q3AzxAZ066QgsoI', cachedResultName: 'gymon_blog_versions' };
@@ -10,7 +10,8 @@ const CRED_GMAIL = { gmailOAuth2: { id: '2MntuHdkPCPZn4Fb', name: 'osheralon5@gm
 const CRED_TAVILY = { tavilyApi: { id: 'c35RkiJeUqxZ9eXO', name: 'osheralon5@gmail.com' } };
 const CRED_CLOUDINARY = { cloudinaryApi: { id: '9N3ayVo3Ijc7tDs4', name: 'osheralon5@gmail.com_DEV AI' } };
 
-const MODEL_WRITE = 'anthropic/claude-opus-5.5';
+const MODEL_WRITE = 'anthropic/claude-sonnet-5.5';
+const MODEL_REWRITE = 'anthropic/claude-sonnet-5.5';
 const MODEL_EDIT = 'anthropic/claude-sonnet-5.5';
 const MODEL_FAST = 'anthropic/claude-haiku-4.5';
 const IMAGE_MODEL = { __rl: true, mode: 'id', value: 'models/gemini-3-pro-image-preview' };
@@ -163,50 +164,76 @@ const fetchSource = node({
   config: {
     name: 'Fetch source article',
     onError: 'continueRegularOutput',
-    parameters: { resource: 'extract', operation: 'urls', urls: [expr('{{ $json.source_url }}')], options: { extract_depth: 'basic', format: 'markdown' } },
+    parameters: {
+      resource: 'extract',
+      operation: 'urls',
+      urls: [expr('{{ $json.source_url }}')],
+      options: { query: expr('{{ $json.topic }}'), chunks_per_source: 5, extract_depth: 'basic', format: 'markdown' },
+    },
     credentials: CRED_TAVILY,
   },
   output: [{ results: [{ url: 'https://example.org/a', raw_content: '…' }] }],
 });
 
-const writerModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Opus — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 12000 } }, credentials: CRED_OPENROUTER },
+const searchQueries = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Search queries (max 3)', parameters: { mode: 'runOnceForAllItems', jsCode: "// Search queries — exactly 3 items, one per Tavily search (hard cap: 3 searches per article).\nconst MAX_SEARCHES = 3;\nconst p = $('Topic plan').first().json;\nconst qs = (Array.isArray(p.search_queries) ? p.search_queries : [])\n  .map(q => String(q || '').trim()).filter(Boolean);\nconst fallback = [`${p.topic} systematic review`, `${p.primary_keyword_en} meta-analysis`, `${p.primary_keyword_en} position stand`];\nconst out = [];\nfor (const q of qs.concat(fallback)) {\n  if (out.length >= MAX_SEARCHES) break;\n  if (!out.includes(q)) out.push(q);\n}\nreturn out.map(query => ({ json: { query }, pairedItem: { item: 0 } }));  // keep the link to Topic plan\n" } },
+  output: [{ query: 'rest interval length strength meta-analysis' }],
 });
 
-const tavilySearch = tool({
-  type: '@tavily/n8n-nodes-tavily.tavilyTool',
+const searchWeb = node({
+  type: '@tavily/n8n-nodes-tavily.tavily',
   version: 1,
   config: {
-    name: 'tavily_search',
+    name: 'Search evidence',
+    onError: 'continueRegularOutput',
     parameters: {
       resource: 'search',
       operation: 'query',
-      descriptionType: 'manual',
-      toolDescription: 'Search the web for authoritative evidence (reviews, meta-analyses, position stands, peer-reviewed studies). Input: one English search query.',
-      query: fromAi('query', 'One English search query'),
-      options: { search_depth: 'advanced', max_results: 6, time_range: 'year', include_answer: 'basic' },
+      query: expr('{{ $json.query }}'),
+      options: { search_depth: 'basic', max_results: 5, time_range: 'year' },
     },
     credentials: CRED_TAVILY,
   },
+  output: [{ results: [{ url: 'https://example.org/b', title: 'Meta-analysis', content: '…', score: 0.8 }] }],
 });
 
-const tavilyExtract = tool({
-  type: '@tavily/n8n-nodes-tavily.tavilyTool',
+const pickPages = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Pick pages to read', parameters: { mode: 'runOnceForAllItems', jsCode: "// Pick pages to read — merges the 3 search results, keeps a short digest of the best results and\n// chooses the 2 pages to read in full (hard cap: 2 extracted pages per article).\nconst MAX_PAGES = 2;\nconst MAX_DIGEST = 10;\nconst SNIPPET_CHARS = 450;\nconst TRUSTED = /(pubmed|ncbi\\.nlm\\.nih\\.gov|nih\\.gov|bjsm\\.bmj|bmj\\.com|springer|link\\.springer|frontiersin|journals\\.lww|physiology\\.org|tandfonline|jissn|acsm\\.org|nsca\\.com|sciencedirect|wiley|mdpi|nature\\.com|cochrane|who\\.int|\\.edu\\b|strongerbyscience|examine\\.com)/i;\nconst source = $('Topic plan').first().json.source_url;\n\nconst seen = new Set();\nconst results = [];\nfor (const item of $input.all()) {\n  for (const r of (item.json.results || [])) {\n    const url = String(r.url || '').trim();\n    if (!/^https?:\\/\\//.test(url) || seen.has(url) || url === source) continue;\n    seen.add(url);\n    const boost = TRUSTED.test(url) ? 0.25 : 0;\n    results.push({\n      url,\n      title: String(r.title || '').replace(/\\s+/g, ' ').trim(),\n      snippet: String(r.content || '').replace(/\\s+/g, ' ').trim().slice(0, SNIPPET_CHARS),\n      score: (Number(r.score) || 0) + boost,\n    });\n  }\n}\nresults.sort((a, b) => b.score - a.score);\nconst digest = results.slice(0, MAX_DIGEST);\nconst urls = digest.slice(0, MAX_PAGES).map(r => r.url);\nwhile (urls.length < MAX_PAGES) urls.push(urls[0] || source);  // the extract node needs 2 entries\nreturn [{ json: { urls, digest }, pairedItem: { item: 0 } }];\n" } },
+  output: [{ urls: ['https://example.org/b', 'https://example.org/c'], digest: [{ url: 'https://example.org/b', title: 'Meta-analysis', snippet: '…', score: 1 }] }],
+});
+
+const readPages = node({
+  type: '@tavily/n8n-nodes-tavily.tavily',
   version: 1,
   config: {
-    name: 'tavily_extract',
+    name: 'Read top 2 pages',
+    onError: 'continueRegularOutput',
     parameters: {
       resource: 'extract',
       operation: 'urls',
-      descriptionType: 'manual',
-      toolDescription: 'Read the full text of one web page. Input: one URL taken from a search result or from the source.',
-      urls: [fromAi('url', 'One URL to read')],
-      options: { extract_depth: 'basic', format: 'markdown' },
+      urls: [expr('{{ $json.urls[0] }}'), expr('{{ $json.urls[1] }}')],
+      options: { query: expr("{{ $('Topic plan').first().json.topic }}"), chunks_per_source: 4, extract_depth: 'basic', format: 'markdown' },
     },
     credentials: CRED_TAVILY,
   },
+  output: [{ results: [{ url: 'https://example.org/b', raw_content: '…' }] }],
+});
+
+const researchPack = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Research pack', parameters: { mode: 'runOnceForAllItems', jsCode: "// Research pack — the only research text the writer sees, size-capped:\n// source ≤ 5,000 chars, ≤ 10 search snippets of ≤ 450 chars, 2 pages ≤ 4,000 chars each.\nconst SOURCE_CHARS = 5000;\nconst PAGE_CHARS = 4000;\n\nconst plan = $('Topic plan').first().json;\nconst src = $('Fetch source article').first().json;\nconst picked = $('Pick pages to read').first().json;\nconst pages = ($input.first().json.results || []);\n\nconst clip = (s, n) => {\n  const t = String(s || '').replace(/\\n{3,}/g, '\\n\\n').trim();\n  return t.length > n ? t.slice(0, n) + ' […]' : t;\n};\nconst srcText = clip(src.results && src.results[0] && src.results[0].raw_content, SOURCE_CHARS);\n\nconst allowed = [plan.source_url];\nconst blocks = [];\nblocks.push(`### Source article\\n${plan.source_title}\\n${plan.source_url}\\n\\n${srcText || '(could not be fetched — rely on the search results)'}`);\nconst pageMap = {};\nfor (const p of pages) pageMap[p.url] = p.raw_content;\nconst readUrls = [...new Set(picked.urls)];\nreadUrls.forEach((u, i) => {\n  if (!pageMap[u]) return;\n  allowed.push(u);\n  blocks.push(`### Page ${i + 1} (read in full)\\n${u}\\n\\n${clip(pageMap[u], PAGE_CHARS)}`);\n});\nconst digest = (picked.digest || []).map((r, i) => {\n  allowed.push(r.url);\n  return `${i + 1}. ${r.title}\\n   ${r.url}\\n   ${r.snippet}`;\n});\nblocks.push(`### Search results (snippets only)\\n${digest.join('\\n') || '(none)'}`);\n\nconst allowedUrls = [...new Set(allowed.filter(Boolean))];\nreturn [{ json: { research: blocks.join('\\n\\n'), allowed_urls: allowedUrls, research_chars: blocks.join('\\n\\n').length }, pairedItem: { item: 0 } }];\n" } },
+  output: [{ research: '### Source article…', allowed_urls: ['https://example.org/a'], research_chars: 12000 }],
+});
+
+const writerModel = languageModel({
+  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
+  version: 1,
+  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 6000 } }, credentials: CRED_OPENROUTER },
 });
 
 const writerParser = outputParser({
@@ -216,17 +243,17 @@ const writerParser = outputParser({
 });
 
 const writeArticle = node({
-  type: '@n8n/n8n-nodes-langchain.agent',
-  version: 3.1,
+  type: '@n8n/n8n-nodes-langchain.chainLlm',
+  version: 1.7,
   config: {
     name: 'Write article (EN)',
     parameters: {
       promptType: 'define',
-      text: expr("Plan\nTopic: {{ $('Topic plan').item.json.topic }}\nAngle: {{ $('Topic plan').item.json.angle }}\nPrimary keyword: {{ $('Topic plan').item.json.primary_keyword_en }}\nSuggested searches:\n- {{ ($('Topic plan').item.json.search_queries || []).join('\\n- ') }}\n\nSource: {{ $('Topic plan').item.json.source_title }}\n{{ $('Topic plan').item.json.source_url }}\n\nSource text (may be cut off or empty):\n{{ String(($json.results && $json.results[0] && $json.results[0].raw_content) || '').slice(0, 12000) }}"),
+      text: expr("Plan\nTopic: {{ $('Topic plan').item.json.topic }}\nAngle: {{ $('Topic plan').item.json.angle }}\nPrimary keyword: {{ $('Topic plan').item.json.primary_keyword_en }}\n\nAllowed URLs (link only to these):\n{{ $json.allowed_urls.join('\\n') }}\n\nRESEARCH PACK\n\n{{ $json.research }}"),
       hasOutputParser: true,
-      options: { systemMessage: "You are a senior evidence-based strength-and-conditioning writer for the Gymon blog. Gymon is a strength-training and workout-logging app. Write ONE original English article for the plan you receive.\n\n## Research — mandatory, in this order\n1. Read the source text in the message. If it is empty or cut off, call the tool \"tavily_extract\" on the source URL.\n2. Run 3–5 searches with the tool \"tavily_search\" (start from the plan's queries; add your own if needed) to find authoritative support: systematic reviews, meta-analyses, position stands (ACSM, NSCA, ISSN), peer-reviewed studies, university or health-institution pages.\n3. Call \"tavily_extract\" on the 2–4 most important results so you read them properly rather than relying on snippets.\n4. Write only what this research supports. Every factual or numeric claim carries an inline Markdown link to the specific page that supports it, e.g. \"… around 1.6 g of protein per kg per day ([Morton et al., 2018](https://…))\". Use only URLs that appeared in your tool results or the source. Never invent a URL, author, year, number or study. If the evidence is mixed or weak, say so plainly.\n5. Rewrite in your own words. Never copy sentences from a source; a short quote (under 15 words) only when essential, in quotation marks, with its link.\n\n## Article rules\n- Audience: people who train or want to start. Practical, calm, respectful. No hype, no shaming, no body-image talk.\n- Length 900–1400 words. Open with a 2–3 sentence paragraph (no heading) that answers the search question directly. Then 4–7 sections with \"## \" headings (\"### \" allowed). Short paragraphs, lists where they help, **bold** sparingly, an optional \"> \" takeaway.\n- Do NOT put the \"# \" title in the body. Do NOT add a disclaimer or \"not medical advice\" note — the site adds one to every article. Do NOT add a \"Sources\"/\"References\" section — the inline links are the citations; you return the list separately.\n- SEO: use the primary keyword naturally in the title, in the first paragraph and in one \"##\" heading. No keyword stuffing.\n- No medical promises or diagnoses: never \"cures\", \"guarantees\", \"prevents injury\", \"treats\". Where pain, injury, pregnancy or a medical condition is relevant, say to consult a qualified professional.\n- No prices, no competitor apps or brands. Optional: one soft, natural sentence near the end connecting the advice to logging sets, weights or rest times (e.g. that a workout log makes progressive overload visible). Never push a download.\n- Weights in kg, with lb in parentheses.\n\n## Output — JSON only\n- title: 45–65 characters, plain text, contains the primary keyword.\n- description: 140–160 characters, plain text (blog card + meta description).\n- image_alt: one plain sentence describing the hero image in general terms (it will be a dark, dramatic gym photograph related to the topic).\n- body_md: the article body as described.\n- sources: every URL you linked, as {\"title\", \"url\"}.\n", maxIterations: 14 },
+      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: "You are a senior evidence-based strength-and-conditioning writer for the Gymon blog. Gymon is a strength-training and workout-logging app. Write ONE original English article for the plan and research pack you receive.\n\n## Research — already done for you\nThe message contains a research pack: the source article, up to two pages read in full, and search-result snippets. It was collected before this call; you have no tools.\n1. Write only what the research pack supports. Every factual or numeric claim carries an inline Markdown link to the specific page that supports it, e.g. \"… around 1.6 g of protein per kg per day ([Morton et al., 2018](https://…))\".\n2. Link only to URLs listed under \"Allowed URLs\". Never invent a URL, author, year, number or study. A claim that appears only in a search snippet may be used if the snippet states it plainly; otherwise leave it out. If the evidence is mixed or weak, say so plainly.\n3. Rewrite in your own words. Never copy sentences from a source; a short quote (under 15 words) only when essential, in quotation marks, with its link.\n\n## Article rules\n- Audience: people who train or want to start. Practical, calm, respectful. No hype, no shaming, no body-image talk.\n- Length 900–1400 words. Open with a 2–3 sentence paragraph (no heading) that answers the search question directly. Then 4–7 sections with \"## \" headings (\"### \" allowed). Short paragraphs, lists where they help, **bold** sparingly, an optional \"> \" takeaway.\n- Do NOT put the \"# \" title in the body. Do NOT add a disclaimer or \"not medical advice\" note — the site adds one to every article. Do NOT add a \"Sources\"/\"References\" section — the inline links are the citations; you return the list separately.\n- SEO: use the primary keyword naturally in the title, in the first paragraph and in one \"##\" heading. No keyword stuffing.\n- No medical promises or diagnoses: never \"cures\", \"guarantees\", \"prevents injury\", \"treats\". Where pain, injury, pregnancy or a medical condition is relevant, say to consult a qualified professional.\n- No prices, no competitor apps or brands. Optional: one soft, natural sentence near the end connecting the advice to logging sets, weights or rest times (e.g. that a workout log makes progressive overload visible). Never push a download.\n- Weights in kg, with lb in parentheses.\n\n## Output — JSON only\n- title: 45–65 characters, plain text, contains the primary keyword.\n- description: 140–160 characters, plain text (blog card + meta description).\n- image_alt: one plain sentence describing the hero image in general terms (it will be a dark, dramatic gym photograph related to the topic).\n- body_md: the article body as described.\n- sources: every URL you linked, as {\"title\", \"url\"}.\n" }] },
     },
-    subnodes: { model: writerModel, tools: [tavilySearch, tavilyExtract], outputParser: writerParser },
+    subnodes: { model: writerModel, outputParser: writerParser },
   },
   output: [{ output: { title: 'How long to rest between sets for strength', description: '…', image_alt: '…', body_md: 'Intro…\n\n## Section', sources: [{ title: 'Meta-analysis', url: 'https://example.org/a' }] } }],
 });
@@ -234,7 +261,7 @@ const writeArticle = node({
 const hebrewModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Opus — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 12000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 8000 } }, credentials: CRED_OPENROUTER },
 });
 
 const hebrewParser = outputParser({
@@ -278,9 +305,9 @@ const complianceCheck = node({
     name: 'Compliance check',
     parameters: {
       promptType: 'define',
-      text: expr("ENGLISH\nTitle: {{ $('Write article (EN)').item.json.output.title }}\nDescription: {{ $('Write article (EN)').item.json.output.description }}\n\n{{ $('Write article (EN)').item.json.output.body_md }}\n\nHEBREW\nTitle: {{ $json.output.title }}\nDescription: {{ $json.output.description }}\n\n{{ $json.output.body_md }}"),
+      text: expr("ENGLISH\nTitle: {{ $('Write article (EN)').item.json.output.title }}\nDescription: {{ $('Write article (EN)').item.json.output.description }}\n\n{{ $('Write article (EN)').item.json.output.body_md }}\n\nHEBREW\nTitle: {{ $json.output.title }}\nDescription: {{ $json.output.description }}\n\n{{ $json.output.body_md }}\n\nAllowed URLs:\n{{ $('Research pack').item.json.allowed_urls.join('\\n') }}"),
       hasOutputParser: true,
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: "You are a strict reviewer for a bilingual fitness blog. Check the English and Hebrew article below and REPORT problems only — do not rewrite.\n\nReport as lists of short items (\"quoted phrase — 3 to 8 word reason\"):\n- gendered_hebrew: Hebrew phrases that use gendered second-person singular (e.g. נסה/נסי, הזן/הזיני, אתה/את, תרגיש/תרגישי, slash forms like מתאמן/ת) or that address one gender only.\n- medical_promises: phrases that promise cures, prevention or guaranteed results, or give diagnosis/treatment advice.\n- unsupported_claims: specific numbers or factual claims in the English text that have no inline link.\n- other: competitor app or brand names, prices, a disclaimer or sources section inside the body, anything off-brand.\n\nEmpty lists when clean. verdict: \"ok\" when all lists are empty, otherwise \"needs_attention\". JSON only.\n" }] },
+      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: "You are a strict reviewer for a bilingual fitness blog. Check the English and Hebrew article below and REPORT problems only — do not rewrite.\n\nReport as lists of short items (\"quoted phrase — 3 to 8 word reason\"):\n- gendered_hebrew: Hebrew phrases that use gendered second-person singular (e.g. נסה/נסי, הזן/הזיני, אתה/את, תרגיש/תרגישי, slash forms like מתאמן/ת) or that address one gender only.\n- medical_promises: phrases that promise cures, prevention or guaranteed results, or give diagnosis/treatment advice.\n- unsupported_claims: specific numbers or factual claims in the English text that have no inline link.\n- other: links whose URL is not in the \"Allowed URLs\" list, competitor app or brand names, prices, a disclaimer or sources section inside the body, anything off-brand.\n\nEmpty lists when clean. verdict: \"ok\" when all lists are empty, otherwise \"needs_attention\". JSON only.\n" }] },
     },
     subnodes: { model: checkModel, outputParser: checkParser },
   },
@@ -1030,7 +1057,7 @@ const needsRewrite = ifElse({
 const rewriteModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Opus — rewrite', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 14000 } }, credentials: CRED_OPENROUTER },
 });
 
 const rewriteParser = outputParser({
@@ -1168,9 +1195,9 @@ const recheck = node({
     name: 'Compliance re-check',
     parameters: {
       promptType: 'define',
-      text: expr("ENGLISH\nTitle: {{ $json.title_en }}\nDescription: {{ $json.description_en }}\n\n{{ $json.body_en }}\n\nHEBREW\nTitle: {{ $json.title_he }}\nDescription: {{ $json.description_he }}\n\n{{ $json.body_he }}"),
+      text: expr("ENGLISH\nTitle: {{ $json.title_en }}\nDescription: {{ $json.description_en }}\n\n{{ $json.body_en }}\n\nHEBREW\nTitle: {{ $json.title_he }}\nDescription: {{ $json.description_he }}\n\n{{ $json.body_he }}\n\nAllowed URLs:\n{{ $('Get article (fix)').first().json.source_url }}\n{{ (JSON.parse($('Get article (fix)').first().json.sources_json || '[]')).map(s => s.url).join('\\n') }}"),
       hasOutputParser: true,
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: "You are a strict reviewer for a bilingual fitness blog. Check the English and Hebrew article below and REPORT problems only — do not rewrite.\n\nReport as lists of short items (\"quoted phrase — 3 to 8 word reason\"):\n- gendered_hebrew: Hebrew phrases that use gendered second-person singular (e.g. נסה/נסי, הזן/הזיני, אתה/את, תרגיש/תרגישי, slash forms like מתאמן/ת) or that address one gender only.\n- medical_promises: phrases that promise cures, prevention or guaranteed results, or give diagnosis/treatment advice.\n- unsupported_claims: specific numbers or factual claims in the English text that have no inline link.\n- other: competitor app or brand names, prices, a disclaimer or sources section inside the body, anything off-brand.\n\nEmpty lists when clean. verdict: \"ok\" when all lists are empty, otherwise \"needs_attention\". JSON only.\n" }] },
+      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: "You are a strict reviewer for a bilingual fitness blog. Check the English and Hebrew article below and REPORT problems only — do not rewrite.\n\nReport as lists of short items (\"quoted phrase — 3 to 8 word reason\"):\n- gendered_hebrew: Hebrew phrases that use gendered second-person singular (e.g. נסה/נסי, הזן/הזיני, אתה/את, תרגיש/תרגישי, slash forms like מתאמן/ת) or that address one gender only.\n- medical_promises: phrases that promise cures, prevention or guaranteed results, or give diagnosis/treatment advice.\n- unsupported_claims: specific numbers or factual claims in the English text that have no inline link.\n- other: links whose URL is not in the \"Allowed URLs\" list, competitor app or brand names, prices, a disclaimer or sources section inside the body, anything off-brand.\n\nEmpty lists when clean. verdict: \"ok\" when all lists are empty, otherwise \"needs_attention\". JSON only.\n" }] },
     },
     subnodes: { model: recheckModel, outputParser: recheckParser },
   },
@@ -1214,7 +1241,7 @@ const emailRevised = node({
 });
 
 
-const noteOverview = sticky("## Gymon Blog — Articles\n**Generate (Sun + Wed 09:00, or Run once):** 13 English RSS feeds → shortlist (no reused sources) → Sonnet picks a topic → Opus researches with Tavily and writes EN → Opus adapts to gender-neutral HE → Haiku flags issues → Gemini hero image → Cloudinary (16:9 JPEG) → Data table `gymon_blog_articles` → review email to gymon.official@gmail.com.\n\n**Review page** `GET /webhook/gymon-blog/review?id=&t=` (token per article).\n**Approve** `POST /webhook/gymon-blog/approve` → one commit (en.md + he.md + jpg) to `OsherAlon/gymon-site` branch `blog/incoming`.\n**Fix** `POST /webhook/gymon-blog/fix` → Haiku routes text / image / both → previous version saved to `gymon_blog_versions` → redo → new email.\n\n⚠️ The GitHub nodes need a GitHub credential (fine-grained token, Contents: read & write on gymon-site).", [], { color: 7, width: 520, height: 460 });
+const noteOverview = sticky("## Gymon Blog — Articles\n**Generate (Sun + Wed 09:00, or Run once):** 13 English RSS feeds → shortlist (no reused sources) → Sonnet picks a topic → Tavily: source + 3 searches + 2 pages (capped) → Sonnet writes EN → Sonnet adapts to gender-neutral HE → Haiku flags issues → Gemini hero image → Cloudinary (16:9 JPEG) → Data table `gymon_blog_articles` → review email to gymon.official@gmail.com.\n\n**Review page** `GET /webhook/gymon-blog/review?id=&t=` (token per article).\n**Approve** `POST /webhook/gymon-blog/approve` → one commit (en.md + he.md + jpg) to `OsherAlon/gymon-site` branch `blog/incoming`.\n**Fix** `POST /webhook/gymon-blog/fix` → Haiku routes text / image / both → previous version saved to `gymon_blog_versions` → redo → new email.\n\n⚠️ The GitHub nodes need a GitHub credential (fine-grained token, Contents: read & write on gymon-site).", [], { color: 7, width: 520, height: 460 });
 
 export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .add(scheduleTrigger)
@@ -1230,6 +1257,11 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(hasTopic.onTrue(
     topicPlan
       .to(fetchSource)
+      .to(searchQueries)
+      .to(searchWeb)
+      .to(pickPages)
+      .to(readPages)
+      .to(researchPack)
       .to(writeArticle)
       .to(hebrewVersion)
       .to(complianceCheck)

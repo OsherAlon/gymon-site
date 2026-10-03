@@ -23,9 +23,12 @@ own files and are inserted as JSON string literals.
    candidates, interleaved by site.
 2. **Pick topic** — Sonnet picks one candidate and plans an evergreen SEO topic (slug, keywords en/he,
    search queries), avoiding used topics; `skip` ends the run.
-3. **Research + write** — Tavily extracts the source; Opus (agent with `tavily_search` + `tavily_extract`)
-   writes the English article with an inline link on every claim; Opus adapts it to gender-neutral Hebrew;
-   Haiku reports gendered Hebrew / medical promises / unlinked claims (shown in the email and page).
+3. **Research + write** — hard-capped, no agent loop: Tavily extracts the source (top 5 chunks for the
+   topic), runs exactly **3 basic searches**, then extracts the **2 best pages** (top 4 chunks each). A Code
+   node clips everything into one research pack (source ≤ 5,000 chars, pages ≤ 4,000, ≤ 10 snippets of
+   450) with the list of allowed URLs. **One Sonnet 5.5 call** writes the English article (inline link on
+   every claim, allowed URLs only); Sonnet adapts it to gender-neutral Hebrew; Haiku reports gendered
+   Hebrew / medical promises / unlinked claims / links outside the allowed list.
 4. **Hero image** — Sonnet writes the prompt (dark, near-monochrome, no text/logos/real people) → Gemini
    → Cloudinary `gymon-blog/drafts/`; served as `c_fill,ar_16:9,w_1600,f_jpg`.
 5. **Save draft** → **Review email** to gymon.official@gmail.com with a link to the review page.
@@ -35,10 +38,17 @@ own files and are inserted as JSON string literals.
    `src/content/blog/{en,he}/<slug>.md` + `public/blog/<slug>.jpg` on `blog/incoming` (created from `main`
    if missing). No build, no deploy, no merge.
 8. **Fix** `POST /webhook/gymon-blog/fix` — Haiku routes the note to `text` / `image` / `both`; the
-   previous version is saved; Opus rewrites and/or a new image is made; Haiku re-checks; a new email goes out.
+   previous version is saved; Sonnet rewrites and/or a new image is made; Haiku re-checks; a new email goes out.
 
 The page footer disclaimer ("general information, not medical advice") comes from the site template,
 so the prompts forbid adding one in the body.
+
+## Cost per run (prices from https://openrouter.ai/api/v1/models, 2026-10-03)
+
+Sonnet 5.5 $2/$10 per M tokens · Haiku 4.5 $1/$5 · Gemini 3 Pro Image $120 per M image-output tokens
+(~1,120 per image) · Tavily: basic search 1 credit, basic extract 1 credit per 5 URLs, $0.008/credit pay-as-you-go
+(1,000 free credits/month). New article ≈ $0.10 LLM + $0.14 image + 5 Tavily credits ≈ **$0.25–0.28**;
+a text fix round ≈ $0.08; an image fix round ≈ $0.15. Models are the `MODEL_*` constants in the template.
 
 ## Storage (n8n Data Tables, keyed by our own `article_id`, never the row id)
 
