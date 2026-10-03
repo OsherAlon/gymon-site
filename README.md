@@ -149,6 +149,14 @@ replace `public/blog/hero-bg.jpg` — or put the new file in `public/blog/` and 
 `BLOG_HERO_BG` in `src/lib/blog.ts` at it. The whole article text is in the server HTML; without
 JS, or with reduced motion, the content is shown directly.
 
+### Preview article
+
+`src/content/blog/preview/{en,he}/creatine-and-resistance-training-guide.md` and
+`public/blog/creatine-and-resistance-training-guide.jpg` are the first real n8n article (data table
+row 1, still `pending_review`). The files are built exactly as the workflow's Approve step builds them,
+with `mock: true` added so the pages get `noindex`. To remove it, delete `src/content/blog/preview/`
+and that image.
+
 ### Mock articles
 
 The six articles in `src/content/blog/mock/{en,he}/` are placeholders (`mock: true`, `noindex`).
