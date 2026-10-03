@@ -10,6 +10,7 @@ const SITE = 'https://gymon.app';
 const OUT = fileURLToPath(new URL('./docs/', import.meta.url));
 
 /** The built file for a site URL (format 'preserve'): / → index.html, /blog/ → blog/index.html, /privacy → privacy.html. */
+/** @param {string} url */
 function builtFile(url) {
   let path = decodeURIComponent(new URL(url).pathname).replace(/^\//, '');
   if (path.endsWith('.html')) return OUT + path;
@@ -23,6 +24,7 @@ function builtFile(url) {
  * (Pages serves privacy.html at /privacy) and a trailing slash on directories
  * (/he/, /blog/).
  */
+/** @param {string} url */
 function clean(url) {
   const u = new URL(url.replace(/\.html$/, '').replace(/\/index$/, '/'));
   if (!u.pathname.endsWith('/') && builtFile(u.href).endsWith('/index.html')) u.pathname += '/';
