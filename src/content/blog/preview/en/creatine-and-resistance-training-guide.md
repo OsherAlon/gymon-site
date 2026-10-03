@@ -2,7 +2,7 @@
 title: "Creatine for Muscle Gain: What the Research Says & How to Dose"
 description: "Does creatine work with lifting? See what meta-analyses show for strength and lean mass, how much to take (3–5 g/day), and how to track your results in a log."
 image: /blog/creatine-and-resistance-training-guide.jpg
-imageAlt: "A lifter in a dark gym gripping a loaded barbell, with dramatic side lighting and chalk dust in the air."
+imageAlt: "A white tub and a scoop of powder on a pale oak counter in soft window light, with a glass of water, a training notebook and a green dumbbell behind them."
 createdAt: 2026-10-03
 author: "Gymon Team"
 readTime: 5
