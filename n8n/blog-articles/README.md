@@ -49,8 +49,13 @@ so the prompts forbid adding one in the body.
 
 Sonnet 5.5 $2/$10 per M tokens · Haiku 4.5 $1/$5 · Gemini 3 Pro Image $120 per M image-output tokens
 (~1,120 per image) · Tavily: basic search 1 credit, basic extract 1 credit per 5 URLs, $0.008/credit pay-as-you-go
-(1,000 free credits/month). New article ≈ $0.10 LLM + $0.14 image + 5 Tavily credits ≈ **$0.25–0.28**;
-a text fix round ≈ $0.08; an image fix round ≈ $0.15. Models are the `MODEL_*` constants in the template.
+(1,000 free credits/month).
+
+Measured in execution 1531: Pick topic 7,234 in / 563 out = $0.020; the writer 7,359 in / 6,000 out (cut off).
+Sonnet 5.5 on OpenRouter spends hidden reasoning tokens that are billed as completion — about 3,400 of
+those 6,000 — so writer and Hebrew maxTokens are 16,000 (rewrite 24,000). Expected per new article:
+topic $0.02 + writer ~$0.08 + Hebrew ~$0.08 + check ~$0.01 + image prompt ~$0.01 + image $0.14
++ 5 Tavily credits ≈ **$0.35–0.40**. Models are the `MODEL_*` constants in the template.
 
 ## Storage (n8n Data Tables, keyed by our own `article_id`, never the row id)
 

@@ -12,6 +12,8 @@ const CRED_CLOUDINARY = { cloudinaryApi: { id: '9N3ayVo3Ijc7tDs4', name: 'oshera
 
 const MODEL_WRITE = 'anthropic/claude-sonnet-5.5';
 const MODEL_REWRITE = 'anthropic/claude-sonnet-5.5';
+// maxTokens on Sonnet 5.5 must cover hidden reasoning + the visible JSON: execution 1531 billed 6,000
+// completion tokens for ~2,600 tokens of visible text and was cut off (finish_reason: length).
 const MODEL_EDIT = 'anthropic/claude-sonnet-5.5';
 const MODEL_FAST = 'anthropic/claude-haiku-4.5';
 const IMAGE_MODEL = { __rl: true, mode: 'id', value: 'models/gemini-3-pro-image-preview' };
@@ -247,7 +249,7 @@ const researchPack = node({
 const writerModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 6000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
 });
 
 const writerParser = outputParser({
@@ -275,7 +277,7 @@ const writeArticle = node({
 const hebrewModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 8000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
 });
 
 const hebrewParser = outputParser({
@@ -1046,7 +1048,7 @@ const needsRewrite = ifElse({
 const rewriteModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 14000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 24000 } }, credentials: CRED_OPENROUTER },
 });
 
 const rewriteParser = outputParser({
