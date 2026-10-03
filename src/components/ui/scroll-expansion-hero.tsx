@@ -18,6 +18,10 @@ import { motion } from 'framer-motion';
  *   Focus moving into the content (Tab) expands fully, so it is never hidden.
  * - `prefers-reduced-motion: reduce` → starts fully expanded, no scroll hijack.
  * - `topOffset`: keeps the media box clear of the site's fixed header.
+ * - Legibility on bright photos (user decision 2026-10-03): a soft dark text-shadow on the
+ *   title and date lines, and a darker media overlay at the start — bg-black/70 ×
+ *   (0.85 − p·0.65): ≈60% black at p0 → ≈14% at p1 (original: bg-black/50 × (0.7 − p·0.3),
+ *   ≈35% → 20%).
  * - Video mode is not ported (articles only use images).
  */
 
@@ -251,21 +255,21 @@ const ScrollExpandMedia = ({
                   />
 
                   <motion.div
-                    className="absolute inset-0 bg-black/50 rounded-xl"
+                    className="absolute inset-0 bg-black/70 rounded-xl"
                     initial={false}
-                    animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
+                    animate={{ opacity: 0.85 - scrollProgress * 0.65 }}
                     transition={{ duration: 0.2 }}
                   />
                 </div>
 
                 <div className="flex flex-col items-center text-center relative z-10 mt-4 transition-none">
                   {date && (
-                    <p className="text-2xl text-blue-200" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
+                    <p className="text-2xl text-blue-200 [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(-${textTranslateX}vw)` }}>
                       {date}
                     </p>
                   )}
                   {scrollToExpand && (
-                    <p className="text-blue-200 font-medium text-center" style={{ transform: `translateX(${textTranslateX}vw)` }}>
+                    <p className="text-blue-200 font-medium text-center [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]" style={{ transform: `translateX(${textTranslateX}vw)` }}>
                       {scrollToExpand}
                     </p>
                   )}
@@ -278,13 +282,13 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.span
-                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none"
+                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.span>{' '}
                 <motion.span
-                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none"
+                  className="block text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none [text-shadow:0_1px_2px_rgba(0,0,0,.35),0_2px_14px_rgba(0,0,0,.5)]"
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}
