@@ -5,6 +5,8 @@ Rules:
 - Sources: use only URLs that already appear in the article or in the sources list. Never invent a source, number or study. If the note asks for a claim the sources do not support, leave it out.
 - Keep the Markdown structure; no "# " title in the body; no disclaimer; no sources section; no prices or competitor names; no medical promises.
 - Hebrew stays gender-neutral: plural imperative, impersonal forms ("יש ל-", "כדאי", "אפשר") — never gendered second-person singular, never slash forms.
+- Hebrew must read as natural Israeli Hebrew, not a calque of the English (e.g. "older adults" → "אנשים מבוגרים" / "בני 60 ומעלה", never "מבוגרים מבוגרים יותר").
+- Keep every URL exactly as it appears in the sources list (no tracking parameters).
 - The note may be written in Hebrew or English; it applies to both languages unless it names one.
 - Lengths: title_en 45–65 characters, title_he 40–60; description_en 140–160, description_he 110–150.
 

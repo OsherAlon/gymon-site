@@ -1,7 +1,15 @@
 // Research pack — the only research text the writer sees, size-capped:
 // source ≤ 5,000 chars, ≤ 10 search snippets of ≤ 450 chars, 2 pages ≤ 4,000 chars each.
+// Every URL carries its tier (PRIMARY / AUTHORITY / SECONDARY) and is stripped of tracking parameters.
 const SOURCE_CHARS = 5000;
 const PAGE_CHARS = 4000;
+
+const cleanUrl = u => String(u || '').trim()
+  .replace(/([?&])(?:utm_[a-z_]+|conv_[a-z_]+|af|fbclid|gclid|dclid|msclkid|mc_cid|mc_eid|_hsenc|_hsmi|ref_src|ref|source|campaign|cmpid|icid|s_cid)=[^&#]*/gi, '$1')
+  .replace(/\?&+/, '?').replace(/&{2,}/g, '&').replace(/[?&]+(#|$)/, '$1');
+const PRIMARY = /(pubmed\.ncbi\.nlm\.nih\.gov|pmc\.ncbi\.nlm\.nih\.gov|ncbi\.nlm\.nih\.gov\/pmc|doi\.org|bjsm\.bmj\.com|bmj\.com|link\.springer\.com|springeropen\.com|biomedcentral\.com|frontiersin\.org|journals\.lww\.com|journals\.physiology\.org|tandfonline\.com|jissn|sciencedirect\.com|onlinelibrary\.wiley\.com|mdpi\.com|nature\.com|cochranelibrary\.com|journals\.plos\.org|jamanetwork\.com|thelancet\.com|academic\.oup\.com|journals\.sagepub\.com|humankinetics\.com)/i;
+const AUTHORITY = /(acsm\.org|nsca\.com|sportsnutritionsociety\.org|\.gov(\/|$|\.)|nih\.gov|who\.int|nhs\.uk|\.edu(\/|$)|\.ac\.[a-z]{2}(\/|$)|ausport\.gov\.au|eatright\.org)/i;
+const tierOf = u => PRIMARY.test(u) ? 'PRIMARY' : AUTHORITY.test(u) ? 'AUTHORITY' : 'SECONDARY';
 
 const plan = $('Topic plan').first().json;
 const src = $('Fetch source article').first().json;
@@ -12,24 +20,27 @@ const clip = (s, n) => {
   const t = String(s || '').replace(/\n{3,}/g, '\n\n').trim();
   return t.length > n ? t.slice(0, n) + ' […]' : t;
 };
+const sourceUrl = cleanUrl(plan.source_url);
 const srcText = clip(src.results && src.results[0] && src.results[0].raw_content, SOURCE_CHARS);
 
-const allowed = [plan.source_url];
+const allowed = [sourceUrl];
 const blocks = [];
-blocks.push(`### Source article\n${plan.source_title}\n${plan.source_url}\n\n${srcText || '(could not be fetched — rely on the search results)'}`);
+blocks.push(`### Source article [${tierOf(sourceUrl)}]\n${plan.source_title}\n${sourceUrl}\n\n${srcText || '(could not be fetched — rely on the search results)'}`);
 const pageMap = {};
-for (const p of pages) pageMap[p.url] = p.raw_content;
-const readUrls = [...new Set(picked.urls)];
+for (const p of pages) pageMap[cleanUrl(p.url)] = p.raw_content;
+const readUrls = [...new Set(picked.urls.map(cleanUrl))];
 readUrls.forEach((u, i) => {
   if (!pageMap[u]) return;
   allowed.push(u);
-  blocks.push(`### Page ${i + 1} (read in full)\n${u}\n\n${clip(pageMap[u], PAGE_CHARS)}`);
+  blocks.push(`### Page ${i + 1} (read in full) [${tierOf(u)}]\n${u}\n\n${clip(pageMap[u], PAGE_CHARS)}`);
 });
 const digest = (picked.digest || []).map((r, i) => {
-  allowed.push(r.url);
-  return `${i + 1}. ${r.title}\n   ${r.url}\n   ${r.snippet}`;
+  const u = cleanUrl(r.url);
+  allowed.push(u);
+  return `${i + 1}. [${tierOf(u)}] ${r.title}\n   ${u}\n   ${r.snippet}`;
 });
 blocks.push(`### Search results (snippets only)\n${digest.join('\n') || '(none)'}`);
 
 const allowedUrls = [...new Set(allowed.filter(Boolean))];
-return [{ json: { research: blocks.join('\n\n'), allowed_urls: allowedUrls, research_chars: blocks.join('\n\n').length }, pairedItem: { item: 0 } }];
+const research = blocks.join('\n\n');
+return [{ json: { research, allowed_urls: allowedUrls, allowed_with_tier: allowedUrls.map(u => `[${tierOf(u)}] ${u}`), research_chars: research.length }, pairedItem: { item: 0 } }];

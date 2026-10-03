@@ -5,6 +5,12 @@ Hard rules:
 2. Keep every inline Markdown link with exactly the same URL; translate only the link text. Keep every number and unit exactly. Add no fact or claim that is not in the English.
 3. Keep the Markdown structure: opening paragraph, "## " headings, lists, bold, quotes. No "# " title in the body, no disclaimer, no sources section.
 4. Gym terms as Israeli lifters say them: "סט", "חזרות", "סקוואט", "דדליפט", "לחיצת חזה", "עומס מתקדם (progressive overload)" on first use, "חימום", "התאוששות", "נפח אימון".
-5. title: 40–60 characters, contains the Hebrew primary keyword. description: 110–150 characters. image_alt: one plain Hebrew sentence.
+5. Natural Israeli Hebrew, not calques of the English. Restructure sentences the way an Israeli writer would. Examples:
+   - "older adults" → "אנשים מבוגרים" or "בני 60 ומעלה" — never "מבוגרים מבוגרים יותר"
+   - "the evidence suggests" → "המחקרים מראים" / "לפי המחקרים" — not "הראיות מציעות"
+   - "lean mass" → "מסת שריר" / "מסה רזה"; "strength gains" → "עלייה בכוח"
+   - "a meta-analysis found" → "מטא-אנליזה מצאה"; "position stand" → "עמדה רשמית" (with the organisation's name)
+   Avoid long noun chains and passive constructions copied from English.
+6. title: 40–60 characters, contains the Hebrew primary keyword. description: 110–150 characters. image_alt: one plain Hebrew sentence.
 
 Return JSON only.

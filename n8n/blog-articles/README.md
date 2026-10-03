@@ -26,12 +26,16 @@ own files and are inserted as JSON string literals.
 2. **Pick topic** — Sonnet picks one candidate and plans an evergreen SEO topic (slug, keywords en/he,
    search queries), avoiding used topics; `skip` ends the run.
 3. **Research + write** — hard-capped, no agent loop: Tavily extracts the source (top 5 chunks for the
-   topic), runs exactly **3 basic searches**, then extracts the **2 best pages** (top 4 chunks each). A Code
+   topic), runs exactly **3 basic searches** (the last one always for a position stand), then extracts the **2 best pages** (top 4 chunks each). A Code
    node clips everything into one research pack (source ≤ 5,000 chars, pages ≤ 4,000, ≤ 10 snippets of
-   450) with the list of allowed URLs. **One Sonnet 5.5 call** writes the English article (inline link on
+   450) with the list of allowed URLs. Every URL is tagged PRIMARY (studies, PubMed/PMC, DOIs) / AUTHORITY
+   (position stands, ACSM/NSCA/ISSN, .gov/.edu) / SECONDARY, ranked in that order; commercial pages
+   ("best X supplements", shops, product reviews) are dropped; tracking parameters (utm_*, conv_*, af,
+   fbclid…) are stripped from every URL and again from the saved body and sources. **One Sonnet 5.5 call** writes the English article (inline link on
    every claim, allowed URLs only); Sonnet adapts it to gender-neutral Hebrew; Haiku reports gendered
    Hebrew / medical promises / unlinked claims / links outside the allowed list.
-4. **Hero image** — Sonnet writes the prompt (dark, near-monochrome, no text/logos/real people) → Gemini
+4. **Hero image** — Sonnet writes the prompt (bright natural daylight, light clean backgrounds for the
+   light-theme site; no text/logos/recognisable faces) → Gemini
    → Cloudinary `gymon-blog/drafts/`; served as `c_fill,ar_16:9,w_1600,f_jpg`.
 5. **Save draft** → **Review email** to gymon.official@gmail.com with a link to the review page.
 6. **Review page** `GET /webhook/gymon-blog/review?id=<article_id>&t=<token>` — both languages, sources,
