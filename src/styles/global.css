@@ -359,3 +359,79 @@
   from { translate: 0 0; }
   to { translate: var(--ah-slide) 0; }
 }
+
+/* Google Play "coming soon" pill — same rules as public/style.css. */
+@layer components {
+  .play-soon {
+    flex: none;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 40px;
+    padding-inline: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-card);
+    color: var(--color-foreground);
+    line-height: 1.1;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .play-soon-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .play-soon-note {
+    font-size: 11px;
+    color: var(--color-muted-foreground);
+  }
+}
+@media (max-width: 469px) {
+  .play-soon {
+    display: none;
+  }
+}
+
+/* "Also in Hebrew" hint on English articles (ArticlePage.astro): fixed under the
+   header, so showing or dismissing it never moves the page. */
+@layer components {
+  .he-hint:not([hidden]) {
+    position: fixed;
+    inset-block-start: calc(var(--topbar-h) + 8px);
+    inset-inline: 16px;
+    z-index: 45;
+    max-width: 480px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-card);
+    box-shadow: 0 6px 20px -8px rgb(11 17 21 / 0.25);
+    font-family: 'Assistant', 'Epilogue', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--color-foreground);
+  }
+  .he-hint a {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+  .he-hint button {
+    margin-inline-start: auto;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-muted-foreground);
+  }
+  .he-hint button:hover {
+    background: var(--color-muted);
+    color: var(--color-foreground);
+  }
+}

@@ -147,3 +147,27 @@ footer {
 footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 8px; }
 footer a { color: var(--muted); }
 footer a[aria-current="page"] { color: var(--text); }
+
+/* Google Play "coming soon": a neutral text pill in the App Store badge's footprint
+   (40px high). Not Google's badge, no Google logo, not a link — see SiteChrome.astro.
+   Same rules in src/styles/global.css. */
+.play-soon {
+  flex: none;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 40px;
+  padding-inline: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.1;
+  cursor: default;
+  white-space: nowrap;
+}
+.play-soon-name { font-size: 14px; font-weight: 600; }
+.play-soon-note { font-size: 11px; color: var(--muted); }
+/* At 390px the bar is ~44px too narrow for the pill (measured): hidden below 470px
+   until the user picks how to make room (see the branch report). */
+@media (max-width: 469px) { .play-soon { display: none; } }

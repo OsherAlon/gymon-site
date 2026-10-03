@@ -25,7 +25,11 @@ interface Props {
 const { lang, page, title, notFound = false, langs = LANGS, description, noindex = false } = Astro.props;
 const redirect =
   "try{var s=localStorage.getItem('lang');if(s==='he'||(!s&&/^(he|iw)\\b/i.test(navigator.language||'')))location.replace('/he'+location.pathname.replace(/\\/$/,'')+location.hash)}catch(e){}";
-const hasRedirect = !notFound && lang === 'en' && langs.includes('he');
+// The device-language redirect runs on the App Store pages (/, /privacy, /terms,
+// /support) only — never on the blog, where an English article may be what was
+// shared or searched. English articles show a dismissible "also in Hebrew" bar instead.
+const isBlog = page === 'blog' || page.startsWith('blog/');
+const hasRedirect = !notFound && !isBlog && lang === 'en' && langs.includes('he');
 ---
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">

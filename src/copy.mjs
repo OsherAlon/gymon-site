@@ -23,6 +23,8 @@ export const copy = {
   en: {
     langName: 'English',
     switchTo: 'עברית',
+    // Google Play is not live: a neutral text pill, not Google's badge (see SiteChrome.astro).
+    playSoon: { name: 'Google Play', soon: 'Coming soon' },
     home: {
       title: 'Gymon',
       tagline: 'Gymon is an app for tracking personal workouts.',
@@ -67,6 +69,7 @@ export const copy = {
   he: {
     langName: 'עברית',
     switchTo: 'English',
+    playSoon: { name: 'Google Play', soon: 'בקרוב' },
     home: {
       title: 'Gymon',
       tagline: 'Gymon היא אפליקציה למעקב אחר אימוני כושר אישיים.',

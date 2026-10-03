@@ -4,8 +4,14 @@
  * the original pages and by the copy of those rules in `src/styles/global.css`
  * on the blog pages.
  *
- * The header is a fixed top bar: logo · Blog · language switch · App Store badge
- * (inline-end, so the order flips in Hebrew).
+ * The header is a fixed top bar: logo · Blog · language switch · App Store badge ·
+ * Google Play "coming soon" (inline-end, so the order flips in Hebrew).
+ *
+ * Google Play: NOT Google's badge. Google's guidelines say the badges "can be used
+ * in marketing campaigns to promote content on Google Play" — "Get it on" to drive
+ * downloads, "Pre-register" to drive pre-registration — and "Don't remove or
+ * rearrange badge elements, or otherwise adjust the badge in any way". Gymon has no
+ * Play listing, so a neutral text pill (no Google logo, not a link) stands in.
  */
 import { copy, SUPPORT_EMAIL, APP_STORE_URL } from '../copy.mjs';
 import { urlFor, type Page } from '@/lib/legal';
@@ -33,6 +39,7 @@ const inBlog = page === 'blog' || page.startsWith('blog/');
 <a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>
 <a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
 <AppStoreButton lang={lang} href={APP_STORE_URL} />
+<span class="play-soon" aria-disabled="true" aria-label={`${t.playSoon.name} · ${t.playSoon.soon}`}><span class="play-soon-name" aria-hidden="true">{t.playSoon.name}</span><span class="play-soon-note" aria-hidden="true">{t.playSoon.soon}</span></span>
 </div>
 </header>
 </div>

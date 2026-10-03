@@ -23,7 +23,11 @@ GitHub Pages serves `privacy.html` at `/privacy` (no extension, no redirect). Th
 and turn `/privacy` into a 301.
 
 English is at the fixed URLs. A device set to Hebrew is sent to `/he/…` unless the visitor picked a
-language on the site before (the inline script in `src/components/SiteHead.astro`). These pages keep
+language on the site before (the inline script in `src/components/SiteHead.astro`).
+
+The blog never redirects. An English article that also exists in Hebrew shows Hebrew-language
+devices a small dismissible bar, "המאמר קיים גם בעברית", that links to the Hebrew version. The
+dismissal is remembered in `localStorage` (`heHintDismissed`). These pages keep
 their original markup and `/style.css` (`public/style.css`) — no Tailwind on them, so they look
 exactly as before.
 
@@ -48,6 +52,13 @@ guidelines allow only the official badges. The files are in `public/badges/`:
 is shown but leads nowhere (no `href`, `aria-disabled="true"`, default cursor). **Once the app is
 live, set it to the listing URL and rebuild.** The badge then becomes a normal link. Never point it
 at a listing that doesn't exist.
+
+**Google Play** shows as a neutral text pill, "Google Play · Coming soon" / "Google Play · בקרוב",
+with no Google logo and no link. Google's official badges may only be used "to promote content on
+Google Play" ("Get it on" to drive downloads, "Pre-register" to drive pre-registration), and there is
+no Play listing yet. Once one exists, replace the pill with Google's localized badge, unmodified and
+linked to the listing, at the same size as the App Store badge or larger. The pill is hidden below
+470px wide, because the bar has no room for it on a phone.
 
 ## Commands
 

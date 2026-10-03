@@ -21,6 +21,10 @@ const langs = await languagesOf(data.slug);
 const other: Lang = lang === 'en' ? 'he' : 'en';
 // The language switch goes to the translation if there is one, else to that language's blog index.
 const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(other, 'blog');
+// English article with a Hebrew version: a dismissible hint for Hebrew-language
+// devices, instead of the redirect the App Store pages use.
+const heHint = lang === 'en' && langs.includes('he') ? articleUrl('he', data.slug) : null;
+const heHintScript = `(function(){var el=document.getElementById('he-hint');if(!el)return;try{if(localStorage.getItem('heHintDismissed')==='1')return}catch(e){}if(!/^(he|iw)\\b/i.test(navigator.language||''))return;el.hidden=false;el.querySelector('button').addEventListener('click',function(){el.hidden=true;try{localStorage.setItem('heHintDismissed','1')}catch(e){}})})();`;
 ---
 <BlogLayout
   lang={lang}
@@ -32,6 +36,17 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
   noindex={data.mock}
   mainClass="-mt-(--topbar-h)"
 >
+  {heHint && (
+    <Fragment>
+      {/* Fixed overlay under the header: no layout shift. Hidden unless the device language is Hebrew. */}
+      <div id="he-hint" class="he-hint" lang="he" dir="rtl" hidden>
+        <span>המאמר קיים גם בעברית</span>
+        <a href={heHint} hreflang="he">לקריאה בעברית</a>
+        <button type="button" aria-label="סגירה">×</button>
+      </div>
+      <script is:inline set:html={heHintScript}></script>
+    </Fragment>
+  )}
   {/* Scroll-linked hero (CSS only, never blocks scrolling); the article follows it, always visible. */}
   <ArticleHero
     image={data.image}
