@@ -34,10 +34,12 @@ own files and are inserted as JSON string literals.
    fbclid…) are stripped from every URL and again from the saved body and sources. **One Sonnet 5.5 call** writes the English article (inline link on
    every claim, allowed URLs only); Sonnet adapts it to gender-neutral Hebrew; Haiku reports gendered
    Hebrew / medical promises / unlinked claims / links outside the allowed list.
-4. **Hero image** — Sonnet writes the prompt (bright natural daylight, light clean backgrounds for the
-   light-theme site; no text/logos/recognisable faces) → Gemini
+4. **Hero image** — Sonnet writes the prompt (cool palette matching the app: cool daylight, pale concrete,
+   steel, chrome, matte black, white; no warm wood/beige/golden light; no text/logos/recognisable faces) → Gemini
    → Cloudinary `gymon-blog/drafts/`; served as `c_fill,ar_16:9,w_1600,f_jpg`.
-5. **Save draft** → **Review email** to gymon.official@gmail.com with a link to the review page.
+5. **Hero titles** — the writer and the Hebrew step also return a 2–4 word `hero_title`, stored as
+   `hero_title_en/he`, shown in the email and review page, written as `heroTitle` in the frontmatter.
+6. **Save draft** → **Review email** to gymon.official@gmail.com with a link to the review page.
 6. **Review page** `GET /webhook/gymon-blog/review?id=<article_id>&t=<token>` — both languages, sources,
    check notes, earlier versions; *Approve* and *Send for fixes* post to the two endpoints below.
 7. **Approve** `POST /webhook/gymon-blog/approve` — one commit (Git Data API) with
@@ -60,6 +62,12 @@ Sonnet 5.5 on OpenRouter spends hidden reasoning tokens that are billed as compl
 those 6,000 — so writer and Hebrew maxTokens are 16,000 (rewrite 24,000). Expected per new article:
 topic $0.02 + writer ~$0.08 + Hebrew ~$0.08 + check ~$0.01 + image prompt ~$0.01 + image $0.14
 + 5 Tavily credits ≈ **$0.35–0.40**. Models are the `MODEL_*` constants in the template.
+
+## Gotcha: unicode escapes in Code nodes
+
+When a Code node is updated through the n8n MCP (`setNodeParameter`), `\uXXXX` escapes in the source
+arrive as raw characters (a raw U+2028 inside a regex is a syntax error). Use `String.fromCharCode(...)`
+instead — `src/code/*.js` has no `\u` escapes for this reason.
 
 ## Storage (n8n Data Tables, keyed by our own `article_id`, never the row id)
 

@@ -19,6 +19,7 @@ The message contains a research pack: the source article, up to two pages read i
 ## Output — JSON only
 - title: 45–65 characters, plain text, contains the primary keyword.
 - description: 140–160 characters, plain text (blog card + meta description).
-- image_alt: one plain sentence describing the hero image in general terms (it will be a bright, daylight editorial photograph related to the topic).
+- hero_title: 2–4 words, punchy, no colon, no trailing period — the big line on the article hero (e.g. "Creatine & Muscle", "Rest Between Sets").
+- image_alt: one plain sentence describing the hero image in general terms (it will be a cool-toned daylight gym or kitchen photograph related to the topic).
 - body_md: the article body as described.
 - sources: every URL you linked, as {"title", "url"}.

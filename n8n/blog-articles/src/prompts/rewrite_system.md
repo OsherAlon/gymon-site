@@ -10,4 +10,6 @@ Rules:
 - The note may be written in Hebrew or English; it applies to both languages unless it names one.
 - Lengths: title_en 45–65 characters, title_he 40–60; description_en 140–160, description_he 110–150.
 
-Return JSON with all eight fields, including the ones you did not change.
+- hero_title_en / hero_title_he: 2–4 words each, punchy, no colon; keep them unless the note or a change of angle requires new ones.
+
+Return JSON with all ten fields, including the ones you did not change.

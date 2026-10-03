@@ -17,7 +17,7 @@ h1{font-size:22px;margin:4px 0 2px}.meta{color:var(--muted);font-size:13px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin:14px 0}
 .tabs{display:flex;gap:8px;margin:18px 0 0}.tab{background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer}
 .tab.on{background:var(--accent);border-color:var(--accent);color:#fff}
-.lang h2.t{font-size:26px;line-height:1.25;margin:0 0 6px}.lang .d{color:var(--muted);margin:0 0 6px}.lang .fm{font-size:12px;color:#71717a;margin-bottom:12px}
+.lang .hero-t{font-size:30px;font-weight:800;line-height:1.15;margin:0 0 6px}.lang h2.t{font-size:26px;line-height:1.25;margin:0 0 6px}.lang .d{color:var(--muted);margin:0 0 6px}.lang .fm{font-size:12px;color:#71717a;margin-bottom:12px}
 .body a{color:#c4b5fd}.body h2{font-size:20px;margin:26px 0 8px}.body h3{font-size:17px;margin:20px 0 6px}
 .body blockquote{border-inline-start:3px solid var(--accent);margin:12px 0;padding:4px 14px;color:#d4d4d8}
 [dir=rtl]{text-align:right}
@@ -41,8 +41,8 @@ if (!a.article_id || !q.t || q.t !== a.review_token) {
 const data = {
   id: a.article_id, t: q.t, status: a.status, round: Number(a.round) || 1, slug: a.slug,
   image_url: a.image_url, published_date: a.published_date, commit_url: a.commit_url, last_feedback: a.last_feedback,
-  en: { title: a.title_en, description: a.description_en, image_alt: a.image_alt_en, body: a.body_en, read: a.read_time_en },
-  he: { title: a.title_he, description: a.description_he, image_alt: a.image_alt_he, body: a.body_he, read: a.read_time_he },
+  en: { hero: a.hero_title_en, title: a.title_en, description: a.description_en, image_alt: a.image_alt_en, body: a.body_en, read: a.read_time_en },
+  he: { hero: a.hero_title_he, title: a.title_he, description: a.description_he, image_alt: a.image_alt_he, body: a.body_he, read: a.read_time_he },
   sources: (() => { try { return JSON.parse(a.sources_json || '[]'); } catch (e) { return []; } })(),
   notes: (() => { try { return JSON.parse(a.check_notes || '{}'); } catch (e) { return { other: [String(a.check_notes || '')] }; } })(),
   source_url: a.source_url, source_title: a.source_title, topic: a.topic,
@@ -51,7 +51,9 @@ const data = {
     body_en: v.body_en, body_he: v.body_he, image_url: v.image_url,
   })),
 };
-const json = JSON.stringify(data).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
+// No backslash-u escapes in this source: the n8n MCP update path decodes them into raw characters.
+const LS = String.fromCharCode(0x2028), PS = String.fromCharCode(0x2029), BS = String.fromCharCode(92);
+const json = JSON.stringify(data).split('<').join(BS + 'u003c').split(LS).join(BS + 'u2028').split(PS).join(BS + 'u2029');
 
 const body = `
 <div class="kicker">GYMON BLOG · REVIEW</div>
@@ -87,7 +89,7 @@ document.getElementById('m').innerHTML = 'slug <code>' + esc(D.slug) + '</code> 
 const img = document.getElementById('img'); if (D.image_url) { img.src = D.image_url; img.alt = D.en.image_alt || ''; } else img.remove();
 const lists = [['Gendered Hebrew', D.notes.gendered_hebrew], ['Medical promises', D.notes.medical_promises], ['Claims without a link', D.notes.unsupported_claims], ['Other', D.notes.other]].filter(x => Array.isArray(x[1]) && x[1].length);
 if (lists.length) { const n = document.getElementById('notes'); n.hidden = false; n.innerHTML = '<h3>AUTOMATIC CHECK — NEEDS ATTENTION</h3>' + lists.map(x => '<b>' + esc(x[0]) + '</b><ul>' + x[1].map(i => '<li>' + esc(i) + '</li>').join('') + '</ul>').join(''); }
-const block = (l) => { const x = D[l]; const rtl = l === 'he'; return '<div class="card lang"' + (rtl ? ' dir="rtl" lang="he"' : ' lang="en"') + '><div class="fm">' + esc(l.toUpperCase()) + ' · ' + esc(x.read) + (rtl ? ' דקות קריאה' : ' min read') + ' · alt: ' + esc(x.image_alt) + '</div><h2 class="t">' + esc(x.title) + '</h2><p class="d">' + esc(x.description) + '</p><div class="body">' + md(x.body) + '</div></div>'; };
+const block = (l) => { const x = D[l]; const rtl = l === 'he'; return '<div class="card lang"' + (rtl ? ' dir="rtl" lang="he"' : ' lang="en"') + '><div class="fm">' + esc(l.toUpperCase()) + ' · ' + esc(x.read) + (rtl ? ' דקות קריאה' : ' min read') + ' · alt: ' + esc(x.image_alt) + '</div>' + (x.hero ? '<div class="hero-t">' + esc(x.hero) + '</div>' : '') + '<h2 class="t">' + esc(x.title) + '</h2><p class="d">' + esc(x.description) + '</p><div class="body">' + md(x.body) + '</div></div>'; };
 const show = (l) => { document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.l === l)); document.getElementById('langs').innerHTML = l === 'both' ? block('en') + block('he') : block(l); };
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => show(b.dataset.l)); show('en');
 document.getElementById('src').innerHTML = (D.sources || []).map(s => '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.title || s.url) + '</a></li>').join('') || '<li>(none listed)</li>';

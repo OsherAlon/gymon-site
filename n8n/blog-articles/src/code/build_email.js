@@ -56,12 +56,14 @@ const html = `<!doctype html><html><body style="margin:0;background:#0b0b0f">
   ${checkHtml}
   <div style="background:#18181b;border-radius:12px;padding:18px 18px 8px;margin:0 0 14px">
     <div style="font-size:11px;color:#71717a;font-weight:700;letter-spacing:.08em;margin-bottom:6px">ENGLISH</div>
+    ${a.hero_title_en ? `<div style="font-size:22px;font-weight:800;color:#fafafa;margin:0 0 4px">${esc(a.hero_title_en)}</div>` : ''}
     <h2 style="margin:0 0 6px;font-size:18px;color:#fafafa">${esc(a.title_en)}</h2>
     <div style="font-size:13px;color:#a1a1aa;margin:0 0 12px">${esc(a.description_en)}</div>
     ${firstParas(a.body_en, 2).map(p => para(p, false)).join('')}
   </div>
   <div dir="rtl" style="background:#18181b;border-radius:12px;padding:18px 18px 8px;margin:0 0 22px;direction:rtl;text-align:right">
     <div style="font-size:11px;color:#71717a;font-weight:700;letter-spacing:.08em;margin-bottom:6px">עברית</div>
+    ${a.hero_title_he ? `<div style="font-size:22px;font-weight:800;color:#fafafa;margin:0 0 4px">${esc(a.hero_title_he)}</div>` : ''}
     <h2 style="margin:0 0 6px;font-size:18px;color:#fafafa">${esc(a.title_he)}</h2>
     <div style="font-size:13px;color:#a1a1aa;margin:0 0 12px">${esc(a.description_he)}</div>
     ${firstParas(a.body_he, 2).map(p => para(p, true)).join('')}

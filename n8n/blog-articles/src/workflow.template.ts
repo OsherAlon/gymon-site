@@ -1140,6 +1140,34 @@ const uploadImageFix = node({
   output: [{ public_id: 'gymon-blog/drafts/rest-between-sets-r2', secure_url: 'https://res.cloudinary.com/demo/image/upload/v1/gymon-blog/drafts/rest-between-sets-r2.png' }],
 });
 
+const altModel = languageModel({
+  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
+  version: 1,
+  config: { name: 'Haiku — image alt', parameters: { model: MODEL_FAST, options: { temperature: 0.2 } }, credentials: CRED_OPENROUTER },
+});
+
+const altParser = outputParser({
+  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
+  version: 1.3,
+  config: { name: 'Image alt format', parameters: { schemaType: 'fromJson', jsonSchemaExample: '{"image_alt_en": "A barbell with matte black plates in a concrete gym", "image_alt_he": "מוט עם משקולות שחורות בחדר כושר מבטון"}' } },
+});
+
+const imageAltFix = node({
+  type: '@n8n/n8n-nodes-langchain.chainLlm',
+  version: 1.7,
+  config: {
+    name: 'Image alt (fix)',
+    parameters: {
+      promptType: 'define',
+      text: expr("Image prompt:\n{{ $('Image prompt (fix)').first().json.text }}"),
+      hasOutputParser: true,
+      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __ALT_SYSTEM__ }] },
+    },
+    subnodes: { model: altModel, outputParser: altParser },
+  },
+  output: [{ output: { image_alt_en: 'A barbell with matte black plates in a concrete gym', image_alt_he: 'מוט עם משקולות שחורות בחדר כושר מבטון' } }],
+});
+
 const revisedArticle = node({
   type: 'n8n-nodes-base.set',
   version: 3.4,
@@ -1295,7 +1323,7 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
       .onFalse(needsImage)))
     .onFalse(rejectFix))
   .add(needsImage
-    .onTrue(fixImagePrompt.to(generateImageFix).to(uploadImageFix).to(revisedArticle))
+    .onTrue(fixImagePrompt.to(generateImageFix).to(uploadImageFix).to(imageAltFix).to(revisedArticle))
     .onFalse(revisedArticle))
   .add(revisedArticle)
   .to(recheck)

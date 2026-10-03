@@ -11,6 +11,7 @@ Hard rules:
    - "lean mass" → "מסת שריר" / "מסה רזה"; "strength gains" → "עלייה בכוח"
    - "a meta-analysis found" → "מטא-אנליזה מצאה"; "position stand" → "עמדה רשמית" (with the organisation's name)
    Avoid long noun chains and passive constructions copied from English.
-6. title: 40–60 characters, contains the Hebrew primary keyword. description: 110–150 characters. image_alt: one plain Hebrew sentence.
+6. hero_title: 2–4 Hebrew words, punchy, no colon, gender-neutral — a natural Hebrew line, not a literal translation of the English hero title (e.g. "קריאטין ושריר", "מנוחה בין סטים").
+7. title: 40–60 characters, contains the Hebrew primary keyword. description: 110–150 characters. image_alt: one plain Hebrew sentence.
 
 Return JSON only.

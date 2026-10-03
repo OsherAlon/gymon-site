@@ -86,11 +86,13 @@ record = [
     ('source_title', f'{{{{ {P}.source_title }}}}', 'string'),
     ('sources_json', cleaned(f'JSON.stringify({W}.sources || [])'), 'string'),
     ('title_en', f'{{{{ {W}.title }}}}', 'string'),
+    ('hero_title_en', f"{{{{ String({W}.hero_title || '').replace(/[:.]+\\s*$/, '').trim() }}}}", 'string'),
     ('description_en', f'{{{{ {W}.description }}}}', 'string'),
     ('image_alt_en', f'{{{{ {W}.image_alt }}}}', 'string'),
     ('body_en', cleaned(f'{W}.body_md'), 'string'),
     ('read_time_en', words(f'{W}.body_md', 230), 'number'),
     ('title_he', f'{{{{ {H}.title }}}}', 'string'),
+    ('hero_title_he', f"{{{{ String({H}.hero_title || '').replace(/[:.]+\\s*$/, '').trim() }}}}", 'string'),
     ('description_he', f'{{{{ {H}.description }}}}', 'string'),
     ('image_alt_he', f'{{{{ {H}.image_alt }}}}', 'string'),
     ('body_he', cleaned(f'{H}.body_md'), 'string'),
@@ -111,8 +113,14 @@ revised = [
     ('round', f'{{{{ (Number({A}.round) || 1) + 1 }}}}', 'number'),
     ('last_feedback', "{{ $('Fix request').first().json.body.feedback }}", 'string'),
 ]
-for f in ['title_en', 'description_en', 'image_alt_en', 'body_en', 'title_he', 'description_he', 'image_alt_he', 'body_he']:
-    if f.startswith('body_'):
+ALT = "$('Image alt (fix)')"
+for f in ['title_en', 'hero_title_en', 'description_en', 'image_alt_en', 'body_en', 'title_he', 'hero_title_he', 'description_he', 'image_alt_he', 'body_he']:
+    if f.startswith('image_alt_'):
+        # a new image needs a new alt text; otherwise keep the rewrite's or the stored one
+        revised.append((f, f"{{{{ {ALT}.isExecuted ? {ALT}.first().json.output.{f} : ({R}.isExecuted ? {R}.first().json.output.{f} : {A}.{f}) }}}}", 'string'))
+    elif f.startswith('hero_title_'):
+        revised.append((f, f"{{{{ ({R}.isExecuted && {R}.first().json.output.{f}) ? {R}.first().json.output.{f} : ({A}.{f} || '') }}}}", 'string'))
+    elif f.startswith('body_'):
         revised.append((f, cleaned(f"({R}.isExecuted ? {R}.first().json.output.{f} : {A}.{f})"), 'string'))
     else:
         revised.append((f, pick(f, f), 'string'))
@@ -150,6 +158,7 @@ rep = {
     '__HEBREW_SYSTEM__': lit(read('prompts/hebrew_system.md')),
     '__CHECK_SYSTEM__': lit(read('prompts/check_system.md')),
     '__IMAGE_SYSTEM__': lit(read('prompts/image_system.md')),
+    '__ALT_SYSTEM__': lit(read('prompts/alt_system.md')),
     '__ROUTER_SYSTEM__': lit(read('prompts/router_system.md')),
     '__REWRITE_SYSTEM__': lit(read('prompts/rewrite_system.md')),
     '__TOPIC_USER__': lit(
@@ -170,13 +179,13 @@ rep = {
         "Allowed URLs (link only to these; the tier is in brackets):\n{{ ($json.allowed_with_tier || $json.allowed_urls).join('\\n') }}\n\n"
         "RESEARCH PACK\n\n{{ $json.research }}"),
     '__WRITER_EXAMPLE__': lit(json.dumps({
-        'title': 'How Long to Rest Between Sets for Strength', 'description': 'One or two sentences for the card and meta description.',
+        'title': 'How Long to Rest Between Sets for Strength', 'hero_title': 'Rest Between Sets', 'description': 'One or two sentences for the card and meta description.',
         'image_alt': 'A loaded barbell on a rack in a sunlit gym', 'body_md': 'Opening paragraph…\n\n## Section\n\nText with a [linked claim](https://example.org).',
         'sources': [{'title': 'Source title', 'url': 'https://example.org'}]}, indent=2)),
     '__HEBREW_USER__': lit(
         f"Hebrew primary keyword: {{{{ {P}.primary_keyword_he }}}}\n\nEnglish article\nTitle: {{{{ $json.output.title }}}}\n"
         "Description: {{ $json.output.description }}\nImage alt: {{ $json.output.image_alt }}\n\n{{ $json.output.body_md }}"),
-    '__HEBREW_EXAMPLE__': lit(json.dumps({'title': 'כמה זמן לנוח בין סטים באימוני כוח', 'description': 'משפט או שניים לכרטיס ולתיאור המטא.',
+    '__HEBREW_EXAMPLE__': lit(json.dumps({'title': 'כמה זמן לנוח בין סטים באימוני כוח', 'hero_title': 'מנוחה בין סטים', 'description': 'משפט או שניים לכרטיס ולתיאור המטא.',
                                          'image_alt': 'מוט עמוס על מתקן בחדר כושר מואר', 'body_md': 'פסקת פתיחה…\n\n## כותרת\n\nטקסט עם [טענה מקושרת](https://example.org).'},
                                         ensure_ascii=False, indent=2)),
     '__CHECK_USER__': lit(
@@ -198,7 +207,7 @@ rep = {
         f"Description: {{{{ {R}.isExecuted ? {R}.first().json.output.description_en : {A}.description_en }}}}\n\n"
         "Reviewer note (follow it within the style rules): {{ $('Fix request').first().json.body.feedback }}\n\n"
         f"Previous image prompt — make a clearly different image where the note asks: {{{{ {A}.image_prompt }}}}"),
-    '__GEMINI_PROMPT__': lit("{{ $json.text }}\n\nAbsolutely no text, letters, numbers, logos or watermarks anywhere in the image. Wide 16:9 landscape composition, bright natural daylight, light clean background."),
+    '__GEMINI_PROMPT__': lit("{{ $json.text }}\n\nAbsolutely no text, letters, numbers, logos or watermarks anywhere in the image. Wide 16:9 landscape composition, cool daylight, cool blue-grey and steel palette, clean background, no warm or golden tones."),
     '__RECORD_ASSIGNMENTS__': assignments(record),
     '__REVISED_ASSIGNMENTS__': assignments(revised),
     '__VERSION_VALUES__': expr_obj(version_vals),
@@ -207,9 +216,9 @@ rep = {
     '__REWRITE_USER__': lit(
         "Reviewer note:\n{{ $('Fix request').first().json.body.feedback }}\n\n"
         f"Sources list (the only allowed links):\n{{{{ {A}.sources_json }}}}\n\n"
-        f"CURRENT ARTICLE\n\ntitle_en: {{{{ {A}.title_en }}}}\ndescription_en: {{{{ {A}.description_en }}}}\nimage_alt_en: {{{{ {A}.image_alt_en }}}}\nbody_en:\n{{{{ {A}.body_en }}}}\n\n"
+        f"CURRENT ARTICLE\n\ntitle_en: {{{{ {A}.title_en }}}}\nhero_title_en: {{{{ {A}.hero_title_en }}}}\nhero_title_he: {{{{ {A}.hero_title_he }}}}\ndescription_en: {{{{ {A}.description_en }}}}\nimage_alt_en: {{{{ {A}.image_alt_en }}}}\nbody_en:\n{{{{ {A}.body_en }}}}\n\n"
         f"title_he: {{{{ {A}.title_he }}}}\ndescription_he: {{{{ {A}.description_he }}}}\nimage_alt_he: {{{{ {A}.image_alt_he }}}}\nbody_he:\n{{{{ {A}.body_he }}}}"),
-    '__REWRITE_EXAMPLE__': lit(json.dumps({'title_en': '…', 'description_en': '…', 'image_alt_en': '…', 'body_en': '…',
+    '__REWRITE_EXAMPLE__': lit(json.dumps({'title_en': '…', 'hero_title_en': '…', 'hero_title_he': '…', 'description_en': '…', 'image_alt_en': '…', 'body_en': '…',
                                           'title_he': '…', 'description_he': '…', 'image_alt_he': '…', 'body_he': '…'}, ensure_ascii=False, indent=2)),
     '__TREE_BODY__': lit(
         "{{ JSON.stringify({ base_tree: $('Get parent commit').item.json.tree.sha, tree: ["

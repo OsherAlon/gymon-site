@@ -14,7 +14,7 @@ if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) throw new Error(`Invalid slug: ${a
 // YAML double-quoted scalars accept JSON string syntax.
 const q = s => JSON.stringify(String(s ?? '').replace(/\s+/g, ' ').trim());
 const cleanBody = b => String(b || '')
-  .replace(/^\uFEFF/, '')
+  .replace(new RegExp('^' + String.fromCharCode(0xFEFF)), '')
   .replace(/^\s*#\s[^\n]*\n+/, '')   // the page renders the title itself
   .trim() + '\n';
 
@@ -22,6 +22,7 @@ const file = lang => [
   '---',
   `title: ${q(a['title_' + lang])}`,
   `description: ${q(a['description_' + lang])}`,
+  ...(a['hero_title_' + lang] ? [`heroTitle: ${q(a['hero_title_' + lang])}`] : []),
   `image: /blog/${slug}.jpg`,
   `imageAlt: ${q(a['image_alt_' + lang])}`,
   `createdAt: ${date}`,
