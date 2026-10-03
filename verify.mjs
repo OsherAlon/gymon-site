@@ -160,5 +160,69 @@ for (const lang of ['en', 'he']) {
   console.log(`  ${own.length} ${lang} article(s) checked`);
 }
 
+// ------------------------------------------------- robots.txt and sitemap --
+
+async function loadFile(path) {
+  if (!base) {
+    const full = join(ROOT, 'docs', path);
+    return existsSync(full) ? readFileSync(full, 'utf8') : null;
+  }
+  const res = await fetch(`${base}/${path}`, { redirect: 'manual' });
+  return res.status === 200 ? res.text() : null;
+}
+
+const robots = await loadFile('robots.txt');
+console.log(`robots.txt ${robots ? 'present' : 'MISSING'}`);
+if (!robots) fail('robots.txt is missing');
+else {
+  if (!/^User-agent: \*$/m.test(robots) || !/^Allow: \/$/m.test(robots)) fail('robots.txt must allow all crawlers');
+  if (!/^Sitemap: https:\/\/gymon\.app\/sitemap\.xml$/m.test(robots)) fail('robots.txt must name https://gymon.app/sitemap.xml');
+  if (/^Disallow: \/\s*$/m.test(robots)) fail('robots.txt disallows the whole site');
+}
+
+const index = await loadFile('sitemap.xml');
+const chunks = index ? [...index.matchAll(/<loc>https:\/\/gymon\.app\/([^<]+)<\/loc>/g)].map((m) => m[1]) : [];
+console.log(`sitemap.xml ${index ? `→ ${chunks.join(', ')}` : 'MISSING'}`);
+if (!index || !chunks.length) fail('sitemap.xml is missing or lists no sitemaps');
+
+/** Built file (format 'preserve') for a public path: / → index.html, /blog/ → blog/index.html, /privacy → privacy.html. */
+const fileFor = (p) => (p === '' || p.endsWith('/') ? `${p}index.html` : `${p}.html`);
+const listed = new Set();
+for (const chunk of chunks) {
+  const xml = await loadFile(chunk);
+  if (!xml) {
+    fail(`${chunk} is missing`);
+    continue;
+  }
+  const locs = [...xml.matchAll(/<loc>https:\/\/gymon\.app\/([^<]*)<\/loc>/g)].map((m) => decodeURIComponent(m[1]));
+  const alts = [...xml.matchAll(/hreflang="[^"]+" href="https:\/\/gymon\.app\/([^"]*)"/g)].map((m) => decodeURIComponent(m[1]));
+  for (const p of [...locs, ...alts]) {
+    if (p.endsWith('.html')) fail(`sitemap URL has an extension: /${p}`);
+    if (/(^|\/)404$/.test(p)) fail('the 404 page is in the sitemap');
+    const html = await loadFile(fileFor(p));
+    if (html === null) fail(`sitemap URL does not exist: /${p}`);
+    else if (/<meta name="robots" content="noindex">/.test(html)) fail(`noindex page in the sitemap: /${p}`);
+  }
+  locs.forEach((p) => listed.add(p));
+  if (!/hreflang="x-default"/.test(xml)) fail(`${chunk} has no x-default alternates`);
+}
+console.log(`  ${listed.size} URL(s) in the sitemap, none noindex`);
+
+// Every indexable built page must be listed (local check only).
+if (!base) {
+  const walk = (dir, rel = '') =>
+    readdirSync(dir).flatMap((n) => {
+      const full = join(dir, n);
+      if (statSync(full).isDirectory()) return n.startsWith('_') ? [] : walk(full, `${rel}${n}/`);
+      return n.endsWith('.html') ? [`${rel}${n}`] : [];
+    });
+  for (const file of walk(join(ROOT, 'docs'))) {
+    if (file === '404.html') continue;
+    if (/<meta name="robots" content="noindex">/.test(readFileSync(join(ROOT, 'docs', file), 'utf8'))) continue;
+    const p = file.replace(/(^|\/)index\.html$/, '$1').replace(/\.html$/, '');
+    if (!listed.has(p)) fail(`indexable page missing from the sitemap: /${p}`);
+  }
+}
+
 console.log(failed ? `\n${failed} problem(s)` : '\nAll pages OK');
 process.exit(failed ? 1 : 0);

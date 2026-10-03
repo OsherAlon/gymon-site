@@ -1,0 +1,5 @@
+# All crawlers welcome — search engines and AI crawlers alike (user decision 2026-10-03).
+User-agent: *
+Allow: /
+
+Sitemap: https://gymon.app/sitemap.xml

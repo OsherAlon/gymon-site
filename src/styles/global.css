@@ -386,9 +386,17 @@
     color: var(--color-muted-foreground);
   }
 }
+/* Below 470px the pill moves from the bar to the footer (no room at 390px). */
+.play-soon--footer {
+  display: none;
+}
 @media (max-width: 469px) {
-  .play-soon {
+  .play-soon--bar {
     display: none;
+  }
+  .play-soon--footer {
+    display: inline-flex;
+    margin-top: 4px;
   }
 }
 

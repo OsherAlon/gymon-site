@@ -202,3 +202,18 @@ scripts/serve.mjs       local GitHub-Pages-like server
 
 GitHub Pages, from `docs/` on `main`. `docs/CNAME` (from `public/CNAME`) holds the custom domain, and
 `docs/.nojekyll` must stay — without it Pages runs Jekyll, which drops the `_astro/` folder.
+
+## Crawlers and sitemap
+
+- **`public/robots.txt`** allows every crawler, search engines and AI crawlers alike
+  (`User-agent: *`, `Allow: /`), and names `https://gymon.app/sitemap.xml`.
+- **`public/sitemap.xml`** is a sitemap index that points at `sitemap-0.xml`. `@astrojs/sitemap`
+  writes that file at build time (it also writes `sitemap-index.xml`, same content).
+- **What gets listed:** every built page except the 404 and any page with
+  `<meta name="robots" content="noindex">`. That covers mock and preview articles, and the blog
+  indexes while they list only those. The filter in `astro.config.mjs` decides from the built HTML
+  itself.
+- **URL form:** URLs are extensionless and match the canonicals (`/privacy`, `/he/`, `/blog/`).
+  Each entry carries en/he alternates plus `x-default` pointing to English.
+- **Check:** `npm run verify` confirms robots.txt and the sitemap exist, that no listed URL is
+  noindex, missing or has a `.html` extension, and that every indexable page is listed.

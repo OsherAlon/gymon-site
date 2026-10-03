@@ -17,6 +17,7 @@ import { copy, SUPPORT_EMAIL, APP_STORE_URL } from '../copy.mjs';
 import { urlFor, type Page } from '@/lib/legal';
 import type { Lang } from '@/lib/source';
 import { AppStoreButton } from '@/components/ui/app-store-button';
+import PlaySoon from '@/components/PlaySoon.astro';
 
 interface Props {
   lang: Lang;
@@ -39,7 +40,7 @@ const inBlog = page === 'blog' || page.startsWith('blog/');
 <a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>
 <a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
 <AppStoreButton lang={lang} href={APP_STORE_URL} />
-<span class="play-soon" aria-disabled="true" aria-label={`${t.playSoon.name} · ${t.playSoon.soon}`}><span class="play-soon-name" aria-hidden="true">{t.playSoon.name}</span><span class="play-soon-note" aria-hidden="true">{t.playSoon.soon}</span></span>
+<PlaySoon lang={lang} where="bar" />
 </div>
 </header>
 </div>
@@ -47,4 +48,5 @@ const inBlog = page === 'blog' || page.startsWith('blog/');
 <footer>
 <nav>{navPages.map((p) => <Fragment><a href={urlFor(lang, p)} aria-current={p === page ? 'page' : undefined}>{t.nav[p]}</a>{'\n'}</Fragment>)}</nav>
 <p><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></p>
+<PlaySoon lang={lang} where="footer" />
 </footer>

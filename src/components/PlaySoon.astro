@@ -1,0 +1,18 @@
+---
+/**
+ * Google Play "coming soon": a neutral text pill, NOT Google's badge (no listing
+ * yet — see SiteChrome.astro for the guideline lines). Not a link, aria-disabled.
+ * `where` picks the slot: the header bar from 470px up, the footer below it.
+ */
+import { copy } from '../copy.mjs';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  lang: Lang;
+  where: 'bar' | 'footer';
+}
+
+const { lang, where } = Astro.props;
+const t = (copy as any)[lang].playSoon;
+---
+<span class={`play-soon play-soon--${where}`} aria-disabled="true" aria-label={`${t.name} · ${t.soon}`}><span class="play-soon-name" aria-hidden="true">{t.name}</span><span class="play-soon-note" aria-hidden="true">{t.soon}</span></span>

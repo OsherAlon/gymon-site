@@ -29,6 +29,8 @@ const TYPES = {
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
   '.json': 'application/json',
+  '.xml': 'application/xml',
+  '.txt': 'text/plain; charset=utf-8',
 };
 
 const isFile = (p) => existsSync(p) && statSync(p).isFile();

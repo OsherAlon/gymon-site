@@ -168,6 +168,10 @@ footer a[aria-current="page"] { color: var(--text); }
 }
 .play-soon-name { font-size: 14px; font-weight: 600; }
 .play-soon-note { font-size: 11px; color: var(--muted); }
-/* At 390px the bar is ~44px too narrow for the pill (measured): hidden below 470px
-   until the user picks how to make room (see the branch report). */
-@media (max-width: 469px) { .play-soon { display: none; } }
+/* At 390px the bar is ~44px too narrow for the pill (measured), so below 470px it
+   moves to the footer (user decision 2026-10-03). */
+.play-soon--footer { display: none; }
+@media (max-width: 469px) {
+  .play-soon--bar { display: none; }
+  .play-soon--footer { display: inline-flex; margin-top: 4px; }
+}
