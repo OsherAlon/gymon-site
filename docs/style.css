@@ -33,13 +33,42 @@ body {
   padding-inline: 16px;
 }
 
+/* ---- fixed top bar — the same rules are copied into src/styles/global.css ---- */
+:root { --topbar-h: 72px; }
+html { scroll-padding-top: var(--topbar-h); }
+body { padding-top: var(--topbar-h); }
+
+.topbar {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
 .top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: 16px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  height: var(--topbar-h);
 }
+
+.top-actions { display: flex; align-items: center; gap: 10px; }
+
+.top-link {
+  color: var(--text);
+  font-size: 15px;
+  text-decoration: none;
+}
+.top-link[aria-current="page"] { font-weight: 600; }
+
+/* Official Apple badge: never resized below 40px; 10px gaps = ¼ of its height clear space. */
+.app-store-badge { display: block; flex: none; }
+.app-store-badge[aria-disabled="true"] { cursor: default; }
 
 .brand {
   color: var(--text);
@@ -55,6 +84,12 @@ body {
   padding: 6px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
+}
+
+@media (max-width: 400px) {
+  .top { gap: 8px; }
+  .top-actions { gap: 10px; }
+  .lang { padding-inline: 10px; }
 }
 
 main { padding-block: 24px 40px; }

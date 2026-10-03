@@ -17,6 +17,7 @@ import { motion } from 'framer-motion';
  *   End advance the expansion; ArrowUp / PageUp / Home at the top collapse it.
  *   Focus moving into the content (Tab) expands fully, so it is never hidden.
  * - `prefers-reduced-motion: reduce` → starts fully expanded, no scroll hijack.
+ * - `topOffset`: keeps the media box clear of the site's fixed header.
  * - Video mode is not ported (articles only use images).
  */
 
@@ -27,6 +28,12 @@ interface ScrollExpandMediaProps {
   date?: string;
   scrollToExpand?: string;
   textBlend?: boolean;
+  /**
+   * Added: height (px) of a fixed site header over the hero. The hero still fills
+   * the whole viewport behind it, but the media box is centred in, and capped to,
+   * the area below the header so the bar never covers it. 0 = the original.
+   */
+  topOffset?: number;
   /** Alt text for the media image. */
   alt?: string;
   children?: ReactNode;
@@ -39,6 +46,7 @@ const ScrollExpandMedia = ({
   date,
   scrollToExpand,
   textBlend,
+  topOffset = 0,
   alt,
   children,
 }: ScrollExpandMediaProps) => {
@@ -217,14 +225,17 @@ const ScrollExpandMedia = ({
           </motion.div>
 
           <div className="container mx-auto flex flex-col items-center justify-start relative z-10">
-            <div className="flex flex-col items-center justify-center w-full h-[100dvh] relative">
+            <div
+              className="flex flex-col items-center justify-center w-full h-[100dvh] relative"
+              style={topOffset ? { height: `calc(100dvh - ${topOffset}px)`, marginTop: topOffset } : undefined}
+            >
               <div
                 className="absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-2xl"
                 style={{
                   width: `${mediaWidth}px`,
                   height: `${mediaHeight}px`,
                   maxWidth: '95vw',
-                  maxHeight: '85vh',
+                  maxHeight: topOffset ? `calc(0.85 * (100dvh - ${topOffset}px))` : '85vh',
                   boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
                 }}
               >

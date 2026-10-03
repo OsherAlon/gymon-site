@@ -32,6 +32,23 @@ exactly as before.
 | `/blog/` · `/he/blog/` | `blog/index.html` · `he/blog/index.html` (`/blog` → 301 → `/blog/`) |
 | `/blog/<slug>` · `/he/blog/<slug>` | `blog/<slug>.html` · `he/blog/<slug>.html` |
 
+## Header and the App Store badge
+
+Every page has the same fixed top bar (`src/components/SiteChrome.astro`): logo · Blog · language
+switch · App Store badge. The badge order flips in Hebrew. Its styles are in `public/style.css`, and a
+copy of them is in `src/styles/global.css`.
+
+The badge is Apple's **official artwork, unmodified**, at the 40px minimum height. Apple's marketing
+guidelines allow only the official badges. The files are in `public/badges/`:
+
+- `app-store-en-us.svg`, from `https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us`
+- `app-store-he-il.svg`, from the same URL ending in `/he-il`
+
+🔴 **`APP_STORE_URL` in `src/copy.mjs` is `null` until the app is live.** While it's null, the badge
+is shown but leads nowhere (no `href`, `aria-disabled="true"`, default cursor). **Once the app is
+live, set it to the listing URL and rebuild.** The badge then becomes a normal link. Never point it
+at a listing that doesn't exist.
+
 ## Commands
 
 Run from the repo root. `.npmrc` holds `include=dev` because `NODE_ENV=production` can be set in this
@@ -128,7 +145,7 @@ advice" note from `src/copy.mjs`.
 Each article opens with the ScrollExpandMedia hero (`src/components/ui/scroll-expansion-hero.tsx`):
 the article's `image` grows from a 300×400 box to full width as the page is scrolled (or with
 PageDown / Space / Arrow keys), over **one site-wide background image**. To change that background,
-replace `public/blog/hero-bg.svg` — or put the new file in `public/blog/` and point
+replace `public/blog/hero-bg.jpg` — or put the new file in `public/blog/` and point
 `BLOG_HERO_BG` in `src/lib/blog.ts` at it. The whole article text is in the server HTML; without
 JS, or with reduced motion, the content is shown directly.
 

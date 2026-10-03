@@ -17,9 +17,11 @@ interface Props {
   langs?: readonly Lang[];
   otherHref?: string;
   noindex?: boolean;
+  /** Extra classes for <main> (the article page pulls its hero up under the fixed header). */
+  mainClass?: string;
 }
 
-const { lang, page, title, description, langs, otherHref, noindex } = Astro.props;
+const { lang, page, title, description, langs, otherHref, noindex, mainClass } = Astro.props;
 ---
 <html lang={lang} dir={lang === 'he' ? 'rtl' : 'ltr'}>
 <head>
@@ -27,7 +29,7 @@ const { lang, page, title, description, langs, otherHref, noindex } = Astro.prop
 </head>
 <body class="min-h-dvh">
 <SiteChrome lang={lang} page={page} otherHref={otherHref}>
-<main class="relative pb-10">
+<main class:list={["relative pb-10", mainClass]}>
 <slot />
 </main>
 </SiteChrome>

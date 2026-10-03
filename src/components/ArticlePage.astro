@@ -28,6 +28,7 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
   langs={langs}
   otherHref={otherHref}
   noindex={data.mock}
+  mainClass="-mt-(--topbar-h)"
 >
   {/*
     ScrollExpandMedia hero (hydrated for the scroll effect). Everything inside
@@ -35,6 +36,7 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
   */}
   <ScrollExpandMedia
     client:load
+    topOffset={72}
     mediaSrc={data.image}
     bgImageSrc={BLOG_HERO_BG}
     alt={data.imageAlt}

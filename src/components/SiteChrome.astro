@@ -3,10 +3,14 @@
  * Header + footer, identical markup on every page. Styled by `/style.css` on
  * the original pages and by the copy of those rules in `src/styles/global.css`
  * on the blog pages.
+ *
+ * The header is a fixed top bar: logo · Blog · language switch · App Store badge
+ * (inline-end, so the order flips in Hebrew).
  */
-import { copy, SUPPORT_EMAIL } from '../copy.mjs';
+import { copy, SUPPORT_EMAIL, APP_STORE_URL } from '../copy.mjs';
 import { urlFor, type Page } from '@/lib/legal';
 import type { Lang } from '@/lib/source';
+import { AppStoreButton } from '@/components/ui/app-store-button';
 
 interface Props {
   lang: Lang;
@@ -20,11 +24,18 @@ const t = (copy as any)[lang];
 const other: Lang = lang === 'en' ? 'he' : 'en';
 const navPages = ['privacy', 'terms', 'support'] as const;
 const setLang = `try{localStorage.setItem('lang','${other}')}catch(e){}`;
+const inBlog = page === 'blog' || page.startsWith('blog/');
 ---
+<div class="topbar">
 <header class="top">
 <a class="brand" href={urlFor(lang, 'index')}>Gymon</a>
+<div class="top-actions">
+<a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>
 <a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
+<AppStoreButton lang={lang} href={APP_STORE_URL} />
+</div>
 </header>
+</div>
 <slot />
 <footer>
 <nav>{navPages.map((p) => <Fragment><a href={urlFor(lang, p)} aria-current={p === page ? 'page' : undefined}>{t.nav[p]}</a>{'\n'}</Fragment>)}</nav>

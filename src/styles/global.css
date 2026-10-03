@@ -66,12 +66,62 @@
     margin: 0 auto;
     padding-inline: 16px;
   }
+  :root {
+    --topbar-h: 72px;
+  }
+  html {
+    scroll-padding-top: var(--topbar-h);
+  }
+  body {
+    padding-top: var(--topbar-h);
+  }
+  .topbar {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.85);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
   .top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-block: 16px;
-    border-bottom: 1px solid var(--color-border);
+    gap: 12px;
+    height: var(--topbar-h);
+  }
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .top-link {
+    color: var(--color-foreground);
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .top-link:hover {
+    color: var(--color-brand-strong);
+  }
+  .top-link[aria-current='page'] {
+    font-weight: 600;
+  }
+  .app-store-badge {
+    display: block;
+    flex: none;
+  }
+  .app-store-badge[aria-disabled='true'] {
+    cursor: default;
+  }
+  @media (max-width: 400px) {
+    .top {
+      gap: 8px;
+    }
+    .top .lang {
+      padding-inline: 10px;
+    }
   }
   .brand {
     color: var(--color-foreground);

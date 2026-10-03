@@ -12,6 +12,13 @@
 export const SUPPORT_EMAIL = 'gymon.official@gmail.com';
 export const APPLE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
 
+/**
+ * Gymon's App Store listing. null while the app is not live: the header still
+ * shows the official badge, but it leads nowhere. Set it once the app is live,
+ * e.g. 'https://apps.apple.com/app/id0000000000', and rebuild.
+ */
+export const APP_STORE_URL = null;
+
 export const copy = {
   en: {
     langName: 'English',
