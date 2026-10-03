@@ -18,9 +18,11 @@ own files and are inserted as JSON string literals.
 
 ## Flow
 
-1. **Collect sources** — Sun + Wed 09:00 Asia/Jerusalem (or *Run once*). 13 English feeds → drop items
+1. **Collect sources** — (the canvas has no node groups; each stage has a grey sticky label) Sun + Wed 09:00 Asia/Jerusalem (or *Run once*). 13 English feeds → drop items
    already used (`gymon_blog_sources`), older than 30 days, off-topic or animal/cell studies → up to 30
-   candidates, interleaved by site.
+   candidates, interleaved by site. `Shortlist candidates` always outputs one item with `counts`
+   (feed_items / already_used / duplicate / off_topic / too_old / kept); `Any candidates?` stops the run
+   when nothing is left. Do not use `new URL()` in Code nodes here — see the comment in `shortlist.js`.
 2. **Pick topic** — Sonnet picks one candidate and plans an evergreen SEO topic (slug, keywords en/he,
    search queries), avoiding used topics; `skip` ends the run.
 3. **Research + write** — hard-capped, no agent loop: Tavily extracts the source (top 5 chunks for the

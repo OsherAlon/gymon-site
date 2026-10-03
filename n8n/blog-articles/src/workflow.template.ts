@@ -92,6 +92,20 @@ const shortlist = node({
 });
 
 
+const anyCandidates = ifElse({
+  version: 2.2,
+  config: {
+    name: 'Any candidates?',
+    parameters: {
+      conditions: {
+        options: IF_OPTS,
+        conditions: [{ leftValue: expr('{{ ($json.candidates || []).length > 0 }}'), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
+        combinator: 'and',
+      },
+    },
+  },
+});
+
 const topicModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
@@ -1199,6 +1213,16 @@ const emailRevised = node({
 });
 
 
+
+const label1 = sticky('## 1 · Collect sources\n13 English RSS feeds → drop used / older than 30 days / off-topic → up to 30 candidates. Output shows `counts`.', [getUsedSources, feedList, splitFeeds, readFeed, shortlist, anyCandidates], { color: 7 });
+const label2 = sticky('## 2 · Pick topic\nSonnet picks one candidate and plans an evergreen SEO topic (slug, keywords). `skip` ends the run.', [pickTopic, hasTopic, topicPlan], { color: 7 });
+const label3 = sticky('## 3 · Research + write\nTavily: source + 3 basic searches + 2 pages (capped) → one Sonnet call writes EN → Sonnet adapts HE → Haiku check.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writeArticle, hebrewVersion, complianceCheck], { color: 7 });
+const label4 = sticky('## 4 · Hero image\nSonnet prompt → Gemini → Cloudinary (served as 16:9 JPEG).', [imagePrompt, generateImage, uploadImage], { color: 7 });
+const label5 = sticky('## 5 · Save draft + email\nRow in gymon_blog_articles, source in gymon_blog_sources, review email to gymon.official@gmail.com.', [articleRecord, insertArticle, logSource, emailNew, loadForEmail, buildEmail, sendReviewEmail], { color: 7 });
+const label7 = sticky('## 6 · Review page (GET /webhook/gymon-blog/review)\nToken-checked page: both languages, sources, versions, Approve / Send for fixes.', [getArticleReview, getVersionsReview, renderPage, respondPage], { color: 7 });
+const label8 = sticky('## 7 · Approve → GitHub (POST /webhook/gymon-blog/approve)\nOne commit (en.md, he.md, jpg) to gymon-site branch blog/incoming. ⚠️ needs a GitHub credential.', [getArticleApprove, canApprove, markApproved, buildFiles, getBranch, createCommit, markCommitted], { color: 7 });
+const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → redo → re-check → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteArticle, revisedArticle, updateArticle], { color: 7 });
+
 const noteOverview = sticky(__NOTE_OVERVIEW__, [], { color: 7, width: 520, height: 460 });
 
 export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
@@ -1211,7 +1235,8 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(splitFeeds)
   .to(readFeed)
   .to(shortlist)
-  .to(pickTopic)
+  .to(anyCandidates.onTrue(pickTopic))
+  .add(pickTopic)
   .to(hasTopic.onTrue(
     topicPlan
       .to(fetchSource)
@@ -1276,4 +1301,12 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(updateArticle)
   .to(emailRevised)
   .to(loadForEmail)
-  .add(noteOverview);
+  .add(noteOverview)
+  .add(label1)
+  .add(label2)
+  .add(label3)
+  .add(label4)
+  .add(label5)
+  .add(label7)
+  .add(label8)
+  .add(label9);

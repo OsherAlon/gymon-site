@@ -87,10 +87,24 @@ const readFeed = node({
 const shortlist = node({
   type: 'n8n-nodes-base.code',
   version: 2,
-  config: { name: 'Shortlist candidates', parameters: { mode: 'runOnceForAllItems', jsCode: "// Shortlist candidates — runs once for all RSS items.\n// Drops items already used (gymon_blog_sources), off-topic items, items older than MAX_AGE_DAYS,\n// and duplicates; then interleaves by site so one busy feed cannot fill the list.\nconst MAX_AGE_DAYS = 30;\nconst MAX_CANDIDATES = 30;\n\nconst usedRows = $('Get used sources').all().map(i => i.json).filter(r => r && r.source_url);\nconst used = new Set(usedRows.map(r => String(r.source_url).trim()));\nconst usedTopics = usedRows.map(r => r.topic).filter(Boolean).slice(-60);\n\nconst relevant = /(strength|resistance (training|exercise)|weight[- ]?(lifting|training)|lifting|hypertroph|muscle|squat|deadlift|bench press|\\bsets?\\b|\\breps?\\b|repetition|training volume|progressive overload|rest interval|inter-set|recovery|warm[- ]?up|stretching|mobility|sleep|protein|creatine|exercise|workout|fitness|athlet|sarcopenia|power training|1rm|one-repetition|tendon|deload|periodi[sz]|adherence|physical activity)/i;\nconst exclude = /\\b(mice|mouse|murine|rats?|zebrafish|in vitro|drosophila|cell line)\\b/i;\n\nconst cutoff = Date.now() - MAX_AGE_DAYS * 864e5;\nconst seen = new Set();\nconst all = [];\n\nfor (const item of $input.all()) {\n  const j = item.json || {};\n  const link = String(j.link || j.guid || '').trim();\n  if (!/^https?:\\/\\//.test(link)) continue;\n  if (used.has(link) || seen.has(link)) continue;\n  const title = String(j.title || '').replace(/\\s+/g, ' ').trim();\n  const snippet = String(j.contentSnippet || j.content || j.summary || '')\n    .replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 500);\n  const text = `${title} ${snippet}`;\n  if (!title || !relevant.test(text) || exclude.test(text)) continue;\n  const d = Date.parse(j.isoDate || j.pubDate || j.date || '');\n  if (!isNaN(d) && d < cutoff) continue;\n  let host = '';\n  try { host = new URL(link).hostname.replace(/^www\\./, ''); } catch (e) { continue; }\n  seen.add(link);\n  all.push({ title, link, snippet, host, date: isNaN(d) ? '' : new Date(d).toISOString().slice(0, 10) });\n}\n\nall.sort((a, b) => (b.date || '').localeCompare(a.date || ''));\nconst byHost = {};\nfor (const c of all) (byHost[c.host] = byHost[c.host] || []).push(c);\nconst picked = [];\nlet added = true;\nwhile (picked.length < MAX_CANDIDATES && added) {\n  added = false;\n  for (const h of Object.keys(byHost)) {\n    const c = byHost[h].shift();\n    if (c) { picked.push(c); added = true; }\n    if (picked.length >= MAX_CANDIDATES) break;\n  }\n}\n\nif (!picked.length) return [];\nreturn [{ json: { candidates: picked, used_topics: usedTopics, used_slugs: usedRows.map(r => r.slug).filter(Boolean), candidate_count: all.length } }];\n" } },
+  config: { name: 'Shortlist candidates', parameters: { mode: 'runOnceForAllItems', jsCode: "// Shortlist candidates — runs once for all RSS items.\n// Drops items already used (gymon_blog_sources), off-topic items, items older than MAX_AGE_DAYS,\n// and duplicates; then interleaves by site so one busy feed cannot fill the list.\n// Always returns ONE item with counters, so an empty shortlist is visible in the execution\n// (the next IF stops the run when candidates is empty).\n// No `new URL()` here: execution 1530 returned 0 items from 462 feed items while the same code\n// and data gave 88 candidates locally — the only silent drop was the URL parse in a try/catch.\nconst MAX_AGE_DAYS = 30;\nconst MAX_CANDIDATES = 30;\n\nconst usedRows = $('Get used sources').all().map(i => i.json).filter(r => r && r.source_url);\nconst used = new Set(usedRows.map(r => String(r.source_url).trim()));\nconst usedTopics = usedRows.map(r => r.topic).filter(Boolean).slice(-60);\n\nconst relevant = /(strength|resistance (training|exercise)|weight[- ]?(lifting|training)|lifting|hypertroph|muscle|squat|deadlift|bench press|\\bsets?\\b|\\breps?\\b|repetition|training volume|progressive overload|rest interval|inter-set|recovery|warm[- ]?up|stretching|mobility|sleep|protein|creatine|exercise|workout|fitness|athlet|sarcopenia|power training|1rm|one-repetition|tendon|deload|periodi[sz]|adherence|physical activity)/i;\nconst exclude = /\\b(mice|mouse|murine|rats?|zebrafish|in vitro|drosophila|cell line)\\b/i;\n\nconst cutoff = Date.now() - MAX_AGE_DAYS * 864e5;\nconst seen = new Set();\nconst all = [];\nconst count = { feed_items: 0, no_link: 0, already_used: 0, duplicate: 0, off_topic: 0, too_old: 0, kept: 0 };\nconst hostOf = u => (String(u).match(/^https?:\\/\\/([^\\/?#:]+)/i) || [, ''])[1].toLowerCase().replace(/^www\\./, '');\n\nfor (const item of $input.all()) {\n  count.feed_items++;\n  const j = item.json || {};\n  const link = String(j.link || j.guid || '').trim();\n  if (!/^https?:\\/\\//.test(link)) { count.no_link++; continue; }\n  if (used.has(link)) { count.already_used++; continue; }\n  if (seen.has(link)) { count.duplicate++; continue; }\n  const title = String(j.title || '').replace(/\\s+/g, ' ').trim();\n  const snippet = String(j.contentSnippet || j.content || j.summary || '')\n    .replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim().slice(0, 500);\n  const text = `${title} ${snippet}`;\n  if (!title || !relevant.test(text) || exclude.test(text)) { count.off_topic++; continue; }\n  const d = Date.parse(j.isoDate || j.pubDate || j.date || '');\n  if (!isNaN(d) && d < cutoff) { count.too_old++; continue; }\n  const host = hostOf(link) || 'unknown';\n  seen.add(link);\n  count.kept++;\n  all.push({ title, link, snippet, host, date: isNaN(d) ? '' : new Date(d).toISOString().slice(0, 10) });\n}\n\nall.sort((a, b) => (b.date || '').localeCompare(a.date || ''));\nconst byHost = {};\nfor (const c of all) (byHost[c.host] = byHost[c.host] || []).push(c);\nconst picked = [];\nlet added = true;\nwhile (picked.length < MAX_CANDIDATES && added) {\n  added = false;\n  for (const h of Object.keys(byHost)) {\n    const c = byHost[h].shift();\n    if (c) { picked.push(c); added = true; }\n    if (picked.length >= MAX_CANDIDATES) break;\n  }\n}\n\nreturn [{ json: { candidates: picked, used_topics: usedTopics, used_slugs: usedRows.map(r => r.slug).filter(Boolean), candidate_count: all.length, counts: count } }];\n" } },
   output: [{ candidates: [{ title: 'Rest intervals and hypertrophy', link: 'https://example.org/a', snippet: '…', host: 'example.org', date: '2026-09-30' }], used_topics: [], used_slugs: [], candidate_count: 1 }],
 });
 
+
+const anyCandidates = ifElse({
+  version: 2.2,
+  config: {
+    name: 'Any candidates?',
+    parameters: {
+      conditions: {
+        options: IF_OPTS,
+        conditions: [{ leftValue: expr('{{ ($json.candidates || []).length > 0 }}'), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
+        combinator: 'and',
+      },
+    },
+  },
+});
 
 const topicModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
@@ -1241,6 +1255,16 @@ const emailRevised = node({
 });
 
 
+
+const label1 = sticky('## 1 · Collect sources\n13 English RSS feeds → drop used / older than 30 days / off-topic → up to 30 candidates. Output shows `counts`.', [getUsedSources, feedList, splitFeeds, readFeed, shortlist, anyCandidates], { color: 7 });
+const label2 = sticky('## 2 · Pick topic\nSonnet picks one candidate and plans an evergreen SEO topic (slug, keywords). `skip` ends the run.', [pickTopic, hasTopic, topicPlan], { color: 7 });
+const label3 = sticky('## 3 · Research + write\nTavily: source + 3 basic searches + 2 pages (capped) → one Sonnet call writes EN → Sonnet adapts HE → Haiku check.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writeArticle, hebrewVersion, complianceCheck], { color: 7 });
+const label4 = sticky('## 4 · Hero image\nSonnet prompt → Gemini → Cloudinary (served as 16:9 JPEG).', [imagePrompt, generateImage, uploadImage], { color: 7 });
+const label5 = sticky('## 5 · Save draft + email\nRow in gymon_blog_articles, source in gymon_blog_sources, review email to gymon.official@gmail.com.', [articleRecord, insertArticle, logSource, emailNew, loadForEmail, buildEmail, sendReviewEmail], { color: 7 });
+const label7 = sticky('## 6 · Review page (GET /webhook/gymon-blog/review)\nToken-checked page: both languages, sources, versions, Approve / Send for fixes.', [getArticleReview, getVersionsReview, renderPage, respondPage], { color: 7 });
+const label8 = sticky('## 7 · Approve → GitHub (POST /webhook/gymon-blog/approve)\nOne commit (en.md, he.md, jpg) to gymon-site branch blog/incoming. ⚠️ needs a GitHub credential.', [getArticleApprove, canApprove, markApproved, buildFiles, getBranch, createCommit, markCommitted], { color: 7 });
+const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → redo → re-check → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteArticle, revisedArticle, updateArticle], { color: 7 });
+
 const noteOverview = sticky("## Gymon Blog — Articles\n**Generate (Sun + Wed 09:00, or Run once):** 13 English RSS feeds → shortlist (no reused sources) → Sonnet picks a topic → Tavily: source + 3 searches + 2 pages (capped) → Sonnet writes EN → Sonnet adapts to gender-neutral HE → Haiku flags issues → Gemini hero image → Cloudinary (16:9 JPEG) → Data table `gymon_blog_articles` → review email to gymon.official@gmail.com.\n\n**Review page** `GET /webhook/gymon-blog/review?id=&t=` (token per article).\n**Approve** `POST /webhook/gymon-blog/approve` → one commit (en.md + he.md + jpg) to `OsherAlon/gymon-site` branch `blog/incoming`.\n**Fix** `POST /webhook/gymon-blog/fix` → Haiku routes text / image / both → previous version saved to `gymon_blog_versions` → redo → new email.\n\n⚠️ The GitHub nodes need a GitHub credential (fine-grained token, Contents: read & write on gymon-site).", [], { color: 7, width: 520, height: 460 });
 
 export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
@@ -1253,7 +1277,8 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(splitFeeds)
   .to(readFeed)
   .to(shortlist)
-  .to(pickTopic)
+  .to(anyCandidates.onTrue(pickTopic))
+  .add(pickTopic)
   .to(hasTopic.onTrue(
     topicPlan
       .to(fetchSource)
@@ -1318,4 +1343,12 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(updateArticle)
   .to(emailRevised)
   .to(loadForEmail)
-  .add(noteOverview);
+  .add(noteOverview)
+  .add(label1)
+  .add(label2)
+  .add(label3)
+  .add(label4)
+  .add(label5)
+  .add(label7)
+  .add(label8)
+  .add(label9);
