@@ -46,7 +46,7 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
     <div class="bg-muted mt-8 aspect-video overflow-hidden rounded-lg border">
       <img src={data.image} alt={data.imageAlt ?? ''} class="size-full object-cover" width="1600" height="900" />
     </div>
-    <div class="prose prose-invert prose-gymon mt-8 max-w-none">
+    <div class="prose prose-gymon mt-8 max-w-none">
       <Content />
     </div>
     <p class="text-muted-foreground mt-10 border-t pt-4 text-sm">{t.disclaimer}</p>

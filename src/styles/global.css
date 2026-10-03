@@ -3,29 +3,31 @@
  * The original pages (home, privacy, terms, support, 404) do NOT load this —
  * they keep `/style.css` (public/style.css) so their look does not change.
  *
- * Token values are Gymon's existing dark look, from public/style.css:
- *   --bg #0b0f14 · --surface #111a24 · --line #1d2a38 · --text #e9f3fb
- *   --muted #a9bccb · --accent #4ba2e1 · --accent-strong #9bcaed
+ * Token values: Gymon's light palette, shared with public/style.css
+ * (switched from dark on 2026-10-03 — keep the two in sync):
+ *   --bg #ffffff · --surface #fafafa · --line #e5e5e5 · --text #0a0a0a
+ *   --muted #6b6b6b · --accent #1f6fb2 · --accent-strong #175a91
  */
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
 @theme {
-  --color-background: #0b0f14;
-  --color-foreground: #e9f3fb;
-  --color-card: #111a24;
-  --color-card-foreground: #e9f3fb;
-  --color-muted: #111a24;
-  --color-muted-foreground: #a9bccb;
+  --color-background: #ffffff;
+  --color-foreground: #0a0a0a;
+  --color-card: #fafafa;
+  --color-card-foreground: #0a0a0a;
+  --color-muted: #f5f5f5;
+  --color-muted-foreground: #6b6b6b;
   /* shadcn's `accent` is a subtle hover surface, not the brand colour. */
-  --color-accent: #16212d;
-  --color-accent-foreground: #e9f3fb;
-  --color-primary: #4ba2e1;
-  --color-primary-foreground: #0b0f14;
-  --color-border: #1d2a38;
-  --color-ring: #4ba2e1;
-  --color-brand: #4ba2e1;
-  --color-brand-strong: #9bcaed;
+  --color-accent: #f5f5f5;
+  --color-accent-foreground: #0a0a0a;
+  --color-primary: #1f6fb2;
+  --color-primary-foreground: #ffffff;
+  --color-border: #e5e5e5;
+  --color-ring: #1f6fb2;
+  /* Brand blue, darkened from brand-300 #4ba2e1 (2.8:1 on white) to pass 4.5:1. */
+  --color-brand: #1f6fb2;
+  --color-brand-strong: #175a91;
 
   --font-sans: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
 }
@@ -111,22 +113,23 @@
 }
 
 /* Article body: Tailwind Typography, recoloured to Gymon's palette.
-   In the utilities layer so it wins over the plugin's own `prose-invert` values. */
+   In the utilities layer so it wins over the plugin's own values. Light: plain
+   `prose`, so the `--tw-prose-*` (not `-invert-`) variables are the ones read. */
 @layer utilities {
   .prose-gymon {
-    --tw-prose-invert-body: #d3e1ec;
-    --tw-prose-invert-headings: var(--color-foreground);
-    --tw-prose-invert-lead: var(--color-muted-foreground);
-    --tw-prose-invert-links: var(--color-brand);
-    --tw-prose-invert-bold: var(--color-foreground);
-    --tw-prose-invert-counters: var(--color-muted-foreground);
-    --tw-prose-invert-bullets: var(--color-brand);
-    --tw-prose-invert-hr: var(--color-border);
-    --tw-prose-invert-quotes: var(--color-foreground);
-    --tw-prose-invert-quote-borders: var(--color-brand);
-    --tw-prose-invert-captions: var(--color-muted-foreground);
-    --tw-prose-invert-code: var(--color-brand-strong);
-    --tw-prose-invert-th-borders: var(--color-border);
-    --tw-prose-invert-td-borders: var(--color-border);
+    --tw-prose-body: #262626;
+    --tw-prose-headings: var(--color-foreground);
+    --tw-prose-lead: var(--color-muted-foreground);
+    --tw-prose-links: var(--color-brand);
+    --tw-prose-bold: var(--color-foreground);
+    --tw-prose-counters: var(--color-muted-foreground);
+    --tw-prose-bullets: var(--color-brand);
+    --tw-prose-hr: var(--color-border);
+    --tw-prose-quotes: var(--color-foreground);
+    --tw-prose-quote-borders: var(--color-brand);
+    --tw-prose-captions: var(--color-muted-foreground);
+    --tw-prose-code: var(--color-brand-strong);
+    --tw-prose-th-borders: var(--color-border);
+    --tw-prose-td-borders: var(--color-border);
   }
 }

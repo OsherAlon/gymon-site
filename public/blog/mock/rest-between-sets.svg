@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
 <defs>
-<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d2b2f"/><stop offset="1" stop-color="#0b0f14"/></linearGradient>
-<radialGradient id="r" cx=".75" cy=".2" r=".8"><stop offset="0" stop-color="#2fb6a6" stop-opacity=".55"/><stop offset="1" stop-color="#2fb6a6" stop-opacity="0"/></radialGradient>
+<linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f4f5"/><stop offset="1" stop-color="#e4e4e7"/></linearGradient>
+<radialGradient id="r" cx=".75" cy=".2" r=".8"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient>
 </defs>
 <rect width="1600" height="900" fill="url(#g)"/>
 <rect width="1600" height="900" fill="url(#r)"/>
-<circle cx="1100" cy="450" r="330" fill="none" stroke="#a6efe4" stroke-width="16" opacity="0.18"/><circle cx="1100" cy="450" r="250" fill="none" stroke="#a6efe4" stroke-width="16" opacity="0.3"/><circle cx="1100" cy="450" r="170" fill="none" stroke="#a6efe4" stroke-width="16" opacity="0.45"/><circle cx="1100" cy="450" r="90" fill="none" stroke="#a6efe4" stroke-width="16" opacity="0.7"/>
+<circle cx="1100" cy="450" r="330" fill="none" stroke="#a3a3a3" stroke-width="16" opacity="0.18"/><circle cx="1100" cy="450" r="250" fill="none" stroke="#a3a3a3" stroke-width="16" opacity="0.3"/><circle cx="1100" cy="450" r="170" fill="none" stroke="#a3a3a3" stroke-width="16" opacity="0.45"/><circle cx="1100" cy="450" r="90" fill="none" stroke="#a3a3a3" stroke-width="16" opacity="0.7"/>
 </svg>

@@ -1,14 +1,16 @@
-/* Gymon brand, from app/tailwind.config.js (`brand-*`) and the app's dark
-   ground. Fonts: the app's stack — Epilogue for Latin, Assistant for Hebrew
+/* Light palette (2026-10-03), matching the blog's shadcn-style light tokens in
+   src/styles/global.css — keep the two in sync. The brand blue is darkened from
+   brand-300 #4ba2e1 (2.8:1 on white) so links pass 4.5:1.
+   Fonts: the app's stack — Epilogue for Latin, Assistant for Hebrew
    (Epilogue has no Hebrew glyphs, so the browser falls through per character). */
 :root {
-  --bg: #0b0f14;
-  --surface: #111a24;
-  --line: #1d2a38;
-  --text: #e9f3fb;        /* brand-50 */
-  --muted: #a9bccb;
-  --accent: #4ba2e1;      /* brand-300 */
-  --accent-strong: #9bcaed; /* brand-200 */
+  --bg: #ffffff;
+  --surface: #fafafa;
+  --line: #e5e5e5;
+  --text: #0a0a0a;          /* 19.8:1 on white */
+  --muted: #6b6b6b;         /* 5.3:1 on white */
+  --accent: #1f6fb2;        /* links, 5.3:1 on white */
+  --accent-strong: #175a91; /* h3, language pill, link hover — 7.2:1 */
   --font: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
 }
 
