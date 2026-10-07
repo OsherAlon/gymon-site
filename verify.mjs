@@ -187,7 +187,9 @@ for (const lang of ['en', 'he']) {
   if (status !== 200) fail(`status ${status}`);
   const own = posts.filter((p) => p.lang === lang);
   for (const post of own) {
-    if (!text(html).includes(post.title)) fail(`${index} does not list "${post.title}"`);
+    // Card titles are per-character wave spans (aria-hidden); the heading's aria-label holds the title.
+    const attr = post.title.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    if (!text(html).includes(post.title) && !html.includes(`aria-label="${attr}"`)) fail(`${index} does not list "${post.title}"`);
     const path = `${prefix}/blog/${post.slug}`;
     const page = await load(path);
     const tag = page.html.match(/<html lang="(\w+)" dir="(\w+)"/);
@@ -197,6 +199,9 @@ for (const lang of ['en', 'he']) {
     if (page.status !== 200) fail(`status ${page.status}`);
     if (!okLang) fail(`${path}: <html> must be lang="${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}"`);
     if (!okText) fail(`${path}: the title is not in the served HTML`);
+    // Titles are questions (user decision 2026-10-07); no headline-reveal / gsap on article pages.
+    if (!post.title.endsWith('?')) fail(`${path}: the title is not a question ending in "?"`);
+    if (/data-reveal|ScrollTrigger|SplitText|headline-reveal/.test(page.html)) fail(`${path}: gsap / headline reveal on an article page`);
     if (post.doc) {
       // Doctrine template: answer first, always visible, structured data present.
       const body = text(page.html);

@@ -1,4 +1,5 @@
 import React from 'react';
+import { WaveText } from '@/components/ui/wave-text';
 import { LazyImage } from './lazy-image';
 
 export interface BlogCard {
@@ -63,7 +64,9 @@ export function BlogSection({
 								<div className="bg-muted-foreground size-1 rounded-full" />
 								<p>{blog.readTime}</p>
 							</div>
-							<h2 className="line-clamp-2 text-lg leading-5 font-semibold tracking-tight">{blog.title}</h2>
+							<h2 className="line-clamp-2 text-lg leading-5 font-semibold tracking-tight" aria-label={blog.title}>
+								<WaveText text={blog.title} />
+							</h2>
 							<p className="text-muted-foreground line-clamp-3 text-sm">{blog.description}</p>
 						</div>
 					</a>

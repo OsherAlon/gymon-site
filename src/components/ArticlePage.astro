@@ -25,6 +25,7 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
 // English article with a Hebrew version: a dismissible hint for Hebrew-language
 // devices, instead of the redirect the App Store pages use.
 const heHint = lang === 'en' && langs.includes('he') ? articleUrl('he', data.slug) : null;
+import WaveText from '@/components/ui/wave-text';
 ---
 <BlogLayout
   lang={lang}
@@ -49,7 +50,7 @@ const heHint = lang === 'en' && langs.includes('he') ? articleUrl('he', data.slu
   <article class="mx-auto w-full max-w-3xl px-8 pt-10 md:px-16">
     {/* Answer first: the full title (the page's only h1), then the description. */}
     <header class="space-y-3">
-      <h1 class="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl">{data.title}</h1>
+      <WaveText client:visible as="h1" headingClassName="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl" text={data.title} />
       <p class="text-muted-foreground text-lg">{data.description}</p>
       <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
         <span>{t.by} {data.author}</span>

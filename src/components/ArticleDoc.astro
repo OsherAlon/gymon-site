@@ -18,6 +18,7 @@ import BlogLayout from '@/layouts/BlogLayout.astro';
 import ArticleHero from '@/components/ArticleHero.astro';
 import HeHint from '@/components/HeHint.astro';
 import OneRepMax from '@/components/OneRepMax.astro';
+import WaveText from '@/components/ui/wave-text';
 import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
 import { urlFor } from '@/lib/legal';
 import { DOMAIN, type Lang } from '@/lib/source';
@@ -120,7 +121,8 @@ const logCols: string[] = c.gymon.cols;
     {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
 
     <header class="doc3-head">
-      <h1 class="doc3-h1">{a.title}</h1>
+      {/* Wave on the title (user-supplied Text_03): characters server-rendered, aria-label = the title. */}
+      <WaveText client:visible as="h1" headingClassName="doc3-h1" text={a.title} />
       <p class="doc3-hook" set:html={inl(a.hook)} />
       <p class="doc3-takeaway">
         <span class="doc3-takeaway-label">{c.inShort}</span>
