@@ -123,7 +123,7 @@ export const copy = {
           heading: 'About the editor',
           name: 'Osher Alon',
           // ⚠ User to confirm: this is Osher's public bio. Truthful by design (no credential claimed).
-          bio: 'Osher Alon builds Gymon and edits this blog. Osher is not a certified coach or dietitian: every article is checked against the sources listed under it, and anything medical belongs with a qualified professional.',
+          bio: 'Edited by Osher Alon, founder of Gymon. Osher is not a certified coach or dietitian. Every article is checked against the sources listed at its end. For medical questions, consult a qualified professional.',
         },
         howMade:
           'How this article was made: an AI model drafted it from the research listed under Sources, and was allowed to cite only those sources. Automated checks then tested every reference link and every number against its source, and Osher Alon fact-checked and edited the article before publication. Corrections: ',
@@ -252,7 +252,7 @@ export const copy = {
           heading: 'על העריכה',
           name: 'אושר אלון',
           // ⚠ לאישור המשתמשת: הביוגרפיה הפומבית. ניסוח ניטרלי מגדרית, בלי הסמכה שאין.
-          bio: 'העריכה: אושר אלון, שבונה את Gymon. לאושר אין הסמכת אימון או תזונה: כל מאמר נבדק מול המקורות שמופיעים בסופו, ונושאים רפואיים שמורים לאנשי מקצוע מוסמכים.',
+          bio: 'עריכה: אושר אלון, מייסדת Gymon. אושר אינה מאמנת מוסמכת או דיאטנית. כל מאמר נבדק מול המקורות המופיעים בסופו. בשאלות רפואיות יש לפנות לאיש מקצוע מוסמך.',
         },
         howMade:
           'איך נכתב המאמר: מודל AI כתב טיוטה על בסיס המחקר שמופיע תחת "מקורות", והורשה לצטט רק אותו. בדיקות אוטומטיות בדקו כל קישור לכל מקור וכל מספר מול המקור שלו, ואושר אלון בדק וערך את המאמר לפני הפרסום. לתיקונים: ',
