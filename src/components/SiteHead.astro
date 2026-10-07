@@ -38,6 +38,8 @@ const hasRedirect = !notFound && !isBlog && lang === 'en' && langs.includes('he'
 <meta name="color-scheme" content="light">
 {description && <meta name="description" content={description}>}
 {noindex && <meta name="robots" content="noindex">}
+{!noindex && isBlog && <meta name="robots" content="max-image-preview:large">}
+{isBlog && <meta http-equiv="content-language" content={lang}>}
 <link rel="icon" href="data:,">
 {!notFound && <link rel="canonical" href={`https://${DOMAIN}${urlFor(lang, page)}`}>}
 {!notFound && langs.length > 1 && langs.map((l) => <link rel="alternate" hreflang={l} href={`https://${DOMAIN}${urlFor(l, page)}`}>)}

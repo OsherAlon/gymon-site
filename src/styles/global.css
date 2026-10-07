@@ -443,3 +443,461 @@
     color: var(--color-foreground);
   }
 }
+
+/*
+ * Doctrine article template (src/components/ArticleDoc.astro).
+ * Typography per ARTICLE_UX_DOCTRINE §2/§5: English body 17px, Hebrew body 18px / 1.75,
+ * no italics and no letter-spacing in Hebrew (emphasis by weight), Hebrew measure ≤ 42em,
+ * meta text ≥ 14px. Callout and quote borders use logical properties (mirror in RTL).
+ */
+@layer components {
+  .doc {
+    --doc-card: var(--color-card);
+  }
+  .doc:lang(he),
+  .doc:lang(he) * {
+    letter-spacing: normal;
+  }
+  .doc:lang(he) em,
+  .doc:lang(he) i {
+    font-style: normal;
+    font-weight: 600;
+  }
+  .doc-section,
+  .doc :target {
+    scroll-margin-top: calc(var(--topbar-h) + 16px);
+  }
+  .doc-sample {
+    margin-bottom: 20px;
+    padding: 10px 14px;
+    border: 1px dashed var(--color-brand);
+    border-radius: 10px;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .doc-trust {
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .doc-label {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-brand-strong);
+  }
+  .doc:lang(he) .doc-label {
+    text-transform: none;
+    font-size: 15px;
+  }
+  .doc-label--sub {
+    margin-top: 14px;
+  }
+  .doc-bottomline {
+    margin-top: 24px;
+    padding: 18px 20px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-brand);
+    border-radius: 12px;
+  }
+  .doc-tldr {
+    margin-top: 6px;
+    font-size: 19px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .doc:lang(he) .doc-tldr {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+  .doc-points {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: disc;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .doc:lang(he) .doc-points {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .doc-points li + li {
+    margin-top: 6px;
+  }
+  .doc-toc {
+    margin-top: 20px;
+    padding: 14px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+  }
+  .doc-toc ol {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: decimal;
+    font-size: 16px;
+  }
+  .doc-toc li {
+    padding-block: 3px;
+  }
+  .doc-toc a,
+  .doc-related a,
+  .doc-sources a,
+  .doc-made a,
+  .doc-cta-inline a,
+  .doc-cta-end a {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .doc-body {
+    margin-top: 28px;
+  }
+  .doc-body .cite,
+  .doc .cite {
+    font-size: 0.72em;
+    margin-inline-start: 2px;
+    white-space: nowrap;
+  }
+  .cite-btn {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+    display: inline-block;
+    line-height: 1.2; /* preflight sets sup { line-height: 0 }, which collapsed the button to 0px */
+    padding: 2px 3px; /* inline target: exempt from WCAG 2.5.8's 24px minimum */
+  }
+  .doc-takeaway {
+    padding: 10px 14px;
+    background: var(--color-muted);
+    border-inline-start: 3px solid var(--color-highlight);
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .doc-claim,
+  .doc-callout,
+  .doc-gymon,
+  .doc-cta-inline {
+    margin-block: 1.5em;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+  }
+  .doc-claim p,
+  .doc-callout p,
+  .doc-gymon p,
+  .doc-cta-inline p {
+    margin-top: 4px;
+  }
+  .doc-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+  }
+  .doc-badge--strong,
+  .doc-badge--moderate {
+    background: #d7e9ee;
+  }
+  .doc-callout {
+    border-inline-start: 4px solid var(--color-brand);
+  }
+  .doc-callout--safety {
+    border-inline-start-color: #8a5a00;
+  }
+  .doc-callout-label,
+  .doc-gymon-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-brand-strong);
+  }
+  .doc-gymon {
+    border-color: var(--color-brand);
+  }
+  .doc-gymon-caption,
+  .doc-gymon-heading {
+    font-weight: 600;
+  }
+  .doc-gymon ul {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: disc;
+  }
+  .doc-gymon-note {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-table {
+    margin-block: 1.5em;
+  }
+  .doc-table-scroll {
+    overflow-x: auto;
+    margin-top: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--doc-card);
+  }
+  .doc-table table,
+  .doc-log {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .doc-table caption {
+    caption-side: top;
+    padding: 10px 12px 4px;
+    text-align: start;
+    font-weight: 600;
+  }
+  .doc-table th,
+  .doc-table td,
+  .doc-log th,
+  .doc-log td {
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-border);
+    text-align: start;
+    font-variant-numeric: tabular-nums;
+  }
+  .doc-log th[scope='col'] {
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+    font-weight: 700;
+  }
+  .doc-log-session th {
+    background: var(--color-muted);
+    font-weight: 700;
+  }
+  .doc-log-prev {
+    color: var(--color-muted-foreground);
+  }
+  .doc-quiz {
+    list-style: decimal;
+    padding-inline-start: 1.25em;
+  }
+  .doc-quiz > li + li {
+    margin-top: 18px;
+  }
+  .doc-quiz-q {
+    font-weight: 600;
+  }
+  .doc-quiz-options {
+    list-style: '○  ';
+    padding-inline-start: 1.25em;
+    margin-block: 6px;
+  }
+  .doc-quiz summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  .doc-cta-end {
+    margin-top: 36px;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+  .doc-cta-end h2 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .doc-cta-end p {
+    margin-top: 6px;
+  }
+  .doc-cta-end a {
+    color: #fff;
+  }
+  .doc-cta-meta {
+    font-size: 15px;
+    opacity: 0.85;
+  }
+  .doc-sources {
+    margin-top: 36px;
+  }
+  .doc-sources h2 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .doc-refs {
+    margin-top: 10px;
+    padding-inline-start: 1.5em;
+    list-style: decimal;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .doc-refs li + li {
+    margin-top: 10px;
+  }
+  .doc-ref-text {
+    unicode-bidi: isolate;
+  }
+  .doc-ref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-ref-tags span {
+    padding: 1px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+  .doc-editor {
+    margin-top: 28px;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  .doc-editor p {
+    margin-top: 4px;
+  }
+  .doc-made {
+    margin-top: 24px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .doc-made p + p {
+    margin-top: 8px;
+  }
+  .doc-related {
+    margin-top: 24px;
+  }
+  .doc-related li + li {
+    margin-top: 6px;
+  }
+  .doc-pop {
+    max-width: min(92vw, 520px);
+    margin: auto;
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-card);
+    color: var(--color-foreground);
+    box-shadow: 0 20px 50px -20px rgb(11 17 21 / 0.45);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .doc-pop::backdrop {
+    background: rgb(11 17 21 / 0.25);
+  }
+  .doc-pop-head {
+    font-weight: 700;
+    color: var(--color-brand-strong);
+  }
+  .doc-pop blockquote {
+    margin: 10px 0;
+    padding-inline-start: 12px;
+    border-inline-start: 3px solid var(--color-highlight);
+    color: var(--color-muted-foreground);
+  }
+  .doc-pop-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .doc-pop-links a,
+  .doc-pop-links button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  /* 1RM calculator */
+  .calc {
+    margin-block: 1.5em;
+    padding: 16px;
+    border: 1px solid var(--color-brand);
+    border-radius: 14px;
+    background: var(--color-card);
+  }
+  .calc-title {
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  @media (min-width: 520px) {
+    .calc-inputs {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      grid-template-rows: auto auto;
+    }
+  }
+  .calc-inputs label {
+    font-size: 15px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-inputs input {
+    font-size: 17px; /* ≥16px: no iOS focus zoom */
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-background);
+    width: 100%;
+  }
+  .calc-result {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--color-muted);
+  }
+  .calc-label {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc-sub,
+  .calc-note {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-note {
+    margin-top: 8px;
+  }
+}
+
+/* Article body size: unlayered on purpose, so it wins over Tailwind Typography's `.prose`
+   font-size (which sits in the utilities layer). EN 17px; HE 18px / 1.75 (UX doctrine §5). */
+.doc .doc-body {
+  font-size: 17px;
+  line-height: 1.7;
+}
+.doc:lang(he) .doc-body {
+  font-size: 18px;
+  line-height: 1.75;
+  max-width: 42em;
+}
+.doc:lang(he) .doc-body :where(p, li) {
+  font-size: 18px;
+  line-height: 1.75;
+}

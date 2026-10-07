@@ -8,6 +8,8 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { validateArticle } from './lib/article/validate.mjs';
+import type { ArticleData } from './lib/article/types';
 
 const blog = defineCollection({
   loader: glob({
@@ -36,4 +38,30 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+/**
+ * Doctrine articles — one JSON file per article per language, in the closed schema of
+ * src/lib/article/schema.mjs (ARTICLE_UX_DOCTRINE §8b). This is what the n8n workflow
+ * commits on Approve. The build runs the SAME validator the workflow runs before the review
+ * email; any error fails the build.
+ *
+ *   src/content/articles/<lang>/<slug>.json          real articles (reviewed)
+ *   src/content/articles/sample/<lang>/<slug>.json   sample articles (`sample: true` → noindex)
+ */
+const articles = defineCollection({
+  loader: glob({
+    pattern: '**/*.json',
+    base: './src/content/articles',
+    generateId: ({ data }) => `${data.lang}/${data.slug}`,
+  }),
+  schema: z
+    .any()
+    .superRefine((data, ctx) => {
+      const { errors, warnings } = validateArticle(data, { mode: 'build' });
+      for (const e of errors) ctx.addIssue({ code: 'custom', message: `${e.path}: ${e.message}` });
+      if (warnings.length && !errors.length)
+        console.warn(`[articles] ${data?.lang}/${data?.slug}: ${warnings.length} warning(s)\n  ` + warnings.map((w) => `${w.path}: ${w.message}`).join('\n  '));
+    })
+    .transform((data) => data as ArticleData),
+});
+
+export const collections = { blog, articles };

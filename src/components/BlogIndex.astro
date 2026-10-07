@@ -1,7 +1,7 @@
 ---
 import BlogLayout from '@/layouts/BlogLayout.astro';
 import { BlogSection } from '@/components/ui/blog-section';
-import { articles, articleUrl, blogCopy, formatDate } from '@/lib/blog';
+import { listing, articleUrl, blogCopy, formatDate } from '@/lib/blog';
 import type { Lang } from '@/lib/source';
 
 interface Props {
@@ -10,18 +10,18 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = blogCopy(lang);
-const list = await articles(lang);
-const blogs = list.map(({ data }) => ({
-  title: data.title,
-  slug: articleUrl(lang, data.slug),
-  description: data.description,
-  image: data.image,
-  createdAt: formatDate(lang, data.createdAt),
-  author: data.author,
-  readTime: t.readTime(data.readTime),
+const list = await listing(lang);
+const blogs = list.map((a) => ({
+  title: a.title,
+  slug: articleUrl(lang, a.slug),
+  description: a.description,
+  image: a.image,
+  createdAt: formatDate(lang, a.date),
+  author: a.author,
+  readTime: t.readTime(a.readTime),
 }));
-// While the blog only holds mock articles, keep it out of search results.
-const onlyMock = list.length > 0 && list.every((a) => a.data.mock);
+// While the blog only holds placeholder articles (mock / preview / sample), keep it out of search results.
+const onlyMock = list.length > 0 && list.every((a) => a.placeholder);
 ---
 <BlogLayout lang={lang} page="blog" title={`${t.title} · Gymon`} description={t.subheading} noindex={onlyMock}>
   {/* Hydrated only for the image fade-in; every word is in the server HTML. */}

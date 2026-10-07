@@ -25,7 +25,7 @@ const { lang, page, title, description, langs, otherHref, noindex, mainClass } =
 ---
 <html lang={lang} dir={lang === 'he' ? 'rtl' : 'ltr'}>
 <head>
-<SiteHead lang={lang} page={page} title={title} description={description} langs={langs} noindex={noindex} />
+<SiteHead lang={lang} page={page} title={title} description={description} langs={langs} noindex={noindex}><slot name="head" /></SiteHead>
 </head>
 <body class="min-h-dvh">
 <SiteChrome lang={lang} page={page} otherHref={otherHref}>

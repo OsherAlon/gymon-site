@@ -1,0 +1,343 @@
+---
+/**
+ * The doctrine article template (ARTICLE_UX_DOCTRINE §8a, SEO_DOCTRINE §4–§5), rendered from
+ * one JSON file in the closed schema of src/lib/article/schema.mjs. Zero JS except the 1RM
+ * calculator's small script; reference previews use the native `popover` attribute.
+ *
+ * Order (§8a): hero → H1 → trust line → bottom line + key points → TOC → body sections (the
+ * "apply" section holds the calculator and the one contextual CTA) → self-check → common
+ * questions → end CTA → sources → editor → how it was made + disclaimer → related.
+ *
+ * The article text is server HTML and always visible: nothing here is opacity:0, nothing waits
+ * on hydration or on scrolling (the hero is scroll-LINKED CSS, see ArticleHero.astro).
+ */
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import ArticleHero from '@/components/ArticleHero.astro';
+import HeHint from '@/components/HeHint.astro';
+import OneRepMax from '@/components/OneRepMax.astro';
+import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
+import { urlFor } from '@/lib/legal';
+import { DOMAIN, type Lang } from '@/lib/source';
+import { renderInline } from '@/lib/article/inline.mjs';
+import { readTimeOf } from '@/lib/article/validate.mjs';
+import { articleJsonLd, absolute, isoJerusalem } from '@/lib/article/seo';
+import { appStoreId, campaignUrl } from '@/lib/appStore';
+import { SUPPORT_EMAIL } from '../copy.mjs';
+
+interface Props {
+  article: DocArticle;
+}
+
+const { data: a } = Astro.props.article;
+const lang = a.lang as Lang;
+const he = lang === 'he';
+const t = blogCopy(lang);
+const c = (t as any).article;
+const date = (d: string) => formatDate(lang, new Date(`${d}T00:00:00Z`));
+
+// References are numbered in list order; every marker gets a tap preview (native popover).
+const refNo = new Map(a.references.map((r, i) => [r.id, i + 1]));
+const inl = (text: string) =>
+  renderInline(text, { lang, refNumber: (id: string) => refNo.get(id), refPopoverId: (id: string) => `refpop-${id}`, sourceLabel: c.source });
+const cites = (ids?: string[]) => (ids && ids.length ? inl(`[[${ids.join(',')}]]`) : '');
+
+const sectionId = (i: number) => `s-${i + 1}`;
+const faq = a.faq ?? [];
+const quiz = a.quiz ?? [];
+const readTime = readTimeOf(a);
+
+const url = `https://${DOMAIN}${articleUrl(lang, a.slug)}`;
+const langs = await languagesOf(a.slug);
+const other: Lang = he ? 'en' : 'he';
+const otherHref = langs.includes(other) ? articleUrl(other, a.slug) : urlFor(other, 'blog');
+const heHint = !he && langs.includes('he') ? articleUrl('he', a.slug) : null;
+
+// Related: other articles in this language sharing the pillar or a tag (never samples next to real ones).
+const related = (await docArticles(lang))
+  .filter((x) => x.data.slug !== a.slug && !!x.data.sample === !!a.sample)
+  .map((x) => ({ x, score: (x.data.pillar === a.pillar ? 2 : 0) + x.data.tags.filter((tg) => a.tags.includes(tg)).length }))
+  .filter((r) => r.score > 0)
+  .sort((p, q) => q.score - p.score)
+  .slice(0, 3)
+  .map((r) => r.x.data);
+
+// Hebrew <title>: an RLM keeps "· Gymon" on the correct side of a Hebrew title.
+const pageTitle = he ? `${a.title}‏ · Gymon` : `${a.title} · Gymon`;
+const jsonLd = articleJsonLd(a, {
+  url,
+  blogUrl: `https://${DOMAIN}${urlFor(lang, 'blog')}`,
+  blogName: t.title,
+  editorName: c.editor.name,
+});
+const endHref = campaignUrl('blog-end');
+const inlineHref = campaignUrl('blog-inline');
+const slotText = c.ctaSlots[a.cta.slot];
+const logCols: string[] = c.gymon.cols;
+---
+<BlogLayout
+  lang={lang}
+  page={`blog/${a.slug}`}
+  title={pageTitle}
+  description={a.description}
+  langs={langs}
+  otherHref={otherHref}
+  noindex={!!a.sample}
+  mainClass="-mt-(--topbar-h)"
+>
+  <Fragment slot="head">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Gymon">
+    <meta property="og:title" content={a.title}>
+    <meta property="og:description" content={a.description}>
+    <meta property="og:url" content={url}>
+    <meta property="og:image" content={absolute(a.image)}>
+    <meta property="og:image:alt" content={a.imageAlt}>
+    <meta property="og:locale" content={he ? 'he_IL' : 'en_US'}>
+    {langs.includes(other) && <meta property="og:locale:alternate" content={he ? 'en_US' : 'he_IL'}>}
+    <meta property="article:published_time" content={isoJerusalem(a.createdAt)}>
+    <meta property="article:modified_time" content={isoJerusalem(a.updatedAt ?? a.createdAt)}>
+    <meta name="twitter:card" content="summary_large_image">
+    {appStoreId && <meta name="apple-itunes-app" content={`app-id=${appStoreId}, app-argument=${url}`}>}
+    {jsonLd.map((j) => <script type="application/ld+json" set:html={j}></script>)}
+  </Fragment>
+
+  {heHint && <HeHint href={heHint} />}
+  <ArticleHero
+    image={a.image}
+    imageAlt={a.imageAlt}
+    bgImage={BLOG_HERO_BG}
+    heroTitle={a.heroTitle}
+    date={`${date(a.updatedAt ?? a.createdAt)} · ${t.readTime(readTime)}`}
+    scrollLabel={t.scrollToRead}
+  />
+
+  <article class="doc mx-auto w-full max-w-3xl px-4 pt-10 sm:px-8 md:px-12">
+    {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
+
+    <header class="space-y-3">
+      <h1 class:list={['doc-h1 text-3xl leading-tight font-bold text-balance sm:text-4xl', !he && 'tracking-tight']}>{a.title}</h1>
+      <p class="doc-trust">
+        <span>{c.drafted}</span>
+        <span aria-hidden="true"> · </span>
+        <span>{a.reviewedAt ? c.reviewed(c.editor.name, date(a.reviewedAt)) : c.notReviewed}</span>
+        <span aria-hidden="true"> · </span>
+        <span><time datetime={a.createdAt}>{c.published(date(a.createdAt))}</time></span>
+        {a.updatedAt && (
+          <Fragment><span aria-hidden="true"> · </span><span><time datetime={a.updatedAt}>{c.updated(date(a.updatedAt))}</time></span></Fragment>
+        )}
+        <span aria-hidden="true"> · </span>
+        <span>{t.readTime(readTime)}</span>
+      </p>
+    </header>
+
+    {/* Answer first: the bottom line and the key points come before everything else. */}
+    <section class="doc-bottomline" aria-labelledby="bottom-line">
+      <h2 id="bottom-line" class="doc-label">{c.bottomLine}</h2>
+      <p class="doc-tldr" set:html={inl(a.tldr)} />
+      <h3 class="doc-label doc-label--sub">{c.keyPoints}</h3>
+      <ul class="doc-points">
+        {a.keyTakeaways.map((k) => <li set:html={inl(k.text) + cites(k.refs)} />)}
+      </ul>
+    </section>
+
+    <nav class="doc-toc" aria-labelledby="toc-label">
+      <h2 id="toc-label" class="doc-label">{c.toc}</h2>
+      <ol>
+        {a.sections.map((s, i) => <li><a href={`#${sectionId(i)}`} set:html={inl(s.heading).replace(/<sup[\s\S]*?<\/sup>/g, '')} /></li>)}
+        {quiz.length > 0 && <li><a href="#quiz">{c.quiz}</a></li>}
+        {faq.length > 0 && <li><a href="#faq">{c.faq}</a></li>}
+        <li><a href="#sources">{c.sources}</a></li>
+      </ol>
+    </nav>
+
+    <div class="prose prose-gymon doc-body max-w-none">
+      {a.sections.map((s, i) => (
+        <section id={sectionId(i)} class="doc-section">
+          <h2 set:html={inl(s.heading)} />
+          {s.blocks.map((b) => {
+            switch (b.type) {
+              case 'p':
+                return <p set:html={inl(b.text)} />;
+              case 'list':
+                return b.ordered
+                  ? <ol>{b.items.map((it) => <li set:html={inl(it)} />)}</ol>
+                  : <ul>{b.items.map((it) => <li set:html={inl(it)} />)}</ul>;
+              case 'takeaway':
+                return <p class="doc-takeaway" set:html={inl(b.text)} />;
+              case 'claim':
+                return (
+                  <div class="doc-claim not-prose">
+                    <span class={`doc-badge doc-badge--${b.evidence}`}>{c.evidence[b.evidence]}</span>
+                    <p set:html={inl(b.text) + cites(b.refs)} />
+                  </div>
+                );
+              case 'callout':
+                return (
+                  <aside class={`doc-callout doc-callout--${b.kind} not-prose`}>
+                    <strong class="doc-callout-label">{c.callout[b.kind]}</strong>
+                    <p set:html={inl(b.text)} />
+                  </aside>
+                );
+              case 'table':
+                return (
+                  <figure class="doc-table not-prose">
+                    <div class="doc-table-scroll" tabindex="0" role="region" aria-label={b.caption}>
+                      <table>
+                        <caption set:html={inl(b.caption) + cites(b.refs)} />
+                        <thead><tr>{b.columns.map((col) => <th scope="col" set:html={inl(col)} />)}</tr></thead>
+                        <tbody>{b.rows.map((row) => <tr>{row.map((cell, ci) => (ci === 0 ? <th scope="row" set:html={inl(String(cell))} /> : <td set:html={inl(String(cell))} />))}</tr>)}</tbody>
+                      </table>
+                    </div>
+                  </figure>
+                );
+              case 'calculator':
+                return <OneRepMax lang={lang} defaults={b.defaults} />;
+              case 'cta':
+                return (
+                  <aside class="doc-cta-inline not-prose">
+                    <p>{slotText}</p>
+                    {inlineHref && <a href={inlineHref} rel="noopener">{c.ctaInlineLink}</a>}
+                  </aside>
+                );
+              case 'gymon':
+                return b.kind === 'log-example' ? (
+                  <figure class="doc-gymon not-prose">
+                    <p class="doc-gymon-label">{c.gymon['log-example']}</p>
+                    <p class="doc-gymon-caption" set:html={inl(b.caption)} />
+                    <div class="doc-table-scroll" tabindex="0" role="region" aria-label={b.caption}>
+                      <table class="doc-log">
+                        <caption class="sr-only">{b.exercise}</caption>
+                        {b.sessions.map((ses) => (
+                          <tbody>
+                            <tr class="doc-log-session"><th colspan="5" scope="colgroup">{b.exercise} · {ses.label}</th></tr>
+                            <tr>{logCols.map((col) => <th scope="col">{col}</th>)}</tr>
+                            {ses.sets.map((st, si) => (
+                              <tr>
+                                <td>{si + 1}</td>
+                                <td class="doc-log-prev"><span dir="ltr">{st.previous ? `${st.previous.kg} × ${st.previous.reps}` : '—'}</span></td>
+                                <td>{st.kg}</td>
+                                <td>{st.reps}</td>
+                                <td aria-label="✓">✓</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        ))}
+                      </table>
+                    </div>
+                    {b.text && <p set:html={inl(b.text)} />}
+                    <p class="doc-gymon-note">{c.gymon.illustrative}</p>
+                  </figure>
+                ) : (
+                  <aside class="doc-gymon not-prose">
+                    <p class="doc-gymon-label">{c.gymon[b.kind]}</p>
+                    {b.heading && <p class="doc-gymon-heading" set:html={inl(b.heading)} />}
+                    <p set:html={inl(b.text)} />
+                    {b.points && b.points.length > 0 && <ul>{b.points.map((pt) => <li set:html={inl(pt)} />)}</ul>}
+                  </aside>
+                );
+            }
+          })}
+        </section>
+      ))}
+
+      {quiz.length > 0 && (
+        <section id="quiz" class="doc-section">
+          <h2>{c.quiz}</h2>
+          <ol class="doc-quiz not-prose">
+            {quiz.map((q) => (
+              <li>
+                <p class="doc-quiz-q" set:html={inl(q.question)} />
+                <ul class="doc-quiz-options">{q.options.map((o) => <li set:html={inl(o)} />)}</ul>
+                <details>
+                  <summary>{c.quizAnswer}</summary>
+                  <p><strong>{c.quizCorrect}</strong> <span set:html={inl(q.options[q.correctIndex])} /></p>
+                  <p set:html={inl(q.explanation) + cites(q.refs)} />
+                </details>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
+
+      {faq.length > 0 && (
+        <section id="faq" class="doc-section">
+          <h2>{c.faq}</h2>
+          {faq.map((f) => (
+            <Fragment>
+              <h3 set:html={inl(f.q)} />
+              <p set:html={inl(f.a) + cites(f.refs)} />
+            </Fragment>
+          ))}
+        </section>
+      )}
+    </div>
+
+    {/* The one end-of-article CTA. Text link, not a second badge: the header already carries the
+        official App Store badge, and Apple allows one badge per layout. */}
+    <aside class="doc-cta-end" aria-labelledby="cta-end">
+      <h2 id="cta-end">{c.endCta.heading}</h2>
+      <p>{slotText}</p>
+      <p class="doc-cta-meta">
+        {endHref ? <a href={endHref} rel="noopener">{c.endCta.link}</a> : <span>{c.endCta.iphone} {c.endCta.soon}</span>}
+        <span> {c.endCta.android}</span>
+      </p>
+    </aside>
+
+    <section id="sources" class="doc-sources" aria-labelledby="sources-h">
+      <h2 id="sources-h">{c.sources}</h2>
+      <ol class="doc-refs">
+        {a.references.map((r) => (
+          <li id={`ref-${r.id}`}>
+            <bdi lang="en" dir="ltr" class="doc-ref-text">
+              {r.authors.length > 0 && <span>{r.authors.length > 3 ? `${r.authors[0]} et al.` : r.authors.join(', ')} </span>}
+              {r.year && <span>({r.year}). </span>}
+              <a href={r.url} rel="noopener">{r.title}</a>.
+              {r.venue && <span> {r.venue}.</span>}
+              {r.doi && <span> DOI <a href={`https://doi.org/${r.doi}`} rel="noopener">{r.doi}</a>.</span>}
+              {r.pmid && <span> PMID <a href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`} rel="noopener">{r.pmid}</a>.</span>}
+            </bdi>
+            <span class="doc-ref-tags">
+              <span>{c.type[r.type] ?? r.type}</span>
+              <span>{c.tier[r.tier]}</span>
+              {!r.fullTextRead && <span>{c.abstractOnly}</span>}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section class="doc-editor" aria-labelledby="editor-h">
+      <h2 id="editor-h" class="doc-label">{c.editor.heading}</h2>
+      <p>{c.editor.bio}</p>
+    </section>
+
+    <footer class="doc-made">
+      <p>{a.sample ? c.howMadeSample : c.howMade}<a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></p>
+      {a.imageAiGenerated && <p>{c.aiImage}</p>}
+      <p>{t.disclaimer}</p>
+    </footer>
+
+    {related.length > 0 && (
+      <nav class="doc-related" aria-label={t.back}>
+        <ul>{related.map((r) => <li><a href={articleUrl(lang, r.slug)}>{r.title}</a></li>)}</ul>
+      </nav>
+    )}
+
+    <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground mt-6 inline-flex min-h-11 items-center gap-1 text-sm">
+      <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
+    </a>
+  </article>
+
+  {/* Reference previews: transient, tap-to-open (UX doctrine §6). Native popover, no JS. */}
+  {a.references.map((r) => (
+    <div id={`refpop-${r.id}`} popover class="doc-pop" lang={lang} dir={he ? 'rtl' : 'ltr'}>
+      <p class="doc-pop-head">{c.source} {refNo.get(r.id)}</p>
+      <p><bdi lang="en" dir="ltr">{r.authors.length > 3 ? `${r.authors[0]} et al.` : r.authors.join(', ')}{r.year ? ` (${r.year})` : ''}. {r.title}</bdi></p>
+      <blockquote lang="en" dir="ltr">“{r.quote}”</blockquote>
+      <p class="doc-pop-links">
+        <a href={r.url} rel="noopener">{c.openSource}</a>
+        <button type="button" popovertarget={`refpop-${r.id}`} popovertargetaction="hide">{c.close}</button>
+      </p>
+    </div>
+  ))}
+</BlogLayout>

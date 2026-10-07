@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 import { copy } from '../copy.mjs';
 import type { Lang } from './source';
+import { readTimeOf } from './article/validate.mjs';
 
 export type Article = CollectionEntry<'blog'>;
 
@@ -19,10 +20,52 @@ export async function articles(lang: Lang): Promise<Article[]> {
   return all.sort((a, b) => b.data.createdAt.getTime() - a.data.createdAt.getTime());
 }
 
+export type DocArticle = CollectionEntry<'articles'>;
+
+/** Doctrine (JSON) articles in one language, newest first. */
+export async function docArticles(lang: Lang): Promise<DocArticle[]> {
+  const all = await getCollection('articles', ({ data }) => data.lang === lang);
+  return all.sort((a, b) => b.data.createdAt.localeCompare(a.data.createdAt));
+}
+
+/** One card on the blog index — the same shape for both content kinds. */
+export interface Listing {
+  slug: string;
+  title: string;
+  description: string;
+  image: string;
+  date: Date;
+  author: string;
+  readTime: number;
+  /** Mock, preview or sample: keeps the index noindex while nothing real is listed. */
+  placeholder: boolean;
+}
+
+/** Everything the index lists in one language, newest first. A JSON article wins over a Markdown one with the same slug. */
+export async function listing(lang: Lang): Promise<Listing[]> {
+  const docs = await docArticles(lang);
+  const out: Listing[] = docs.map(({ data }) => ({
+    slug: data.slug,
+    title: data.title,
+    description: data.description,
+    image: data.image,
+    date: new Date(`${data.createdAt}T00:00:00Z`),
+    author: (copy as any)[lang].blog.article.editor.name,
+    readTime: readTimeOf(data),
+    placeholder: !!data.sample,
+  }));
+  for (const { data } of await articles(lang)) {
+    if (out.some((o) => o.slug === data.slug)) continue;
+    out.push({ slug: data.slug, title: data.title, description: data.description, image: data.image, date: data.createdAt, author: data.author, readTime: data.readTime, placeholder: data.mock });
+  }
+  return out.sort((a, b) => b.date.getTime() - a.date.getTime());
+}
+
 /** Languages an article (by slug) is published in. */
 export async function languagesOf(slug: string): Promise<Lang[]> {
-  const all = await getCollection('blog', ({ data }) => data.slug === slug && !data.draft);
-  return (['en', 'he'] as const).filter((l) => all.some((a) => a.data.lang === l));
+  const md = await getCollection('blog', ({ data }) => data.slug === slug && !data.draft);
+  const docs = await getCollection('articles', ({ data }) => data.slug === slug);
+  return (['en', 'he'] as const).filter((l) => md.some((a) => a.data.lang === l) || docs.some((a) => a.data.lang === l));
 }
 
 export const blogCopy = (lang: Lang) => (copy as any)[lang].blog as {

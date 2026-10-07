@@ -137,7 +137,20 @@ function articles(dir = join(ROOT, 'src', 'content', 'blog')) {
   });
 }
 
-const posts = articles();
+/** Every JSON (doctrine) article under src/content/articles. */
+function docArticles(dir = join(ROOT, 'src', 'content', 'articles')) {
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name);
+    if (statSync(full).isDirectory()) return docArticles(full);
+    if (!name.endsWith('.json')) return [];
+    const a = JSON.parse(readFileSync(full, 'utf8'));
+    return [{ lang: a.lang, slug: a.slug, title: a.title, doc: a }];
+  });
+}
+
+const docs = docArticles();
+const posts = [...docs, ...articles().filter((p) => !docs.some((d) => d.slug === p.slug && d.lang === p.lang))];
 for (const lang of ['en', 'he']) {
   const prefix = lang === 'en' ? '' : '/he';
   const index = `${prefix}/blog/`;
@@ -156,6 +169,22 @@ for (const lang of ['en', 'he']) {
     if (page.status !== 200) fail(`status ${page.status}`);
     if (!okLang) fail(`${path}: <html> must be lang="${lang}" dir="${lang === 'he' ? 'rtl' : 'ltr'}"`);
     if (!okText) fail(`${path}: the title is not in the served HTML`);
+    if (post.doc) {
+      // Doctrine template: answer first, always visible, structured data present.
+      const body = text(page.html);
+      const plain = (t) => t.replace(/\[\[[^\]]+\]\]/g, '').replace(/\*\*/g, '').replace(/\s+([.,;:])/g, '$1').replace(/\s+/g, ' ').trim();
+      if (!body.includes(plain(post.doc.tldr).slice(0, 60))) fail(`${path}: the bottom line is not in the HTML`);
+      if (/opacity:\s*0[;"]/.test(page.html.split('<article')[1] ?? '')) fail(`${path}: article content ships at opacity:0`);
+      if (!/"@type":"BlogPosting"/.test(page.html)) fail(`${path}: no BlogPosting JSON-LD`);
+      if (!/property="og:image"/.test(page.html)) fail(`${path}: no og:image`);
+      if (!/id="sources"/.test(page.html)) fail(`${path}: no sources list`);
+      if (post.doc.sample && !/<meta name="robots" content="noindex">/.test(page.html)) fail(`${path}: a sample article must be noindex`);
+      if (lang === 'he' && /\d\s*[–×]\s*\d/.test(body.replace(/<[^>]+>/g, ''))) {
+        // Allowed only inside an LTR isolate.
+        const bare = page.html.replace(/<span dir="ltr">[^<]*<\/span>/g, '').replace(/<bdi[\s\S]*?<\/bdi>/g, '').replace(/<(script|blockquote)[\s\S]*?<\/\1>/g, '');
+        if (/\d\s*[–×]\s*\d/.test(text(bare))) fail(`${path}: a number range with – or × outside an LTR isolate`);
+      }
+    }
   }
   console.log(`  ${own.length} ${lang} article(s) checked`);
 }
