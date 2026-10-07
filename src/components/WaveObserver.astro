@@ -1,0 +1,9 @@
+---
+/**
+ * Touch devices have no hover: play each .wave-text once when it first scrolls into view.
+ * Inline, ~0.4 KB, no framework. Does nothing on hover-capable pointers or with reduced motion.
+ */
+---
+<script is:inline>
+(function(){if(!('IntersectionObserver'in window)||matchMedia('(hover:hover) and (pointer:fine)').matches||matchMedia('(prefers-reduced-motion: reduce)').matches)return;var o=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('wave-play');o.unobserve(e.target)}})},{threshold:.6});function go(){document.querySelectorAll('.wave-text').forEach(function(el){o.observe(el)})}document.readyState==='loading'?document.addEventListener('DOMContentLoaded',go):go()})();
+</script>

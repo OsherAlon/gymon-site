@@ -1238,3 +1238,32 @@ body:has(.pricing-page) {
     scroll-snap-align: start;
   }
 }
+
+/* Wave text (src/components/ui/wave-text.tsx): CSS version of the user-supplied Text_03.
+   cubic-bezier(.34,1.56,.64,1) overshoots like the source's spring (300/15). */
+.wave-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.wave-char {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wave-char {
+    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: calc(var(--i, 0) * 30ms);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wave-text:hover .wave-char {
+      transform: translateY(-4px) scale(1.2);
+    }
+  }
+  .wave-text.wave-play .wave-char {
+    animation: wave-hop 760ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 30ms) both;
+  }
+}
+@keyframes wave-hop {
+  0% { transform: none; }
+  45% { transform: translateY(-4px) scale(1.2); }
+  100% { transform: none; }
+}

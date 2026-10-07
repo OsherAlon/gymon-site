@@ -26,6 +26,7 @@ const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(
 // devices, instead of the redirect the App Store pages use.
 const heHint = lang === 'en' && langs.includes('he') ? articleUrl('he', data.slug) : null;
 import WaveText from '@/components/ui/wave-text';
+import WaveObserver from '@/components/WaveObserver.astro';
 ---
 <BlogLayout
   lang={lang}
@@ -50,7 +51,8 @@ import WaveText from '@/components/ui/wave-text';
   <article class="mx-auto w-full max-w-3xl px-8 pt-10 md:px-16">
     {/* Answer first: the full title (the page's only h1), then the description. */}
     <header class="space-y-3">
-      <WaveText client:visible as="h1" headingClassName="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl" text={data.title} />
+      <WaveText as="h1" headingClassName="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl" text={data.title} />
+      <WaveObserver />
       <p class="text-muted-foreground text-lg">{data.description}</p>
       <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
         <span>{t.by} {data.author}</span>

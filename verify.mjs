@@ -202,6 +202,8 @@ for (const lang of ['en', 'he']) {
     // Titles are questions (user decision 2026-10-07); no headline-reveal / gsap on article pages.
     if (!post.title.endsWith('?')) fail(`${path}: the title is not a question ending in "?"`);
     if (/data-reveal|ScrollTrigger|SplitText|headline-reveal/.test(page.html)) fail(`${path}: gsap / headline reveal on an article page`);
+    // The H1 wave is CSS-only: no React / framer-motion islands on article pages.
+    if (/<astro-island|renderer-url|framer|use-reduced-motion/.test(page.html)) fail(`${path}: a React island on an article page`);
     if (post.doc) {
       // Doctrine template: answer first, always visible, structured data present.
       const body = text(page.html);

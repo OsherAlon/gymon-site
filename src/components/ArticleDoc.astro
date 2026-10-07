@@ -19,6 +19,7 @@ import ArticleHero from '@/components/ArticleHero.astro';
 import HeHint from '@/components/HeHint.astro';
 import OneRepMax from '@/components/OneRepMax.astro';
 import WaveText from '@/components/ui/wave-text';
+import WaveObserver from '@/components/WaveObserver.astro';
 import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
 import { urlFor } from '@/lib/legal';
 import { DOMAIN, type Lang } from '@/lib/source';
@@ -121,8 +122,9 @@ const logCols: string[] = c.gymon.cols;
     {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
 
     <header class="doc3-head">
-      {/* Wave on the title (user-supplied Text_03): characters server-rendered, aria-label = the title. */}
-      <WaveText client:visible as="h1" headingClassName="doc3-h1" text={a.title} />
+      {/* Wave on the title (user-supplied Text_03), CSS only: no client directive, zero JS. */}
+      <WaveText as="h1" headingClassName="doc3-h1" text={a.title} />
+      <WaveObserver />
       <p class="doc3-hook" set:html={inl(a.hook)} />
       <p class="doc3-takeaway">
         <span class="doc3-takeaway-label">{c.inShort}</span>

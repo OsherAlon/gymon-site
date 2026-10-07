@@ -2,6 +2,7 @@
 import BlogLayout from '@/layouts/BlogLayout.astro';
 import { BlogSection } from '@/components/ui/blog-section';
 import { listing, articleUrl, blogCopy, formatDate } from '@/lib/blog';
+import WaveObserver from '@/components/WaveObserver.astro';
 import type { Lang } from '@/lib/source';
 
 interface Props {
@@ -27,4 +28,5 @@ const onlyMock = list.length > 0 && list.every((a) => a.placeholder);
   {/* Hydrated only for the image fade-in; every word is in the server HTML. */}
   <BlogSection client:load blogs={blogs} heading={t.heading} subheading={t.subheading} byLabel={t.by} />
   {list.length === 0 && <p class="text-muted-foreground mx-auto max-w-5xl px-6">{t.empty}</p>}
+  <WaveObserver />
 </BlogLayout>
