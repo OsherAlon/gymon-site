@@ -42,6 +42,15 @@ export const copy = {
     // users yet and invented reviews are prohibited. Every claim is checked against the shipped
     // app (gymon app/src + departments/legal/app_store_listing_draft.md). Data-driven, so real
     // reviews (with permission) can replace these later.
+    // Home zigzag showcase (2026-10-07): one row per App Store screenshot, texts describe what
+    // that screen shows (evidence in the commit message). Order: logger, chat, plan, progress, summary.
+    showcase: [
+      { key: 'logger', tag: 'Workout log', title: 'Log a set in seconds', text: "Weight and reps for each set, with last time's numbers already filled in. Mark a set as done and the rest timer starts.", alt: 'The workout log in Gymon: sets with weight and reps, three marked done.' },
+      { key: 'chat', tag: 'Chat with Gymon', title: 'Stuck? Ask Gymon', text: "Ask about a lift that won't budge and get practical ideas for the next workout.", alt: 'A chat with Gymon about a bench press that has stalled.' },
+      { key: 'plan', tag: 'Your plan', title: 'A week built around you', text: 'Your goal, how often you train and where, turned into a typical week of workouts.', alt: "Gymon's plan overview: the goal, four sessions a week, and the week's workouts." },
+      { key: 'progress', tag: 'Profile', title: 'Steps and weight in one place', text: 'Your weekly step average, the days you hit your step goal, and your weight against your target.', alt: 'The Gymon profile: weekly step average, daily step goal and body weight against a goal.' },
+      { key: 'summary', tag: 'Workout summary', title: 'Every workout, wrapped up', text: 'When you finish: the time, the exercises completed, the total weight lifted and every set.', alt: 'A Gymon workout summary: duration, exercises completed, total weight and sets.' },
+    ],
     features: {
       title: "What's inside Gymon",
       description: 'A quick look at what the app does.',
@@ -198,6 +207,13 @@ export const copy = {
       screenAlt: 'מסך הבית באפליקציית Gymon: האימונים של השבוע והצעדים של היום.',
     },
     nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג' },
+    showcase: [
+      { key: 'logger', tag: 'יומן אימון', title: 'מתעדים סט בשניות', text: 'משקל וחזרות לכל סט, והמספרים מהפעם הקודמת כבר ממולאים. מסמנים סט כבוצע וטיימר המנוחה מתחיל.', alt: 'יומן האימון ב-Gymon: סטים עם משקל וחזרות, שלושה מסומנים כבוצעו.' },
+      { key: 'chat', tag: 'שיחה עם Gymon', title: 'נתקעים? שואלים את Gymon', text: 'שואלים על תרגיל שלא מתקדם ומקבלים רעיונות מעשיים לאימון הבא.', alt: 'שיחה עם Gymon על לחיצת חזה שנתקעה.' },
+      { key: 'plan', tag: 'התוכנית', title: 'שבוע שנבנה סביבכם', text: 'המטרה, התדירות ומקום האימון הופכים לשבוע אימונים טיפוסי.', alt: 'סקירת התוכנית ב-Gymon: המטרה, ארבעה אימונים בשבוע והאימונים של השבוע.' },
+      { key: 'progress', tag: 'פרופיל', title: 'צעדים ומשקל במקום אחד', text: 'ממוצע הצעדים השבועי, הימים שבהם הושג יעד הצעדים, והמשקל מול היעד.', alt: 'הפרופיל ב-Gymon: ממוצע צעדים שבועי, יעד צעדים יומי ומשקל מול יעד.' },
+      { key: 'summary', tag: 'סיכום אימון', title: 'כל אימון, בסיכום אחד', text: 'בסיום: משך האימון, התרגילים שהושלמו, המשקל הכולל וכל הסטים.', alt: 'סיכום אימון ב-Gymon: משך, תרגילים שהושלמו, משקל כולל וסטים.' },
+    ],
     features: {
       title: 'מה יש ב-Gymon',
       description: 'הצצה קצרה למה שהאפליקציה עושה.',

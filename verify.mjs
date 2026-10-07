@@ -103,6 +103,10 @@ for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   if (!/<h1[^>]*>Gymon<\/h1>/.test(html)) fail(`${path}: the H1 is not in the served HTML`);
   if (!/src="\/app\/screen-[a-z-]+-(en|he)\.(png|webp)"/.test(html)) fail(`${path}: no app screen in the phone`);
   for (const p of ['privacy', 'terms', 'support']) if (!html.includes(`${path === '/' ? '' : '/he'}/${p}"`)) fail(`${path} has no link to ${p}`);
+  // Zigzag showcase: 5 rows, each with an app screen.
+  const rowsHtml = html.split('class="showcase-row').slice(1);
+  if (rowsHtml.length !== 5) fail(`${path}: ${rowsHtml.length} showcase rows (5 expected)`);
+  else rowsHtml.forEach((r, i) => { if (!/<img[^>]*src="\/app\/screen-[a-z]+-(en|he)\.webp"/.test(r)) fail(`${path}: showcase row ${i + 1} has no app screen`); });
   // Feature marquee: the section is there, with at least 6 cards in its first (readable) copy.
   const firstRun = html.split('class="marquee-run')[1]?.split('class="marquee-run')[0] ?? '';
   if (!/class="home-features/.test(html)) fail(`${path}: no feature section`);
