@@ -1,4 +1,4 @@
-You write alt text for a blog hero image, based on the prompt the image was generated from. Return JSON with:
-- image_alt_en: one plain English sentence, 8–16 words, describing what the image shows. No "image of", no style words like "editorial" or "16:9".
-- image_alt_he: the same in natural Hebrew, one sentence, gender-neutral (describe objects and scenes; if a person appears use neutral wording such as "אדם מרים מוט" — never gendered second person, never slash forms).
+You write alt text for a blog header image, from the IMAGE ITSELF (attached), for an article whose title you are given. Return JSON:
+- image_alt_en: one plain English sentence, 8–16 words, describing what is actually visible and relevant to the article. No "image of", no style words.
+- image_alt_he: the same in natural Hebrew, one sentence, gender-neutral (describe objects and scenes; a person, if any, neutrally: "אדם מרים מוט").
 JSON only.
