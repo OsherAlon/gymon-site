@@ -24,16 +24,19 @@ interface Props {
   page: Page;
   /** Where the language switch points (an article may lack a translation). */
   otherHref?: string;
+  /** Tailwind pages (home, blog, articles, pricing): white bar, 1280px content width like the
+   *  home showcase. The LegacyLayout pages Apple reviews (privacy/terms/support) leave it off. */
+  wide?: boolean;
 }
 
-const { lang, page, otherHref } = Astro.props;
+const { lang, page, otherHref, wide = false } = Astro.props;
 const t = (copy as any)[lang];
 const other: Lang = lang === 'en' ? 'he' : 'en';
 const navPages = ['privacy', 'terms', 'support'] as const;
 const setLang = `try{localStorage.setItem('lang','${other}')}catch(e){}`;
 const inBlog = page === 'blog' || page.startsWith('blog/');
 ---
-<div class="topbar">
+<div class:list={["topbar", wide && "topbar--wide"]}>
 <header class="top">
 <a class="brand" href={urlFor(lang, 'index')}>Gymon</a>
 <div class="top-actions">
