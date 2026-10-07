@@ -154,7 +154,7 @@ const logCols: string[] = c.gymon.cols;
       {a.sections.map((s, i) => (
         <section id={sectionId(i)} class="doc-section">
           <h2 set:html={inl(s.heading)} />
-          {s.blocks.map((b) => {
+          {s.blocks.map((b, j) => {
             switch (b.type) {
               case 'p':
                 return <p set:html={inl(b.text)} />;
@@ -191,7 +191,7 @@ const logCols: string[] = c.gymon.cols;
                   </figure>
                 );
               case 'calculator':
-                return <OneRepMax lang={lang} defaults={b.defaults} />;
+                return <OneRepMax lang={lang} defaults={b.defaults} uid={`orm-${i}-${j}`} />;
               case 'cta':
                 return (
                   <aside class="doc-cta-inline not-prose">

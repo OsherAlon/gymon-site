@@ -15,15 +15,16 @@ import type { Lang } from '@/lib/source';
 interface Props {
   lang: Lang;
   defaults?: { weightKg?: number; reps?: number };
+  /** Unique per page and stable across builds (the article passes `orm-<section>-<block>`). */
+  uid?: string;
 }
-const { lang, defaults = {} } = Astro.props;
+const { lang, defaults = {}, uid = 'orm' } = Astro.props;
 const reg = CALCULATORS['one-rep-max'];
 const t = (copy as any)[lang].blog.article.calc['one-rep-max'];
 const w = defaults.weightKg ?? reg.weightKg.default;
 const r = defaults.reps ?? reg.reps.default;
 const res = oneRepMax(w, r);
 const nf = new Intl.NumberFormat(lang === 'he' ? 'he-IL' : 'en-US', { maximumFractionDigits: 1 });
-const uid = `orm-${Math.random().toString(36).slice(2, 8)}`;
 ---
 <figure class="calc not-prose" data-calc="one-rep-max" data-lang={lang}
   data-range={t.range('{lo}', '{hi}')} data-unit={t.unit} data-bad-weight={t.invalidWeight} data-bad-reps={t.invalidReps}>

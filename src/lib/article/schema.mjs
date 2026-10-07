@@ -2,7 +2,7 @@
  * The article contract — ONE closed vocabulary shared by:
  *   - the site build (`src/content.config.ts` validates every article file with it), and
  *   - the n8n pipeline (`n8n/blog-articles/src/build.py` inlines this file and validate.mjs
- *     into the "Assemble + validate" Code node, and emits the writer's JSON Schema from it).
+ *     into the "Validate articles" Code node, and emits the writer's JSON Schema from it).
  *
  * Doctrine: ARTICLE_UX_DOCTRINE §8a/§8b, SEO_DOCTRINE §2–§4, §9.1.
  *
