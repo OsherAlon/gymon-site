@@ -1,4 +1,4 @@
-import { workflow, node, trigger, sticky, newCredential, ifElse, languageModel, outputParser, expr } from '@n8n/workflow-sdk';
+import { workflow, node, trigger, sticky, ifElse, languageModel, outputParser, expr } from '@n8n/workflow-sdk';
 
 const T_ARTICLES = { __rl: true, mode: 'id', value: 't7r8sTFqvaGTXQZ9', cachedResultName: 'gymon_blog_articles' };
 const T_VERSIONS = { __rl: true, mode: 'id', value: '6Q3AzxAZ066QgsoI', cachedResultName: 'gymon_blog_versions' };
@@ -23,7 +23,7 @@ const GH_HEADERS = { parameters: [
   { name: 'Accept', value: 'application/vnd.github+json' },
   { name: 'X-GitHub-Api-Version', value: '2022-11-28' },
 ] };
-const CRED_GITHUB = { githubApi: newCredential('GitHub — gymon-site') };
+const CRED_GITHUB = { githubApi: { id: '87ElEfiIizw4AWkh', name: 'GitHub gymon-site' } };
 
 const IF_OPTS = { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 };
 

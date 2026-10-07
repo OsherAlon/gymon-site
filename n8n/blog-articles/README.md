@@ -133,8 +133,9 @@ Every read/write is its own named Data table node, so a later move to a database
 
 ## Before the first run
 
-- Add a **GitHub** credential (type *GitHub API*, fine-grained token on `OsherAlon/gymon-site` with
-  *Contents: read and write*) and select it on the 8 GitHub HTTP nodes in group *8 · Approve → GitHub*.
+- ✅ GitHub credential **GitHub gymon-site** (`87ElEfiIizw4AWkh`, fine-grained token on
+  `OsherAlon/gymon-site`, *Contents: read and write*) is set on the 8 GitHub HTTP nodes
+  (`CRED_GITHUB` in the template). An id is not a secret; the token stays in n8n.
 - Confirm the Cloudinary credential (`osheralon5@gmail.com_DEV AI`) is the account the blog images
   should live in.
 - The site must already contain the JSON article template (`src/content/articles/`, branch
