@@ -123,37 +123,50 @@ The contract lives in `src/lib/article/` and is the single definition shared wit
 The build validates every file through the `articles` collection in `src/content.config.ts` and fails
 on any error. Tests: `npm test` (`node --test tests/*.test.mjs`).
 
+**Schema v2 (user decision 2026-10-07: "full of text, not fun to read")** — a short, card-based
+article. Where it conflicts with the UX/SEO doctrines, v2 wins.
+
 Top-level keys (the pipeline owns the first group, the writer the second):
 
-- **code-owned**: `schemaVersion`, `lang`, `slug`, `pillar`, `tags`, `intent`, `ymylLevel` (only
-  `low`), `lengthBand`, `image`, `imageAiGenerated`, `createdAt`, `updatedAt`, `reviewedAt`, `editor`
-  (`osher-alon`), `aiAssisted`, `sample`
+- **code-owned**: `schemaVersion` (2), `lang`, `slug`, `pillar`, `tags`, `intent`, `ymylLevel` (only
+  `low`), `lengthBand` (`500-700`), `image`, `imageAiGenerated`, `createdAt`, `updatedAt`, `reviewedAt`,
+  `editor` (`osher-alon`), `aiAssisted`, `sample`
 - **writer-owned**: `title` (20–52 chars, the page's only `<h1>`), `heroTitle` (1–4 words),
-  `description` (meta description), `primaryQuery`, `imageAlt`, `tldr` (≤ 3 sentences, the bottom
-  line), `keyTakeaways` (3–5), `sections` (4–7, each `heading` + `blocks`), `faq`, `quiz`,
-  `references` (numbered `r1`…, with `url`, optional `doi`/`pmid`, `tier`, `type`, a verbatim
-  `quote` and `fullTextRead`), `cta` (`{ slot }`, copy comes from `src/copy.mjs`)
+  `description`, `primaryQuery`, `imageAlt`, and:
+  - `bottomLine` — ONE sentence.
+  - `cards` — 3–5 idea cards `{ label, heading, text }`: a 1–4 word label, a headline that states the
+    answer, 2–3 short sentences. Research only as `[[rN]]` superscripts, at most one key number per card.
+  - `apply` — `{ steps: 3–6 × { title, text }, calculator?, gymon? }`: numbered step cards (one line
+    each), plus the 1RM calculator and the Gymon log example only when the topic calls for them.
+  - `references` — numbered `r1`…, with `url`, optional `doi`/`pmid`, `tier`, `type`, `fullTextRead`, a
+    verbatim `quote`, and the reader-facing detail: `finding` (what the study found, with its size and
+    population) and `certainty` (strong | moderate | limited | mixed | insufficient). Study detail lives
+    ONLY here; the validator flags p-values, ± and "n =" in the body.
+  - `cta` — `{ slot }`; the single end CTA's copy comes from `src/copy.mjs`.
 
-Block types: `p`, `list`, `takeaway`, `claim` (with `evidence` level and `refs`), `callout`
-(`note`/`myth`/`safety`), `table`, `calculator` (`one-rep-max`, pre-filled and showing its result
-without JavaScript), `cta` (at most one contextual mention), and exactly one `gymon` block (the
-Gymon-unique element: `log-example`, `plan-logic` or `teardown-finding`).
+Length: 500–700 words in English (380–560 in Hebrew, which runs ~20–25% fewer words), sentences ≤ 20
+words, a 2–3 minute read. The page renders (`src/components/ArticleDoc.astro`): hero → title, dates and
+trust line → bottom line → idea cards → "how to apply" step cards (+ calculator, + log example) → end
+CTA → sources (finding, certainty, type, tier) → editor box → "how this article was made". No table of
+contents, FAQ, quiz, evidence badges or inline CTA. Head: `BlogPosting` JSON-LD, Open Graph,
+`dateModified`, `max-image-preview:large`. A Hebrew page is never auto-redirected; the English page
+shows an "also in Hebrew" banner.
 
-The page renders (`src/components/ArticleDoc.astro`): hero → title, dates and trust line → bottom
-line + key takeaways → table of contents → sections → quiz → FAQ → one end CTA → numbered sources
-(each marker opens a preview) → editor box → "how this article was made". Hebrew: 18px / 1.75, no italics, no
-letter-spacing. Head: `BlogPosting` JSON-LD, Open Graph, `dateModified`, `max-image-preview:large`.
-A Hebrew page is never auto-redirected; the English page shows an "also in Hebrew" banner.
+⚠ The n8n workflow still writes schema v1 (its tests use a frozen v1 copy in
+`n8n/blog-articles/tests/fixtures/v1/`). It must be migrated before any article is approved, or the
+committed files will fail this build.
 
 Rules for the text: Hebrew is gender-neutral (no second-person singular: "יש ל-", plural or impersonal
-forms); no high-YMYL topics (supplements, weight loss, injuries, pregnancy, medical); no medical
-promises. The "general information, not medical advice" footer comes from `src/copy.mjs`.
+forms) and real Hebrew, not English in Hebrew letters ("עומס הדרגתי", never "פרוגרסיב אוברלואד" — the
+validator flags it); no high-YMYL topics (supplements, weight loss, injuries, pregnancy, medical); no
+medical promises. The "general information, not medical advice" footer comes from `src/copy.mjs`.
 
 ### Sample article
 
 `src/content/articles/sample/{en,he}/estimate-one-rep-max.json` is a sample pair (`sample: true` →
 `noindex`, a visible "sample" label and its own "how this sample was made" note). Its two sources are
-real (Richens & Cleather 2014; Brzycki 1993); no editor has reviewed it. To remove it, delete
+real (Richens & Cleather 2014; Brzycki 1993); no editor has reviewed it. It is in the v2 layout: EN 502
+words, HE 385 words. To remove it, delete
 `src/content/articles/sample/`.
 
 ### Older Markdown articles
