@@ -1,5 +1,5 @@
 ---
-title: "Why logging every set pays off"
+title: "Why log every set?"
 heroTitle: "Log Every Set"
 description: "A training log is the difference between hoping to progress and knowing whether it is happening. What to write down, and what to look for later."
 image: /blog/mock/why-log-every-set.svg

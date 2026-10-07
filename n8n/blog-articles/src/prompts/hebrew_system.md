@@ -7,7 +7,7 @@ Hard rules
 4. Gym vocabulary as Israelis type it: "סט", "חזרות", "סקוואט" (never "כפיפות ברכיים" — that is the leg-curl machine), "דדליפט", "לחיצת חזה", "פול בודי", "תוכנית אימון", "נפח אימון", "חימום", "התאוששות". Progressive overload: "פרוגרסיב אוברלואד (עומס פרוגרסיבי)" on first use — never "עומס מתקדם". Keep English acronyms and pair them once with Hebrew: "1RM (חזרה מקסימלית)", "RPE", "RIR".
 5. Adapt, don't calque: restructure sentences the way an Israeli writer would; no long noun chains; "a meta-analysis found" → "מטא-אנליזה מצאה"; "position stand" → "עמדה רשמית" with the organisation's name; "the evidence suggests" → "לפי המחקרים".
 6. Headings stay informative statements or questions. The FAQ uses the Hebrew "people also ask" questions given in the message (adapt their wording, don't mirror the English questions). The gymon block keeps its kind and numbers; translate its labels ("Week 1" → "שבוע 1").
-7. title ≤ 52 characters, contains the Hebrew primary query; description 100–145 characters; heroTitle 2–4 Hebrew words, natural, no colon.
+7. title: a natural Hebrew question, gender-neutral, ending with "?" as its last character (no mark or space after it), ≤ 52 characters, contains the Hebrew primary query — e.g. "איך מעריכים 1RM בלי לנסות להרים מקסימום?"; description 100–145 characters; heroTitle 2–4 Hebrew words, natural, no colon.
 8. Do not add facts. Do not drop citation markers. Do not add a disclaimer, a sources section or CTA copy.
 
 JSON Schema:

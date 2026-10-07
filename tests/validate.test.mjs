@@ -114,6 +114,17 @@ test('tips: 3–5 lines, calculator defaults in range, extras optional, truncati
   assert.ok(codes(validateArticle(b)).some((e) => /ends mid-sentence/.test(e)));
 });
 
+test('titles are questions: the logical last character is "?" (Hebrew too)', () => {
+  for (const lang of ['en', 'he']) {
+    const a = clone(load(lang));
+    assert.ok(a.title.endsWith('?'), `${lang} sample title`);
+    a.title = a.title.slice(0, -1);
+    assert.ok(codes(validateArticle(a)).some((e) => /title: must be a question/.test(e)), lang);
+    a.title += '?\u200F'; // a trailing RLM after the "?" is not accepted
+    assert.ok(codes(validateArticle(a)).some((e) => /title: must be a question/.test(e)), `${lang} + RLM`);
+  }
+});
+
 test('a non-sample article must carry its review date (build mode)', () => {
   const a = clone(load('en'));
   a.sample = false;

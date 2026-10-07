@@ -38,6 +38,13 @@ Then push to n8n with `validate_workflow` → `update_workflow`. The SDK is a re
 subset, so long sources live in their own files and are inserted as JSON string literals. Comments,
 indentation, imports and exports are stripped from the inlined code to stay under the 300K limit.
 
+> ⚠ **Not yet in the live draft (2026-10-07).** The site moved to article schema v3 (hook ·
+> bottomLine · beats · pullQuote · tips; see the site README) and every title must now be a question
+> ending in "?" (the validator errors otherwise). The prompts in `src/prompts/` already ask for
+> question titles, but `workflow.sdk.ts` and the live n8n draft are still the v1 workflow: do NOT
+> run `src/build.py` or push to n8n until the whole workflow is migrated to v3 in one go
+> (`emit.mjs` still builds the v1 writer schema). Its tests use the frozen v1 fixture.
+
 ## Flow
 
 1. **Collect sources**: Sunday 09:00 Asia/Jerusalem, weekly (or *Run once*). 11 English training

@@ -13,7 +13,7 @@ GYMON-UNIQUE BLOCK — mandatory, exactly one block of type "gymon"
 - Never write "our users", user counts, user quotes, personal anecdotes or invented experience.
 
 STRUCTURE (the page renders the title, trust line, table of contents, sources list, CTA copy and disclaimer itself — never write them)
-- title ≤ 52 characters, contains the primary query, answers or poses the question. heroTitle 2–4 words. description 120–155 characters.
+- title: a natural question that ends with "?" (the "?" is the last character), ≤ 52 characters, contains the primary query — e.g. "How do you estimate your 1RM without maxing out?". heroTitle 2–4 words. description 120–155 characters.
 - tldr: 1–3 sentences that answer the question directly, with a certainty verb. keyTakeaways: 3–5 one-sentence items; any item with a number has a [[rN]] marker.
 - sections: 4–7. Every heading is an informative statement or question whose first two words carry the gist (not "Introduction", not one-word labels). The first sentence of every paragraph states its point. Average about 15 words per sentence, never more than 25. Bold only a few key phrases.
 - Every section object has the boolean field "apply" next to "heading" and "blocks". Exactly one section has "apply": true and every other section has "apply": false; a heading that starts with "Apply it" does not replace the field. The apply section is the practical protocol ("Apply it: …"), including how to test it on oneself by logging. Put the single {"type":"cta"} block there (it renders a fixed sentence about Gymon; you never write CTA copy) and, only when the topic is about estimating maximal strength, a {"type":"calculator","calculator":"one-rep-max"} block with realistic defaults.

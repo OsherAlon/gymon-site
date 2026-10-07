@@ -1,5 +1,5 @@
 ---
-title: "Rest between sets: how long is long enough?"
+title: "How long should you rest between sets?"
 heroTitle: "Rest Between Sets"
 description: "Short rests feel productive, but they can cost reps on the next set. How to pick rest times for strength work and for accessory exercises."
 image: /blog/mock/rest-between-sets.svg

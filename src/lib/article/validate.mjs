@@ -198,6 +198,9 @@ export function validateArticle(a, ctx = {}) {
     if (a.title.length > LIMITS.title.hardMax) err('title', `${a.title.length} characters (hard limit ${LIMITS.title.hardMax})`);
     else if (a.title.length > LIMITS.title.max) warn('title', `${a.title.length} characters — SEO doctrine caps titles at ${LIMITS.title.max}`);
     if (a.title.length < LIMITS.title.min) warn('title', 'very short');
+    // User decision 2026-10-07: every title is a natural question. The "?" must be the LOGICAL last
+    // character (Hebrew included) — a trailing bidi mark or space after it does not count.
+    if (!a.title.endsWith('?')) err('title', 'must be a question ending in "?"');
   }
   if (!isStr(a.heroTitle)) err('heroTitle', 'required (2–4 words)');
   else {

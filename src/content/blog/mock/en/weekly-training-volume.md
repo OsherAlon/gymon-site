@@ -1,5 +1,5 @@
 ---
-title: "How many sets a week? A practical look at training volume"
+title: "How many sets a week do you really need?"
 heroTitle: "Weekly Volume"
 description: "Volume — the number of hard sets per muscle per week — is one of the most useful dials in a training plan. A simple way to set it and adjust it."
 image: /blog/mock/weekly-training-volume.svg
