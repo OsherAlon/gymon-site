@@ -173,7 +173,11 @@ for (const lang of ['en', 'he']) {
       // Doctrine template: answer first, always visible, structured data present.
       const body = text(page.html);
       const plain = (t) => t.replace(/\[\[[^\]]+\]\]/g, '').replace(/\*\*/g, '').replace(/\s+([.,;:])/g, '$1').replace(/\s+/g, ' ').trim();
-      if (!body.includes(plain(post.doc.tldr).slice(0, 60))) fail(`${path}: the bottom line is not in the HTML`);
+      if (!body.includes(plain(post.doc.bottomLine).slice(0, 60))) fail(`${path}: the bottom line is not in the HTML`);
+      // v2 layout: every idea card and every step is in the served HTML, and the body carries no evidence badge.
+      for (const card of post.doc.cards) if (!body.includes(plain(card.heading).slice(0, 40))) fail(`${path}: card "${card.heading}" is not in the HTML`);
+      if ((page.html.match(/class="doc-step"/g) || []).length !== post.doc.apply.steps.length) fail(`${path}: the apply steps are not all rendered`);
+      if (/doc-badge/.test(page.html)) fail(`${path}: an evidence badge in the body (v2 keeps certainty in the sources list)`);
       if (/opacity:\s*0[;"]/.test(page.html.split('<article')[1] ?? '')) fail(`${path}: article content ships at opacity:0`);
       if (!/"@type":"BlogPosting"/.test(page.html)) fail(`${path}: no BlogPosting JSON-LD`);
       if (!/property="og:image"/.test(page.html)) fail(`${path}: no og:image`);

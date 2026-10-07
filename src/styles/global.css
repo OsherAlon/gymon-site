@@ -720,6 +720,112 @@
     font-size: 15px;
     opacity: 0.85;
   }
+  /* v2 (user decision 2026-10-07): idea cards (label · headline · 2–3 lines) and numbered step
+     cards. One idea per card, generous space, no badges. Body sizes match the doctrine:
+     English 17px, Hebrew 18px / 1.75. */
+  .doc-cards {
+    display: grid;
+    gap: 14px;
+    margin-top: 22px;
+  }
+  .doc-card {
+    padding: 18px 20px 20px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+    border-radius: 18px;
+  }
+  .doc-card-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+  .doc-card-heading {
+    margin-top: 4px;
+    font-size: 21px;
+    line-height: 1.3;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+  .doc-card-text {
+    margin-top: 8px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--color-card-foreground);
+  }
+  .doc:lang(he) .doc-card-label {
+    font-size: 15px;
+  }
+  .doc:lang(he) .doc-card-heading {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+  .doc:lang(he) .doc-card-text {
+    font-size: 18px;
+    line-height: 1.75;
+  }
+  .doc-apply {
+    margin-top: 36px;
+  }
+  .doc-apply-heading {
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .doc-steps {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+  .doc-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+  }
+  .doc-step-no {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .doc-step-title {
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+  .doc-step-text {
+    margin-top: 2px;
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--color-muted-foreground);
+  }
+  .doc:lang(he) .doc-step-title {
+    font-size: 18px;
+  }
+  .doc:lang(he) .doc-step-text {
+    font-size: 17px;
+    line-height: 1.7;
+  }
+  .doc-apply .calc,
+  .doc-apply .doc-gymon {
+    margin-top: 18px;
+  }
+  .doc-sources-note {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-ref-finding {
+    margin-top: 4px;
+  }
   .doc-sources {
     margin-top: 36px;
   }
