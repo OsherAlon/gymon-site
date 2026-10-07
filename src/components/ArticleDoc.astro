@@ -4,19 +4,19 @@
  * one JSON file in the closed schema of src/lib/article/schema.mjs. Zero JS except the 1RM
  * calculator's small script; reference previews use the native `popover` attribute.
  *
- * Order (v2, user decision 2026-10-07, overrides §8a where they differ): hero → H1 → trust line →
- * one-sentence bottom line → 3–5 idea cards → "how to apply" numbered steps (+ calculator and the
- * Gymon log example when the article has them) → end CTA → sources (all study detail) → editor →
- * how it was made + disclaimer → related. No TOC, FAQ, quiz, evidence badges or inline CTA.
+ * Order (v3, user decision 2026-10-07, overrides §8a where they differ): H1 → relatable hook →
+ * one-sentence takeaway ("in short") → quiet trust line → article image → 3–6 beats (headline IS the
+ * point + 1–3 short lines) → optional pull quote → "try it" list → quiet extras (calculator, Gymon
+ * block) → end CTA → sources (collapsed; all study detail) → editor → how it was made → related.
+ * No scroll-linked hero, TOC, FAQ, quiz, cards, evidence badges or inline CTA.
  *
- * The article text is server HTML and always visible: nothing here is opacity:0, nothing waits
- * on hydration or on scrolling (the hero is scroll-LINKED CSS, see ArticleHero.astro).
+ * The article text is server HTML and always visible: nothing here is opacity:0 and nothing waits
+ * on hydration or on scrolling. The H1 is in the first screen.
  */
 import BlogLayout from '@/layouts/BlogLayout.astro';
-import ArticleHero from '@/components/ArticleHero.astro';
 import HeHint from '@/components/HeHint.astro';
 import OneRepMax from '@/components/OneRepMax.astro';
-import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
+import { articleUrl, blogCopy, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
 import { urlFor } from '@/lib/legal';
 import { DOMAIN, type Lang } from '@/lib/source';
 import { renderInline } from '@/lib/article/inline.mjs';
@@ -41,8 +41,8 @@ const refNo = new Map(a.references.map((r, i) => [r.id, i + 1]));
 const inl = (text: string) =>
   renderInline(text, { lang, refNumber: (id: string) => refNo.get(id), refPopoverId: (id: string) => `refpop-${id}`, sourceLabel: c.source });
 
-const calc = a.apply.calculator;
-const gy = a.apply.gymon;
+const calc = a.calculator;
+const gy = a.gymon;
 const readTime = readTimeOf(a);
 
 const url = `https://${DOMAIN}${articleUrl(lang, a.slug)}`;
@@ -80,7 +80,6 @@ const logCols: string[] = c.gymon.cols;
   langs={langs}
   otherHref={otherHref}
   noindex={!!a.sample}
-  mainClass="-mt-(--topbar-h)"
 >
   <Fragment slot="head">
     <meta property="og:type" content="article">
@@ -100,21 +99,22 @@ const logCols: string[] = c.gymon.cols;
   </Fragment>
 
   {heHint && <HeHint href={heHint} />}
-  <ArticleHero
-    image={a.image}
-    imageAlt={a.imageAlt}
-    bgImage={BLOG_HERO_BG}
-    heroTitle={a.heroTitle}
-    date={`${date(a.updatedAt ?? a.createdAt)} · ${t.readTime(readTime)}`}
-    scrollLabel={t.scrollToRead}
-  />
 
-  <article class="doc mx-auto w-full max-w-3xl px-4 pt-10 sm:px-8 md:px-12">
+  {/* v3 (user decision 2026-10-07, reference: Headspace articles): "it should feel like scrolling,
+      not reading". The first screen carries the title, a relatable hook and the takeaway. Then one
+      idea per screen: a plain headline that IS the point, 1–3 short lines. Effortful things (the
+      calculator, the sources) sit low and quiet. No dark full-screen hero before the H1. */}
+  <article class="doc doc3 mx-auto w-full max-w-2xl px-5 pt-8 sm:px-8">
     {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
 
-    <header class="space-y-3">
-      <h1 class:list={['doc-h1 text-3xl leading-tight font-bold text-balance sm:text-4xl', !he && 'tracking-tight']}>{a.title}</h1>
-      <p class="doc-trust">
+    <header class="doc3-head">
+      <h1 class="doc3-h1">{a.title}</h1>
+      <p class="doc3-hook" set:html={inl(a.hook)} />
+      <p class="doc3-takeaway">
+        <span class="doc3-takeaway-label">{c.inShort}</span>
+        <span set:html={inl(a.bottomLine)} />
+      </p>
+      <p class="doc-trust doc3-meta">
         <span>{c.drafted}</span>
         <span aria-hidden="true"> · </span>
         <span>{a.reviewedAt ? c.reviewed(c.editor.name, date(a.reviewedAt)) : c.notReviewed}</span>
@@ -128,76 +128,74 @@ const logCols: string[] = c.gymon.cols;
       </p>
     </header>
 
-    {/* v2 (user decision 2026-10-07): one-sentence bottom line → 3–5 idea cards → numbered steps.
-        Research appears in the body only as small superscript numbers; all study detail is in Sources. */}
-    <section class="doc-bottomline" aria-labelledby="bottom-line">
-      <h2 id="bottom-line" class="doc-label">{c.bottomLine}</h2>
-      <p class="doc-tldr" set:html={inl(a.bottomLine)} />
-    </section>
+    <figure class="doc3-figure">
+      <img src={a.image} alt={a.imageAlt} width="1600" height="900" decoding="async" fetchpriority="high" />
+    </figure>
 
-    <div class="doc-cards">
-      {a.cards.map((card, i) => (
-        <section class="doc-card" aria-labelledby={`card-${i + 1}`}>
-          <p class="doc-card-label">{card.label}</p>
-          <h2 id={`card-${i + 1}`} class="doc-card-heading" set:html={inl(card.heading)} />
-          <p class="doc-card-text" set:html={inl(card.text)} />
-        </section>
-      ))}
-    </div>
+    {a.beats.map((beat, i) => (
+      <section class="doc3-beat" aria-labelledby={`beat-${i + 1}`}>
+        <h2 id={`beat-${i + 1}`} class="doc3-beat-h" set:html={inl(beat.heading)} />
+        <p class="doc3-beat-p" set:html={inl(beat.text)} />
+      </section>
+    ))}
 
-    <section class="doc-apply" aria-labelledby="apply-h">
-      <h2 id="apply-h" class="doc-apply-heading">{c.apply}</h2>
-      <ol class="doc-steps">
-        {a.apply.steps.map((st, i) => (
-          <li class="doc-step">
-            <span class="doc-step-no" aria-hidden="true">{i + 1}</span>
-            <div>
-              <h3 class="doc-step-title"><span class="sr-only">{c.step(i + 1)}: </span><span set:html={inl(st.title)} /></h3>
-              <p class="doc-step-text" set:html={inl(st.text)} />
-            </div>
-          </li>
-        ))}
+    {a.pullQuote && (
+      <figure class="doc3-quote">
+        {a.pullQuote.lead && <p class="doc3-quote-lead" set:html={inl(a.pullQuote.lead)} />}
+        {/* No typed quote marks: in RTL they land on the wrong side. The rule and size mark it. */}
+        <blockquote lang={he ? 'he' : 'en'}><p>{a.pullQuote.text}</p></blockquote>
+        <figcaption><bdi dir={he ? 'rtl' : 'ltr'}>{a.pullQuote.attribution}</bdi><span set:html={inl(`[[${a.pullQuote.ref}]]`)} /></figcaption>
+      </figure>
+    )}
+
+    <section class="doc3-tips" aria-labelledby="tips-h">
+      <h2 id="tips-h" class="doc3-beat-h">{a.tips.heading}</h2>
+      <ol>
+        {a.tips.items.map((tip) => <li set:html={inl(tip)} />)}
       </ol>
-
-      {calc && <OneRepMax lang={lang} defaults={calc.defaults} uid="orm-apply" />}
-
-      {gy && gy.kind === 'log-example' && (
-        <figure class="doc-gymon">
-          <p class="doc-gymon-label">{c.gymon['log-example']}</p>
-          <p class="doc-gymon-caption" set:html={inl(gy.caption)} />
-          <div class="doc-table-scroll" tabindex="0" role="region" aria-label={gy.caption}>
-            <table class="doc-log">
-              <caption class="sr-only">{gy.exercise}</caption>
-              {gy.sessions.map((ses) => (
-                <tbody>
-                  <tr class="doc-log-session"><th colspan="5" scope="colgroup">{gy.exercise} · {ses.label}</th></tr>
-                  <tr>{logCols.map((col) => <th scope="col">{col}</th>)}</tr>
-                  {ses.sets.map((st, si) => (
-                    <tr>
-                      <td>{si + 1}</td>
-                      <td class="doc-log-prev"><span dir="ltr">{st.previous ? `${st.previous.kg} × ${st.previous.reps}` : '—'}</span></td>
-                      <td>{st.kg}</td>
-                      <td>{st.reps}</td>
-                      <td aria-label="✓">✓</td>
-                    </tr>
-                  ))}
-                </tbody>
-              ))}
-            </table>
-          </div>
-          {gy.text && <p set:html={inl(gy.text)} />}
-          <p class="doc-gymon-note">{c.gymon.illustrative}</p>
-        </figure>
-      )}
-      {gy && gy.kind !== 'log-example' && (
-        <aside class="doc-gymon">
-          <p class="doc-gymon-label">{c.gymon[gy.kind]}</p>
-          {gy.heading && <p class="doc-gymon-heading" set:html={inl(gy.heading)} />}
-          <p set:html={inl(gy.text)} />
-          {gy.points && gy.points.length > 0 && <ul>{gy.points.map((pt) => <li set:html={inl(pt)} />)}</ul>}
-        </aside>
-      )}
     </section>
+
+    {(calc || gy) && (
+      <div class="doc3-extras">
+        {calc && <OneRepMax lang={lang} defaults={calc.defaults} uid="orm-extra" />}
+        {gy && gy.kind === 'log-example' && (
+          <figure class="doc-gymon">
+            <p class="doc-gymon-label">{c.gymon['log-example']}</p>
+            <p class="doc-gymon-caption" set:html={inl(gy.caption)} />
+            <div class="doc-table-scroll" tabindex="0" role="region" aria-label={gy.caption}>
+              <table class="doc-log">
+                <caption class="sr-only">{gy.exercise}</caption>
+                {gy.sessions.map((ses) => (
+                  <tbody>
+                    <tr class="doc-log-session"><th colspan="5" scope="colgroup">{gy.exercise} · {ses.label}</th></tr>
+                    <tr>{logCols.map((col) => <th scope="col">{col}</th>)}</tr>
+                    {ses.sets.map((st, si) => (
+                      <tr>
+                        <td>{si + 1}</td>
+                        <td class="doc-log-prev"><span dir="ltr">{st.previous ? `${st.previous.kg} × ${st.previous.reps}` : '—'}</span></td>
+                        <td>{st.kg}</td>
+                        <td>{st.reps}</td>
+                        <td aria-label="✓">✓</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
+              </table>
+            </div>
+            {gy.text && <p set:html={inl(gy.text)} />}
+            <p class="doc-gymon-note">{c.gymon.illustrative}</p>
+          </figure>
+        )}
+        {gy && gy.kind !== 'log-example' && (
+          <aside class="doc-gymon">
+            <p class="doc-gymon-label">{c.gymon[gy.kind]}</p>
+            {gy.heading && <p class="doc-gymon-heading" set:html={inl(gy.heading)} />}
+            <p set:html={inl(gy.text)} />
+            {gy.points && gy.points.length > 0 && <ul>{gy.points.map((pt) => <li set:html={inl(pt)} />)}</ul>}
+          </aside>
+        )}
+      </div>
+    )}
 
     {/* The one end-of-article CTA. Text link, not a second badge: the header already carries the
         official App Store badge, and Apple allows one badge per layout. */}
@@ -210,9 +208,9 @@ const logCols: string[] = c.gymon.cols;
       </p>
     </aside>
 
-    <section id="sources" class="doc-sources" aria-labelledby="sources-h">
-      <h2 id="sources-h">{c.sources}</h2>
-      <p class="doc-sources-note">{c.sourcesNote}</p>
+    {/* Quiet by default: the study detail is one tap away, never in the reader's path. */}
+    <details id="sources" class="doc-sources doc3-sources">
+      <summary><span id="sources-h" class="doc3-sources-h">{c.sources}</span> <span class="doc3-sources-n">({a.references.length})</span> <span class="doc-sources-note">{c.sourcesNote}</span></summary>
       <ol class="doc-refs">
         {a.references.map((r) => (
           <li id={`ref-${r.id}`}>
@@ -234,7 +232,7 @@ const logCols: string[] = c.gymon.cols;
           </li>
         ))}
       </ol>
-    </section>
+    </details>
 
     <section class="doc-editor" aria-labelledby="editor-h">
       <h2 id="editor-h" class="doc-label">{c.editor.heading}</h2>

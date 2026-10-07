@@ -174,9 +174,13 @@ for (const lang of ['en', 'he']) {
       const body = text(page.html);
       const plain = (t) => t.replace(/\[\[[^\]]+\]\]/g, '').replace(/\*\*/g, '').replace(/\s+([.,;:])/g, '$1').replace(/\s+/g, ' ').trim();
       if (!body.includes(plain(post.doc.bottomLine).slice(0, 60))) fail(`${path}: the bottom line is not in the HTML`);
-      // v2 layout: every idea card and every step is in the served HTML, and the body carries no evidence badge.
-      for (const card of post.doc.cards) if (!body.includes(plain(card.heading).slice(0, 40))) fail(`${path}: card "${card.heading}" is not in the HTML`);
-      if ((page.html.match(/class="doc-step"/g) || []).length !== post.doc.apply.steps.length) fail(`${path}: the apply steps are not all rendered`);
+      // v3 layout: the hook, every beat headline and every tip are in the served HTML, and the H1
+      // comes before any image (no full-screen hero in front of the title).
+      if (!body.includes(plain(post.doc.hook).slice(0, 40))) fail(`${path}: the hook is not in the HTML`);
+      for (const beat of post.doc.beats) if (!body.includes(plain(beat.heading).slice(0, 40))) fail(`${path}: beat "${beat.heading}" is not in the HTML`);
+      for (const tip of post.doc.tips.items) if (!body.includes(plain(tip).slice(0, 30))) fail(`${path}: tip "${tip}" is not in the HTML`);
+      const art = page.html.split('<article')[1] ?? '';
+      if (art.indexOf('<h1') < 0 || (art.indexOf('<img') >= 0 && art.indexOf('<img') < art.indexOf('<h1'))) fail(`${path}: the H1 must come before the article image`);
       if (/doc-badge/.test(page.html)) fail(`${path}: an evidence badge in the body (v2 keeps certainty in the sources list)`);
       if (/opacity:\s*0[;"]/.test(page.html.split('<article')[1] ?? '')) fail(`${path}: article content ships at opacity:0`);
       if (!/"@type":"BlogPosting"/.test(page.html)) fail(`${path}: no BlogPosting JSON-LD`);

@@ -720,103 +720,233 @@
     font-size: 15px;
     opacity: 0.85;
   }
-  /* v2 (user decision 2026-10-07): idea cards (label · headline · 2–3 lines) and numbered step
-     cards. One idea per card, generous space, no badges. Body sizes match the doctrine:
-     English 17px, Hebrew 18px / 1.75. */
-  .doc-cards {
-    display: grid;
-    gap: 14px;
+  /* v3 (user decision 2026-10-07, reference: Headspace articles): "feel like scrolling, not
+     reading". No boxes around the reading path: big plain headlines, short lines, a lot of air,
+     one calm accent. Body sizes keep the doctrine: English 18px, Hebrew 18px / 1.75. */
+  .doc3 {
+    --doc3-ink: #2a3338;
+    --doc3-soft: #5b6a73;
+    padding-bottom: 24px;
+  }
+  .doc3-head {
+    padding-top: 8px;
+  }
+  .doc3-h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .doc3:lang(he) .doc3-h1 {
+    font-size: 34px;
+    line-height: 1.25;
+    letter-spacing: normal;
+  }
+  .doc3-hook {
+    margin-top: 16px;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--doc3-soft);
+  }
+  .doc3-takeaway {
     margin-top: 22px;
+    font-size: 22px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: var(--color-brand-strong);
+    text-wrap: pretty;
   }
-  .doc-card {
-    padding: 18px 20px 20px;
-    background: var(--doc-card);
-    border: 1px solid var(--color-border);
-    border-radius: 18px;
-  }
-  .doc-card-label {
+  .doc3-takeaway-label {
+    display: block;
+    margin-bottom: 4px;
     font-size: 14px;
     font-weight: 700;
     color: var(--color-brand);
   }
-  .doc-card-heading {
-    margin-top: 4px;
-    font-size: 21px;
-    line-height: 1.3;
+  .doc3-meta {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+  .doc3-figure {
+    margin-top: 28px;
+  }
+  .doc3-figure img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 22px;
+    background: var(--color-muted);
+  }
+  .doc3-beat {
+    margin-top: 72px;
+  }
+  .doc3-beat-h {
+    font-size: 27px;
+    line-height: 1.22;
     font-weight: 700;
+    color: var(--color-foreground);
     text-wrap: balance;
   }
-  .doc-card-text {
-    margin-top: 8px;
-    font-size: 17px;
+  .doc3-beat-p,
+  .doc3-tips li {
+    margin-top: 12px;
+    font-size: 18px;
     line-height: 1.6;
-    color: var(--color-card-foreground);
+    color: var(--doc3-ink);
   }
-  .doc:lang(he) .doc-card-label {
-    font-size: 15px;
+  .doc3:lang(he) .doc3-beat-h {
+    line-height: 1.3;
   }
-  .doc:lang(he) .doc-card-heading {
-    font-size: 22px;
-    line-height: 1.4;
-  }
-  .doc:lang(he) .doc-card-text {
+  .doc3:lang(he) .doc3-beat-p,
+  .doc3:lang(he) .doc3-tips li,
+  .doc3:lang(he) .doc3-hook {
     font-size: 18px;
     line-height: 1.75;
   }
-  .doc-apply {
-    margin-top: 36px;
+  .doc3-quote {
+    margin-top: 72px;
+    padding-inline-start: 18px;
+    border-inline-start: 3px solid var(--color-highlight);
   }
-  .doc-apply-heading {
-    font-size: 24px;
-    font-weight: 700;
+  .doc3-quote-lead {
+    font-size: 17px;
+    color: var(--doc3-soft);
   }
-  .doc-steps {
-    display: grid;
-    gap: 10px;
+  .doc3 .cite {
+    font-size: 0.62em;
+    margin-inline-start: 1px;
+  }
+  .doc3 .cite-btn {
+    text-decoration: none;
+    color: var(--doc3-soft);
+    padding: 2px 2px;
+  }
+  .doc3-quote blockquote p {
+    margin-top: 8px;
+    font-size: 25px;
+    line-height: 1.35;
+    font-weight: 600;
+    color: var(--color-brand-strong);
+  }
+  .doc3-quote figcaption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--doc3-soft);
+  }
+  .doc3-tips {
+    margin-top: 72px;
+  }
+  .doc3-tips ol {
+    margin-top: 6px;
+    counter-reset: tip;
+  }
+  .doc3-tips li {
+    position: relative;
+    padding-inline-start: 40px;
+    counter-increment: tip;
+  }
+  .doc3-tips li + li {
     margin-top: 14px;
   }
-  .doc-step {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 14px 16px;
-    background: var(--doc-card);
-    border: 1px solid var(--color-border);
-    border-radius: 16px;
-  }
-  .doc-step-no {
-    flex: none;
+  .doc3-tips li::before {
+    content: counter(tip);
+    position: absolute;
+    inset-inline-start: 0;
+    top: 1px;
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 999px;
-    background: var(--color-brand);
-    color: #fff;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  /* Effortful things: low, and visually quiet. */
+  .doc3-extras {
+    margin-top: 56px;
+  }
+  .doc3 .calc,
+  .doc3 .doc-gymon {
+    border: 0;
+    box-shadow: none;
+    background: color-mix(in srgb, var(--color-muted) 70%, transparent);
+    border-radius: 20px;
+  }
+  .doc3 .doc-cta-end {
+    margin-top: 56px;
+    padding: 0;
+    background: none;
+    color: var(--color-foreground);
+    border-radius: 0;
+  }
+  .doc3 .doc-cta-end h2 {
+    font-size: 22px;
+  }
+  .doc3 .doc-cta-end p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--doc3-ink);
+  }
+  .doc3 .doc-cta-end a {
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  .doc3 .doc-cta-meta {
+    opacity: 1;
+    color: var(--doc3-soft);
+  }
+  .doc3-sources {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .doc3-sources summary {
+    position: relative;
+    cursor: pointer;
+    min-height: 44px;
+    padding-inline-end: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+    list-style: none;
+    color: var(--doc3-soft);
     font-size: 15px;
+  }
+  .doc3-sources summary::-webkit-details-marker {
+    display: none;
+  }
+  .doc3-sources summary::after {
+    content: '+';
+    position: absolute;
+    inset-inline-end: 4px;
+    top: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--color-brand);
+  }
+  .doc3-sources[open] summary::after {
+    content: '−';
+  }
+  .doc3-sources-h {
     font-weight: 700;
+    color: var(--color-foreground);
   }
-  .doc-step-title {
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.35;
+  .doc3-sources .doc-sources-note {
+    margin: 0;
+    flex-basis: 100%;
+    font-size: 13px;
   }
-  .doc-step-text {
-    margin-top: 2px;
-    font-size: 16px;
-    line-height: 1.55;
-    color: var(--color-muted-foreground);
-  }
-  .doc:lang(he) .doc-step-title {
-    font-size: 18px;
-  }
-  .doc:lang(he) .doc-step-text {
-    font-size: 17px;
-    line-height: 1.7;
-  }
-  .doc-apply .calc,
-  .doc-apply .doc-gymon {
-    margin-top: 18px;
+  .doc3 .doc-editor {
+    margin-top: 28px;
+    padding: 0;
+    border: 0;
+    font-size: 15px;
+    color: var(--doc3-soft);
   }
   .doc-sources-note {
     margin-top: 4px;
