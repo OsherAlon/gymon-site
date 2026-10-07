@@ -140,10 +140,6 @@ const logCols: string[] = c.gymon.cols;
       </p>
     </header>
 
-    <figure class="doc3-figure">
-      <img src={a.image} alt={a.imageAlt} width="1600" height="900" decoding="async" fetchpriority="high" />
-    </figure>
-
     {a.beats.map((beat, i) => (
       <section class="doc3-beat" aria-labelledby={`beat-${i + 1}`}>
         <h2 id={`beat-${i + 1}`} class="doc3-beat-h" set:html={inl(beat.heading)} />
