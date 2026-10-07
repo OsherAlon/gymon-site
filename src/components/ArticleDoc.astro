@@ -120,11 +120,11 @@ const logCols: string[] = c.gymon.cols;
     {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
 
     <header class="doc3-head">
-      <h1 class="doc3-h1" data-reveal>{a.title}</h1>
+      <h1 class="doc3-h1">{a.title}</h1>
       <p class="doc3-hook" set:html={inl(a.hook)} />
       <p class="doc3-takeaway">
         <span class="doc3-takeaway-label">{c.inShort}</span>
-        <span class="block" data-reveal set:html={inl(a.bottomLine)} />
+        <span set:html={inl(a.bottomLine)} />
       </p>
       <p class="doc-trust doc3-meta">
         <span>{c.drafted}</span>
@@ -142,7 +142,7 @@ const logCols: string[] = c.gymon.cols;
 
     {a.beats.map((beat, i) => (
       <section class="doc3-beat" aria-labelledby={`beat-${i + 1}`}>
-        <h2 id={`beat-${i + 1}`} class="doc3-beat-h" data-reveal set:html={inl(beat.heading)} />
+        <h2 id={`beat-${i + 1}`} class="doc3-beat-h" set:html={inl(beat.heading)} />
         <p class="doc3-beat-p" set:html={inl(beat.text)} />
       </section>
     ))}
@@ -157,7 +157,7 @@ const logCols: string[] = c.gymon.cols;
     )}
 
     <section class="doc3-tips" aria-labelledby="tips-h">
-      <h2 id="tips-h" class="doc3-beat-h" data-reveal>{a.tips.heading}</h2>
+      <h2 id="tips-h" class="doc3-beat-h">{a.tips.heading}</h2>
       <ol>
         {a.tips.items.map((tip) => <li set:html={inl(tip)} />)}
       </ol>
@@ -276,8 +276,4 @@ const logCols: string[] = c.gymon.cols;
       </p>
     </div>
   ))}
-  {/* Headline reveal (H1, "In short", section headings): a bundled module, no island. */}
-  <script>
-    import '@/scripts/headline-reveal';
-  </script>
 </BlogLayout>
