@@ -45,7 +45,7 @@ export default function ZigzagShowcase({ rows }: { rows: ShowcaseRow[] }) {
   const still = Boolean(useReducedMotion());
   const refs = React.useRef<(HTMLDivElement | null)[]>([]);
   // Hooks in a fixed-length list: the row count is static per page.
-  const progress = rows.map((_, i) => useMotionValue(still ? 1 : i === 0 ? FIRST_START : 0)); // eslint-disable-line react-hooks/rules-of-hooks
+  const progress = rows.map((r) => useMotionValue(still ? 1 : r.h1 ? FIRST_START : 0)); // eslint-disable-line react-hooks/rules-of-hooks
 
   React.useLayoutEffect(() => {
     if (still) return;
@@ -55,7 +55,7 @@ export default function ZigzagShowcase({ rows }: { rows: ShowcaseRow[] }) {
       const vh = window.innerHeight;
       refs.current.forEach((el, i) => {
         if (!el) return;
-        if (i === 0) {
+        if (rows[i].h1) {
           progress[0].set(Math.min(1, FIRST_START + (1 - FIRST_START) * (window.scrollY / (vh * 0.5))));
           return;
         }
@@ -86,7 +86,7 @@ export default function ZigzagShowcase({ rows }: { rows: ShowcaseRow[] }) {
             ref={(el) => {
               refs.current[i] = el;
             }}
-            className={`showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 ${i === 0 ? 'pt-6 pb-8 md:py-12' : 'py-8 md:py-16'}`}
+            className={`showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 ${row.h1 ? 'pt-6 pb-8 md:py-12' : 'py-8 md:py-16'}`}
           >
             {/* Phone hugs its outer edge; the text hugs the opposite edge (logical: start/end). */}
             <div className={`flex justify-center ${phoneSecond ? 'md:order-2 md:justify-end' : 'md:justify-start'}`}>

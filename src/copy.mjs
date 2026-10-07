@@ -49,6 +49,20 @@ export const copy = {
     // (gymon departments/legal/app_store_listing_draft.md §3). Premium vs free from
     // app/src/lib/entitlementRules.ts. Save % = floor((1 − 149.90 / (12 × 19.90)) × 100) = 37,
     // the same formula as app/src/lib/paywallOffer.ts.
+    // Home cinematic hero (2026-10-07, user-supplied CinematicHero). Badges = moments the App
+    // Store logger screenshot shows (rest 1:30; set 3 at 40 kg × 6). Card heading = the store
+    // subtitle ("Personal plan, log & AI coach"); description = home.tagline.
+    cinematic: {
+      tagline2: 'Every set, logged.',
+      cardHeading: 'A personal plan, a log and an AI coach.',
+      badges: [
+        { icon: '⏱️', title: 'Rest timer', subtitle: '1:30' },
+        { icon: '✅', title: 'Set 3 done', subtitle: '40 kg × 6 reps' },
+      ],
+      ctaHeading: 'Coming to iPhone',
+      ctaDescription: 'Start with 14 days free, then monthly or yearly.',
+      ctaLink: 'See pricing',
+    },
     pricing: {
       title: 'Pricing',
       description: 'Gymon Premium: ₪19.90 a month or ₪149.90 a year, with a 14-day free trial for eligible new subscribers.',
@@ -236,6 +250,17 @@ export const copy = {
       screenAlt: 'מסך הבית באפליקציית Gymon: האימונים של השבוע והצעדים של היום.',
     },
     nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג', pricing: 'מחירים' },
+    cinematic: {
+      tagline2: 'כל סט, מתועד.',
+      cardHeading: 'תוכנית אישית, יומן ומאמן AI.',
+      badges: [
+        { icon: '⏱️', title: 'טיימר מנוחה', subtitle: '1:30' },
+        { icon: '✅', title: 'סט 3 הושלם', subtitle: '6 חזרות ב־40 ק״ג' },
+      ],
+      ctaHeading: 'בקרוב לאייפון',
+      ctaDescription: 'מתחילים ב־14 ימי ניסיון חינם, ואחר כך מנוי חודשי או שנתי.',
+      ctaLink: 'למחירים',
+    },
     pricing: {
       title: 'מחירים',
       description: 'Gymon Premium: ‏19.90 ₪ לחודש או 149.90 ₪ לשנה, עם 14 ימי ניסיון חינם למנויים חדשים שזכאים לכך.',

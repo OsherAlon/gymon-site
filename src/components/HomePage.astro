@@ -7,6 +7,8 @@
 import BlogLayout from '@/layouts/BlogLayout.astro';
 import FeatureMarquee from '@/components/ui/FeatureMarquee.astro';
 import ZigzagShowcase from '@/components/ui/zigzag-showcase';
+import CinematicHero from '@/components/ui/cinematic-hero';
+import { APP_STORE_URL } from '../copy.mjs';
 import { copy } from '../copy.mjs';
 import { urlFor } from '@/lib/legal';
 import type { Lang } from '@/lib/source';
@@ -16,18 +18,33 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = (copy as any)[lang];
-const rows = [
-  // Row 1: the page's opening — the only H1, the tagline, the app's home screen.
-  { h1: true, title: t.home.title, text: t.home.tagline, alt: t.home.screenAlt, src: `/app/screen-home-${lang}.webp` },
-  ...t.showcase.map((r: any) => ({ tag: r.tag, title: r.title, text: r.text, alt: r.alt, src: `/app/screen-${r.key}-${lang}.webp` })),
-];
+const rows = t.showcase.map((r: any) => ({ tag: r.tag, title: r.title, text: r.text, alt: r.alt, src: `/app/screen-${r.key}-${lang}.webp` }));
+const c = t.cinematic;
 const links = (['privacy', 'terms', 'support', 'blog', 'pricing'] as const).map((p) => ({ href: urlFor(lang, p), label: t.nav[p] }));
 ---
 <BlogLayout lang={lang} page="index" title="Gymon" description={t.home.tagline}>
   <div class="home-v2">
-    {/* client:load — row 1 (the H1 and the home screen) is above the fold and animates from the
-        first scroll. All rows are server-rendered, so first paint does not wait for it. */}
-    <ZigzagShowcase client:load rows={rows} />
+    {/* The page opens with the cinematic hero: the only H1 ("Gymon" + the tagline), pinned scroll.
+        client:load — it is the first thing on screen. Server-rendered either way. */}
+    <CinematicHero
+      client:load
+      lang={lang}
+      brandName={t.home.title}
+      tagline1={t.home.title}
+      tagline2={c.tagline2}
+      cardHeading={c.cardHeading}
+      cardDescription={t.home.tagline}
+      screenSrc={`/app/screen-home-${lang}.webp`}
+      screenAlt={t.home.screenAlt}
+      badges={c.badges}
+      ctaHeading={c.ctaHeading}
+      ctaDescription={c.ctaDescription}
+      ctaLink={{ href: urlFor(lang, 'pricing'), label: c.ctaLink }}
+      appStoreHref={APP_STORE_URL}
+      playSoon={t.playSoon}
+    />
+    {/* client:visible — the showcase now starts below the hero. Server-rendered. */}
+    <ZigzagShowcase client:visible rows={rows} />
     <ul class="home-links mx-auto w-full max-w-md px-4">
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
     </ul>

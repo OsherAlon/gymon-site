@@ -99,14 +99,16 @@ for (const path of pages) {
 for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   const { html } = await load(path);
   if (!html.includes(`href="${href}"`)) fail(`${path} has no link to ${href}`);
-  // The opening is row 1 of the showcase: exactly one H1 ("Gymon"), server-rendered inside it.
-  const h1s = html.match(/<h1[^>]*>[^<]*<\/h1>/g) || [];
-  if (h1s.length !== 1 || !/>Gymon</.test(h1s[0])) fail(`${path}: expected one H1 "Gymon", found ${h1s.length}`);
-  else if (html.indexOf(h1s[0]) < html.indexOf('class="showcase-row')) fail(`${path}: the H1 is not inside the showcase`);
+  // The page opens with the cinematic hero: exactly one H1, server-rendered, starting with "Gymon",
+  // and a <noscript> fallback that shows it without JS.
+  const h1s = html.match(/<h1[\s\S]*?<\/h1>/g) || [];
+  if (h1s.length !== 1 || !/>Gymon</.test(h1s[0])) fail(`${path}: expected one H1 starting with "Gymon", found ${h1s.length}`);
+  else if (html.indexOf(h1s[0]) < html.indexOf('class="cine ')) fail(`${path}: the H1 is not inside the hero`);
+  if (!/<noscript><style>[^<]*\.cine \.gsap-reveal \{ visibility: visible/.test(html)) fail(`${path}: no no-JS fallback for the hero`);
   for (const p of ['privacy', 'terms', 'support']) if (!html.includes(`${path === '/' ? '' : '/he'}/${p}"`)) fail(`${path} has no link to ${p}`);
-  // Zigzag showcase: 6 rows (the opening + 5), each with an app screen.
+  // Zigzag showcase: 5 rows (logger … summary), each with an app screen.
   const rowsHtml = html.split('class="showcase-row').slice(1);
-  if (rowsHtml.length !== 6) fail(`${path}: ${rowsHtml.length} showcase rows (6 expected)`);
+  if (rowsHtml.length !== 5) fail(`${path}: ${rowsHtml.length} showcase rows (5 expected)`);
   else rowsHtml.forEach((r, i) => { if (!/<img[^>]*src="\/app\/screen-[a-z]+-(en|he)\.webp"/.test(r)) fail(`${path}: showcase row ${i + 1} has no app screen`); });
   // Feature marquee: the section is there, with at least 6 cards in its first (readable) copy.
   const firstRun = html.split('class="marquee-run')[1]?.split('class="marquee-run')[0] ?? '';
