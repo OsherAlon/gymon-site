@@ -77,7 +77,7 @@ export default function ZigzagShowcase({ rows }: { rows: ShowcaseRow[] }) {
   }, [still]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <section className="home-showcase mx-auto w-full max-w-[1440px] px-5 pb-10 md:px-12 md:pb-16 lg:px-20">
+    <section className="home-showcase mx-auto w-full max-w-[1280px] px-5 pb-10 md:px-12 md:pb-16 lg:px-20">
       {rows.map((row, i) => {
         const phoneSecond = i % 2 === 1;
         return (
