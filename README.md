@@ -101,57 +101,66 @@ git add -A && git commit -m "rebuild from gymon <sha>" && git push
 node verify.mjs https://gymon.app            # after Pages deploys
 ```
 
-## Blog articles — the file format (for the n8n agent)
+## Blog articles — the JSON format (for the n8n workflow)
 
-One Markdown file **per article per language**:
+Since the doctrine rebuild (2026-10) an article is **one closed-schema JSON file per language**:
 
 ```
-src/content/blog/en/<slug>.md
-src/content/blog/he/<slug>.md
+src/content/articles/en/<slug>.json
+src/content/articles/he/<slug>.json
 ```
 
-The English and Hebrew versions of one article share the same `slug` — it is both the URL and the
-translation key. An article may exist in one language only; the language switch then goes to the
-other language's blog index.
+The contract lives in `src/lib/article/` and is the single definition shared with the n8n workflow
+(`n8n/blog-articles` inlines the same files):
 
-```markdown
----
-title: "Progressive overload, explained without the jargon"
-heroTitle: "Progressive Overload"
-description: "One or two sentences. Shown on the card and as the meta description."
-image: /blog/progressive-overload.jpg
-imageAlt: "What the image shows"
-createdAt: 2026-09-28
-author: "Gymon Team"
-readTime: 5
-lang: en
-slug: progressive-overload
-draft: false
----
+| File | Holds |
+|---|---|
+| `schema.mjs` | the closed vocabulary: pillars, block types, evidence levels, CTA slots, limits, YMYL and Hebrew word lists |
+| `inline.mjs` | the inline syntax and its renderer: `**bold**`, `[[r1]]` reference markers, `[text](/blog/<slug>)` internal links; numbers and units are wrapped in LTR isolates for Hebrew |
+| `validate.mjs` | `validateArticle(article, ctx)`: errors fail the build, warnings are review flags |
+| `types.ts` | TypeScript view of the same shape |
 
-Body in Markdown. Start with a paragraph, use `##` for sections (the page already has the `#` title).
-Lists, **bold**, links and > quotes are styled.
-```
+The build validates every file through the `articles` collection in `src/content.config.ts` and fails
+on any error. Tests: `npm test` (`node --test tests/*.test.mjs`).
 
-| Field | Required | Rules |
-|---|---|---|
-| `title` | yes | Plain text. Quote it if it holds `:`. The page's single `<h1>` (SEO) |
-| `heroTitle` | no | 2–4 words for the big animated hero. It splits as first word / the rest. Without it, the hero uses the first 3 words of `title` |
-| `description` | yes | Plain text, ~1–2 sentences |
-| `image` | yes | Path under `public/` (e.g. `/blog/<slug>.jpg`, file at `public/blog/<slug>.jpg`) or an `https://` URL. 16:9 |
-| `imageAlt` | no | Alt text for the article hero image |
-| `createdAt` | yes | `YYYY-MM-DD`. Newest first on the index |
-| `author` | yes | Shown as "by …" / "מאת …" |
-| `readTime` | yes | Whole minutes (number). Rendered as "5 min read" / "5 דקות קריאה" |
-| `lang` | yes | `en` or `he` — must match the folder |
-| `slug` | yes | `lowercase-latin-and-dashes`, same in both languages |
-| `draft` | no | `true` keeps it out of the build |
-| `mock` | no | `true` marks placeholder content (adds `noindex`) |
+Top-level keys (the pipeline owns the first group, the writer the second):
 
-The build validates every file against `src/content.config.ts` and fails on a bad field.
-Hebrew articles: gender-neutral language (no second-person singular — "יש ל-", plural or impersonal
-forms), and no medical promises. Every article page ends with a "general information, not medical
-advice" note from `src/copy.mjs`.
+- **code-owned**: `schemaVersion`, `lang`, `slug`, `pillar`, `tags`, `intent`, `ymylLevel` (only
+  `low`), `lengthBand`, `image`, `imageAiGenerated`, `createdAt`, `updatedAt`, `reviewedAt`, `editor`
+  (`osher-alon`), `aiAssisted`, `sample`
+- **writer-owned**: `title` (20–52 chars, the page's only `<h1>`), `heroTitle` (1–4 words),
+  `description` (meta description), `primaryQuery`, `imageAlt`, `tldr` (≤ 3 sentences, the bottom
+  line), `keyTakeaways` (3–5), `sections` (4–7, each `heading` + `blocks`), `faq`, `quiz`,
+  `references` (numbered `r1`…, with `url`, optional `doi`/`pmid`, `tier`, `type`, a verbatim
+  `quote` and `fullTextRead`), `cta` (`{ slot }`, copy comes from `src/copy.mjs`)
+
+Block types: `p`, `list`, `takeaway`, `claim` (with `evidence` level and `refs`), `callout`
+(`note`/`myth`/`safety`), `table`, `calculator` (`one-rep-max`, pre-filled and showing its result
+without JavaScript), `cta` (at most one contextual mention), and exactly one `gymon` block (the
+Gymon-unique element: `log-example`, `plan-logic` or `teardown-finding`).
+
+The page renders (`src/components/ArticleDoc.astro`): hero → title, dates and trust line → bottom
+line + key takeaways → table of contents → sections → quiz → FAQ → one end CTA → numbered sources
+(each marker opens a preview) → editor box → "how this article was made". Hebrew: 18px / 1.75, no italics, no
+letter-spacing. Head: `BlogPosting` JSON-LD, Open Graph, `dateModified`, `max-image-preview:large`.
+A Hebrew page is never auto-redirected; the English page shows an "also in Hebrew" banner.
+
+Rules for the text: Hebrew is gender-neutral (no second-person singular: "יש ל-", plural or impersonal
+forms); no high-YMYL topics (supplements, weight loss, injuries, pregnancy, medical); no medical
+promises. The "general information, not medical advice" footer comes from `src/copy.mjs`.
+
+### Sample article
+
+`src/content/articles/sample/{en,he}/estimate-one-rep-max.json` is a sample pair (`sample: true` →
+`noindex`, a visible "sample" label and its own "how this sample was made" note). Its two sources are
+real (Richens & Cleather 2014; Brzycki 1993); no editor has reviewed it. To remove it, delete
+`src/content/articles/sample/`.
+
+### Older Markdown articles
+
+`src/content/blog/{en,he}/<slug>.md` (frontmatter `title`, `heroTitle`, `description`, `image`,
+`imageAlt`, `createdAt`, `author`, `readTime`, `lang`, `slug`, `draft`, `mock`) still renders through
+the old `ArticlePage`. Only the mock articles use it; new articles are JSON.
 
 ### Article page
 
@@ -167,14 +176,6 @@ reduced motion get the static end state: the expanded image, then the article.
 
 To change the background, replace `public/blog/hero-bg.jpg`, or put the new file in `public/blog/`
 and point `BLOG_HERO_BG` in `src/lib/blog.ts` at it.
-
-### Preview article
-
-`src/content/blog/preview/{en,he}/creatine-and-resistance-training-guide.md` and
-`public/blog/creatine-and-resistance-training-guide.jpg` are the first real n8n article (data table
-row 1, still `pending_review`). The files are built exactly as the workflow's Approve step builds them,
-with `mock: true` added so the pages get `noindex`. To remove it, delete `src/content/blog/preview/`
-and that image.
 
 ### Mock articles
 
