@@ -1238,3 +1238,9 @@ body:has(.pricing-page) {
     scroll-snap-align: start;
   }
 }
+
+/* Headline reveal (src/scripts/headline-reveal.ts): SplitText measures lines with normal wrapping;
+   `balance`/`pretty` re-wrap after the split and push text out of the line masks. */
+.doc3 [data-reveal] {
+  text-wrap: wrap;
+}
