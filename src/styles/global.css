@@ -873,7 +873,7 @@
   .doc3 .doc-gymon {
     border: 0;
     box-shadow: none;
-    background: color-mix(in srgb, var(--color-muted) 70%, transparent);
+    background: var(--color-muted); /* solid: a 70% tint vanished on the white article page */
     border-radius: 20px;
   }
   .doc3 .doc-cta-end {
@@ -1136,4 +1136,14 @@
 .doc:lang(he) .doc-body :where(p, li) {
   font-size: 18px;
   line-height: 1.75;
+}
+
+/* JSON article pages: plain white ground behind the article (user decision 2026-10-07: the
+   bluish site ground read as "ugly" there). Scoped by the template's .doc3 class, so the rest of
+   the site, the topbar and the hero itself are unchanged. */
+body:has(.doc3) {
+  background: #ffffff;
+}
+.doc3 .calc-inputs input {
+  background: #ffffff;
 }
