@@ -12,6 +12,8 @@ if ($('Rewrite article').isExecuted) {
   if (r.article_en) en = writerFields(r.article_en);
   if (r.article_he) he = writerFields(r.article_he);
 }
+markApplyFromCta(en);
+syncApply(en, he);
 const keep = (stored) => {
   const out = {};
   for (const k of CODE_FIELDS) if (stored[k] !== undefined) out[k] = stored[k];

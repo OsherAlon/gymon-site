@@ -171,6 +171,24 @@ test('Parse article (EN): reads an OpenRouter completion, and names a max_tokens
   assert.throws(() => run('Parse article (EN)', { input: [{ error: { message: 'x' } }] }), /no completion in the response/);
 });
 
+test('apply flag: set from the cta section when the writer omits it, and copied to Hebrew (execution 1541)', () => {
+  const en = sample('en');
+  const noFlag = { ...en, sections: en.sections.map(({ apply, ...s }) => s) };
+  const parsed = run('Parse article (EN)', { input: [{ text: JSON.stringify(noFlag) }] })[0].json;
+  const ctaIdx = en.sections.findIndex((s) => s.blocks.some((b) => b.type === 'cta'));
+  assert.deepEqual(parsed.article.sections.map((s) => s.apply), en.sections.map((_, i) => i === ctaIdx));
+  const he = sample('he');
+  const heNoFlag = { ...he, sections: he.sections.map(({ apply, ...s }) => s) };
+  const plan = { slug: 'estimate-one-rep-max', pillar: 'tools', tags: ['one-rep-max', 'strength'], intent: 'do', length_band: '600-900', published: [] };
+  const pack = { research: RESEARCH, allowed_urls: bundle().allowed_urls, read_urls: bundle().read_urls };
+  const [{ json }] = run('Prepare (new)', {
+    input: [{ text: JSON.stringify(heNoFlag) }],
+    nodes: { 'Topic plan': [plan], 'Research pack': [pack], 'Parse article (EN)': [parsed] },
+  });
+  assert.deepEqual(json.article_he.sections.map((s) => s.apply), json.article_en.sections.map((s) => s.apply));
+  assert.equal(json.article_en.sections.filter((s) => s.apply).length, 1);
+});
+
 test('Build commit files: writes build-valid JSON with review date, and refuses a file the build would reject', () => {
   const row = {
     article_id: 'x', slug: 'estimate-one-rep-max', round: 1, title_en: 'T',

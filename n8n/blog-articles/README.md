@@ -119,6 +119,15 @@ expression, so the long prompt never sits inside an expression. `llm_text.js` re
 with the token usage if `finish_reason` is `length`. Models and effort are written inside each
 `jsonBody` in the template; the other Sonnet/Haiku calls are still chain nodes.
 
+**Execution 1541 (measured, 2026-10-07): ≈ $0.32–0.36 per article.** Writer 14,044 in / 4,260 out =
+$0.071 and Hebrew 8,044 / 5,442 = $0.071 (OpenRouter `usage.cost`; `reasoning_tokens: 0` on both, so
+effort low removes the hidden reasoning); topic $0.027; Haiku fact check $0.010; image prompt $0.004; alt
+text $0.002; Gemini image ≈ $0.134; Tavily 5 credits ≈ $0.04 (or free-tier). The same run showed the
+writer naming the protocol section "Apply it: …" without setting `"apply": true`, so the validator
+rejected the CTA and calculator placement: `apply` is now required in the writer/Hebrew JSON Schema,
+Parse article (EN) marks the section holding the cta block when no section is marked, and Hebrew copies
+the flags from English by section index.
+
 ## Gotcha: unicode escapes in Code nodes
 
 When a Code node is updated through the n8n MCP (`setNodeParameter`), `\uXXXX` escapes in the source

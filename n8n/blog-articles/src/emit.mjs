@@ -144,7 +144,7 @@ function articleSchema({ withReferences }) {
       type: 'array',
       minItems: S.LIMITS.sections[0],
       maxItems: S.LIMITS.sections[1],
-      items: obj({ heading: text('An informative statement or question; first two words carry the gist.'), apply: { type: 'boolean' }, blocks: { type: 'array', minItems: 1, items: block } }, ['heading', 'blocks']),
+      items: obj({ heading: text('An informative statement or question; first two words carry the gist.'), apply: { type: 'boolean', description: 'true on exactly one section (the practical protocol that holds the cta block), false on every other section.' }, blocks: { type: 'array', minItems: 1, items: block } }, ['heading', 'apply', 'blocks']),
     },
     faq: { type: 'array', minItems: 3, maxItems: S.LIMITS.faq[1], items: obj({ q: str(), a: text('40–60 words. ' + INLINE), refs: refIds }, ['q', 'a']) },
     quiz: {

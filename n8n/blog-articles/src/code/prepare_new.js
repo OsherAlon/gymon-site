@@ -10,6 +10,7 @@ const he = writerFields(parseLooseJson(llmText($input.first().json, 'Hebrew vers
 const today = $now.setZone('Asia/Jerusalem').toFormat('yyyy-MM-dd');
 const refs = codeReferences(en.references, pack.read_urls);
 const article_en = canonical({ ...codeFields(plan, 'en', today), ...en.article, references: refs });
+syncApply(en.article, he);
 const article_he = canonical({ ...codeFields(plan, 'he', today), ...he, references: refs });
 return [{ json: {
   mode: 'new',
