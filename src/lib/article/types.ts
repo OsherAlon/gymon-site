@@ -33,20 +33,14 @@ export type GymonBlock =
   | { kind: 'log-example'; caption: string; exercise: string; sessions: { label: string; sets: LoggedSet[] }[]; text?: string }
   | { kind: 'plan-logic' | 'teardown-finding'; heading?: string; text: string; points?: string[] };
 
-/** One idea: a small label, a headline that states the answer, 2–3 short sentences. */
-export interface Card {
-  label: string;
+/** One idea per screen: a plain headline that IS the point, then 1–3 short sentences. */
+export interface Beat {
   heading: string;
   text: string;
 }
 
-export interface Step {
-  title: string;
-  text: string;
-}
-
 export interface ArticleData {
-  schemaVersion: 2;
+  schemaVersion: 3;
   lang: Lang;
   slug: string;
   title: string;
@@ -67,14 +61,16 @@ export interface ArticleData {
   editor: 'osher-alon';
   aiAssisted: true;
   sample?: boolean;
-  /** ONE sentence. */
+  /** A relatable question or situation, 1–2 short sentences. */
+  hook: string;
+  /** ONE sentence: the takeaway, visible on the first screen. */
   bottomLine: string;
-  cards: Card[];
-  apply: {
-    steps: Step[];
-    gymon?: GymonBlock;
-    calculator?: { calculator: 'one-rep-max'; defaults?: { weightKg?: number; reps?: number } };
-  };
+  beats: Beat[];
+  /** Verbatim from a cited source (translated on the Hebrew page). */
+  pullQuote?: { ref: string; text: string; attribution: string; lead?: string };
+  tips: { heading: string; items: string[] };
+  calculator?: { calculator: 'one-rep-max'; defaults?: { weightKg?: number; reps?: number } };
+  gymon?: GymonBlock;
   references: Reference[];
   cta: { slot: 'log-sets' | 'track-progress' | 'plan-builder' };
 }

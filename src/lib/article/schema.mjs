@@ -5,8 +5,10 @@
  *     into the "Validate articles" Code node, and emits the writer's JSON Schema from it).
  *
  * Doctrine: ARTICLE_UX_DOCTRINE §8a/§8b, SEO_DOCTRINE §2–§4, §9.1 — overridden where they conflict by
- * the user's v2 decision (2026-10-07): an article is a one-sentence bottom line, 3–5 idea cards,
- * numbered "how to apply" steps and a sources list that holds all study detail. 500–700 words.
+ * the user's v3 decision (2026-10-07, reference: Headspace articles): "it should feel like scrolling,
+ * not reading". An article is a short relatable hook, a one-sentence takeaway, 3–6 "beats" (a plain
+ * headline that IS the point + 1–3 short sentences), an optional pull quote, a short "try it" list,
+ * and quiet extras (calculator, Gymon block, sources) at the bottom. Headlines alone tell the story.
  *
  * 🔴 Dependency-free and plain JS on purpose: an n8n Code node cannot import packages.
  * 🔴 No `\u` escapes and no `new URL()` anywhere in this file or validate.mjs — the n8n MCP
@@ -14,7 +16,7 @@
  *    n8n Code node before (see n8n/blog-articles/README.md).
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const LANGS = ['en', 'he'];
 
@@ -30,12 +32,12 @@ export const INTENTS = ['know', 'do'];
 /** User decision 2026-10-03: no high-YMYL topics. Only `low` passes the guard. */
 export const YMYL_LEVELS = ['low'];
 
-/** v2: one band. 500–700 words, a 2–3 minute read (user decision 2026-10-07). */
-export const LENGTH_BANDS = ['500-700'];
+/** v3: short. Whatever keeps it effortless — no padding to a word count (user decision 2026-10-07). */
+export const LENGTH_BANDS = ['short'];
 
 /**
  * Evidence scale (§8b). ⚠ Open owner decision #4: GRADE's four levels vs this five-level scale.
- * v2: the level is shown ONLY in the sources list (reference.certainty), never as a badge in the
+ * v2+: the level is shown ONLY in the sources list (reference.certainty), never as a badge in the
  * body. The body says it in plain words ("research suggests"). CERTAINTY_WORDS is kept for the
  * n8n v1 pipeline until it is migrated.
  */
@@ -78,8 +80,8 @@ export const CALLOUT_KINDS = ['note', 'myth', 'safety'];
 export const CTA_SLOTS = ['log-sets', 'track-progress', 'plan-builder'];
 
 /**
- * The Gymon-unique element ("information gain", SEO_DOCTRINE rule 2). v2: optional, at most one,
- * inside the apply part, and only when it fits the topic (user decision 2026-10-07).
+ * The Gymon-unique element ("information gain", SEO_DOCTRINE rule 2). v2+: optional, at most one,
+ * placed low and quiet, and only when it fits the topic (user decision 2026-10-07).
  *   log-example      — an ILLUSTRATIVE logging table (SET | PREVIOUS | KG | REPS | ✓). Its numbers
  *                      are an example, labelled as such, and exempt from the source-number check.
  *   plan-logic       — how Gymon's plan builder decides (from the supplied Gymon material).
@@ -95,7 +97,7 @@ export const CALCULATORS = {
   },
 };
 
-/** v1 block vocabulary — kept only for the n8n v1 pipeline until it is migrated. v2 has no blocks. */
+/** v1 block vocabulary — kept only for the n8n v1 pipeline until it is migrated. v2+ has no blocks. */
 export const BLOCK_TYPES = ['p', 'list', 'takeaway', 'claim', 'callout', 'table', 'calculator', 'cta', 'gymon'];
 
 export const LIMITS = {
@@ -103,20 +105,23 @@ export const LIMITS = {
   heroTitleWords: { min: 1, max: 4 },
   description: { en: [120, 155], he: [100, 145] },
   tags: [2, 4],
-  bottomLineWords: 30,
-  cards: [3, 5],
-  cardLabelWords: 4,
-  cardHeadingWords: 12,
-  cardSentences: [2, 3],
-  cardNumbers: 1,
-  steps: [3, 6],
-  stepTitleWords: 8,
-  stepTextWords: 25,
+  hookSentences: 2,
+  hookWords: 35,
+  bottomLineWords: 25,
+  beats: [3, 6],
+  beatHeadingWords: 9,
+  beatSentences: 3,
+  beatWords: 45,
+  beatNumbers: 1,
+  tips: [3, 5],
+  tipWords: 20,
+  pullQuoteWords: 30,
   references: [1, 12],
   findingWords: 45,
   sentenceWords: 20,
-  // Hebrew runs ~20–25% fewer words than English for the same text, so its band is lower.
-  words: { en: [500, 700], he: [380, 560] },
+  // A ceiling, not a target: past it the article stops feeling like a scroll. Hebrew runs ~20–25%
+  // fewer words than English for the same text.
+  words: { en: [150, 450], he: [110, 360] },
   internalLinks: [1, 3],
 };
 
@@ -168,7 +173,7 @@ export const CODE_FIELDS = [
 export const TOP_LEVEL_KEYS = [
   ...CODE_FIELDS,
   'title', 'heroTitle', 'description', 'primaryQuery', 'imageAlt',
-  'bottomLine', 'cards', 'apply', 'references', 'cta',
+  'hook', 'bottomLine', 'beats', 'pullQuote', 'tips', 'calculator', 'gymon', 'references', 'cta',
 ];
 
 /** Gym words written in Hebrew letters but not Hebrew (user decision: "עומס הדרגתי", not a transliteration). */

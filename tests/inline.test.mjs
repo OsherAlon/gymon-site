@@ -12,7 +12,7 @@ test('escapes everything that is not the closed inline syntax', () => {
 test('bold, citations and internal links', () => {
   const html = renderInline('A **key** claim [[r1, r2]] and [more](/blog/rest-between-sets).', opts);
   assert.match(html, /<strong>key<\/strong>/);
-  assert.match(html, /claim<sup class="cite" dir="ltr">\[<button[^>]*popovertarget="pop-r1"[^>]*>1<\/button>, <button[^>]*>2<\/button>\]<\/sup>/);
+  assert.match(html, /claim<sup class="cite" dir="ltr"><button[^>]*popovertarget="pop-r1"[^>]*>1<\/button>,<button[^>]*>2<\/button><\/sup>/);
   assert.match(html, /<a href="\/blog\/rest-between-sets">more<\/a>/);
 });
 

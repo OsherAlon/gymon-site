@@ -98,7 +98,7 @@ export const readTimeOf = (article) => {
   return Math.max(1, Math.round(words / (article && article.lang === 'he' ? 200 : 230)));
 };
 
-/** Every reader-facing text unit of a v2 article, with the refs its inline markers carry. */
+/** Every reader-facing text unit of a v3 article, with the refs its inline markers carry. */
 export function collectUnits(a) {
   const units = [];
   const push = (path, text, kind = 'text') => {
@@ -106,26 +106,28 @@ export function collectUnits(a) {
     units.push({ path, text, refs: refsIn(text), kind });
   };
   if (!isObj(a)) return units;
+  push('hook', a.hook);
   push('bottomLine', a.bottomLine);
-  (Array.isArray(a.cards) ? a.cards : []).forEach((c, i) => {
-    if (!isObj(c)) return;
-    push(`cards[${i}].label`, c.label, 'heading');
-    push(`cards[${i}].heading`, c.heading, 'heading');
-    push(`cards[${i}].text`, c.text, 'card');
+  (Array.isArray(a.beats) ? a.beats : []).forEach((b, i) => {
+    if (!isObj(b)) return;
+    push(`beats[${i}].heading`, b.heading, 'heading');
+    push(`beats[${i}].text`, b.text, 'beat');
   });
-  const ap = isObj(a.apply) ? a.apply : {};
-  (Array.isArray(ap.steps) ? ap.steps : []).forEach((st, i) => {
-    if (!isObj(st)) return;
-    push(`apply.steps[${i}].title`, st.title, 'heading');
-    push(`apply.steps[${i}].text`, st.text, 'step');
-  });
-  const g = isObj(ap.gymon) ? ap.gymon : null;
+  if (isObj(a.pullQuote)) {
+    push('pullQuote.lead', a.pullQuote.lead);
+    push('pullQuote.text', a.pullQuote.text, 'quote');
+  }
+  if (isObj(a.tips)) {
+    push('tips.heading', a.tips.heading, 'heading');
+    (Array.isArray(a.tips.items) ? a.tips.items : []).forEach((t, i) => push(`tips.items[${i}]`, t, 'tip'));
+  }
+  const g = isObj(a.gymon) ? a.gymon : null;
   if (g) {
     const kind = g.kind === 'log-example' ? 'gymon-example' : 'gymon';
-    if (g.heading) push('apply.gymon.heading', g.heading, 'heading');
-    push('apply.gymon.text', g.text, kind);
-    (Array.isArray(g.points) ? g.points : []).forEach((pt, pi) => push(`apply.gymon.points[${pi}]`, pt, kind));
-    if (g.caption) push('apply.gymon.caption', g.caption, kind);
+    if (g.heading) push('gymon.heading', g.heading, 'heading');
+    push('gymon.text', g.text, kind);
+    (Array.isArray(g.points) ? g.points : []).forEach((pt, pi) => push(`gymon.points[${pi}]`, pt, kind));
+    if (g.caption) push('gymon.caption', g.caption, kind);
   }
   return units;
 }
@@ -285,95 +287,116 @@ export function validateArticle(a, ctx = {}) {
     }
   });
 
-  // ---- bottom line ----
+  // ---- hook + bottom line (the first screen) ----
+  if (!isStr(a.hook)) err('hook', 'required: a relatable question or situation, 1–2 short sentences');
+  else {
+    const n = sentences(a.hook).length;
+    if (n > LIMITS.hookSentences) warn('hook', `${n} sentences (≤${LIMITS.hookSentences})`);
+    if (wordCount(a.hook) > LIMITS.hookWords) warn('hook', `${wordCount(a.hook)} words (≤${LIMITS.hookWords})`);
+  }
   if (!isStr(a.bottomLine)) err('bottomLine', 'required: one sentence that answers the title');
   else {
     const n = sentences(a.bottomLine).length;
-    if (n > 2) err('bottomLine', `${n} sentences — the bottom line is ONE sentence`);
-    else if (n > 1) warn('bottomLine', `${n} sentences — the bottom line is one sentence`);
-    const w = wordCount(a.bottomLine);
-    if (w > LIMITS.bottomLineWords) warn('bottomLine', `${w} words (≤${LIMITS.bottomLineWords})`);
+    if (n > 2) err('bottomLine', `${n} sentences — the takeaway is ONE sentence`);
+    else if (n > 1) warn('bottomLine', `${n} sentences — the takeaway is one sentence`);
+    if (wordCount(a.bottomLine) > LIMITS.bottomLineWords) warn('bottomLine', `${wordCount(a.bottomLine)} words (≤${LIMITS.bottomLineWords})`);
   }
 
-  // ---- idea cards ----
-  if (!Array.isArray(a.cards) || a.cards.length < LIMITS.cards[0] || a.cards.length > LIMITS.cards[1])
-    err('cards', `${LIMITS.cards[0]}–${LIMITS.cards[1]} idea cards`);
-  (Array.isArray(a.cards) ? a.cards : []).forEach((c, i) => {
-    const p = `cards[${i}]`;
-    if (!isObj(c)) return err(p, '{ label, heading, text }');
-    for (const k of Object.keys(c)) if (!['label', 'heading', 'text'].includes(k)) err(`${p}.${k}`, 'unknown field');
-    if (!isStr(c.label)) err(`${p}.label`, 'required (1–4 words)');
-    else if (wordCount(c.label) > LIMITS.cardLabelWords) warn(`${p}.label`, `${wordCount(c.label)} words (≤${LIMITS.cardLabelWords})`);
-    if (!isStr(c.heading)) err(`${p}.heading`, 'required: the answer, stated');
-    else if (wordCount(c.heading) > LIMITS.cardHeadingWords) warn(`${p}.heading`, `${wordCount(c.heading)} words (≤${LIMITS.cardHeadingWords})`);
-    if (!isStr(c.text)) err(`${p}.text`, 'required: 2–3 short sentences');
+  // ---- beats: one idea per screen; the headline IS the point ----
+  if (!Array.isArray(a.beats) || a.beats.length < LIMITS.beats[0] || a.beats.length > LIMITS.beats[1])
+    err('beats', `${LIMITS.beats[0]}–${LIMITS.beats[1]} beats`);
+  (Array.isArray(a.beats) ? a.beats : []).forEach((b, i) => {
+    const p = `beats[${i}]`;
+    if (!isObj(b)) return err(p, '{ heading, text }');
+    for (const k of Object.keys(b)) if (!['heading', 'text'].includes(k)) err(`${p}.${k}`, 'unknown field');
+    if (!isStr(b.heading)) err(`${p}.heading`, 'required: a plain statement of the point');
     else {
-      const n = sentences(c.text).length;
-      if (n > LIMITS.cardSentences[1] + 1) err(`${p}.text`, `${n} sentences — a card holds one idea in 2–3 sentences`);
-      else if (n < LIMITS.cardSentences[0] || n > LIMITS.cardSentences[1]) warn(`${p}.text`, `${n} sentences (2–3)`);
-      const nums = new Set(numbersIn(plainText(c.text)));
-      if (nums.size > LIMITS.cardNumbers) warn(`${p}.text`, `${nums.size} numbers — at most one key number per card (study detail belongs in the sources)`);
+      if (wordCount(b.heading) > LIMITS.beatHeadingWords) warn(`${p}.heading`, `${wordCount(b.heading)} words (≤${LIMITS.beatHeadingWords})`);
+      if (refsIn(b.heading).length) err(`${p}.heading`, 'no citation markers in a headline');
+    }
+    if (!isStr(b.text)) err(`${p}.text`, 'required: 1–3 short sentences');
+    else {
+      const n = sentences(b.text).length;
+      if (n > LIMITS.beatSentences + 1) err(`${p}.text`, `${n} sentences — a beat is one idea in 1–3 short sentences`);
+      else if (n > LIMITS.beatSentences) warn(`${p}.text`, `${n} sentences (≤${LIMITS.beatSentences})`);
+      const w = wordCount(b.text);
+      if (w > LIMITS.beatWords) warn(`${p}.text`, `${w} words (≤${LIMITS.beatWords}) — keep it a glance`);
+      const nums = new Set(numbersIn(plainText(b.text)));
+      if (nums.size > LIMITS.beatNumbers) warn(`${p}.text`, `${nums.size} numbers — at most one key number per beat (study detail belongs in the sources)`);
     }
   });
 
-  // ---- how to apply ----
-  const ap = a.apply;
-  if (!isObj(ap)) err('apply', 'required: { steps, gymon?, calculator? }');
+  // ---- pull quote: verbatim from a cited source (English), attributed ----
+  if (a.pullQuote != null) {
+    const q = a.pullQuote;
+    if (!isObj(q)) err('pullQuote', '{ ref, text, attribution, lead? }');
+    else {
+      for (const k of Object.keys(q)) if (!['ref', 'text', 'attribution', 'lead'].includes(k)) err(`pullQuote.${k}`, 'unknown field');
+      if (!isStr(q.text)) err('pullQuote.text', 'required');
+      else if (wordCount(q.text) > LIMITS.pullQuoteWords) warn('pullQuote.text', `${wordCount(q.text)} words (≤${LIMITS.pullQuoteWords})`);
+      if (!isStr(q.attribution)) err('pullQuote.attribution', 'required: who said or wrote it');
+      if (!isStr(q.ref) || !refs.has(q.ref)) err('pullQuote.ref', 'must be the id of a reference');
+      else if (lang === 'en' && isStr(q.text) && !normForMatch(refs.get(q.ref).quote).includes(normForMatch(q.text).replace(/^["“]|["”]$/g, '')))
+        err('pullQuote.text', `not found in the quote of ${q.ref} — a pull quote is verbatim`);
+    }
+  }
+
+  // ---- try it ----
+  const tp = a.tips;
+  if (!isObj(tp)) err('tips', 'required: { heading, items: 3–5 }');
   else {
-    for (const k of Object.keys(ap)) if (!['steps', 'gymon', 'calculator'].includes(k)) err(`apply.${k}`, 'unknown field');
-    if (!Array.isArray(ap.steps) || ap.steps.length < LIMITS.steps[0] || ap.steps.length > LIMITS.steps[1])
-      err('apply.steps', `${LIMITS.steps[0]}–${LIMITS.steps[1]} numbered steps`);
-    (Array.isArray(ap.steps) ? ap.steps : []).forEach((st, i) => {
-      const p = `apply.steps[${i}]`;
-      if (!isObj(st) || !isStr(st.title) || !isStr(st.text)) return err(p, '{ title, text }');
-      for (const k of Object.keys(st)) if (!['title', 'text'].includes(k)) err(`${p}.${k}`, 'unknown field');
-      if (wordCount(st.title) > LIMITS.stepTitleWords) warn(`${p}.title`, `${wordCount(st.title)} words (≤${LIMITS.stepTitleWords})`);
-      if (wordCount(st.text) > LIMITS.stepTextWords) warn(`${p}.text`, `${wordCount(st.text)} words — one line (≤${LIMITS.stepTextWords})`);
-    });
-    if (ap.calculator != null) {
-      const cp = 'apply.calculator';
-      if (!isObj(ap.calculator)) err(cp, '{ calculator, defaults? }');
-      else {
-        for (const k of Object.keys(ap.calculator)) if (!['calculator', 'defaults'].includes(k)) err(`${cp}.${k}`, 'unknown field');
-        const reg = CALCULATORS[ap.calculator.calculator];
-        if (!reg) err(`${cp}.calculator`, `not in the registry (${Object.keys(CALCULATORS).join(', ')})`);
-        else if (ap.calculator.defaults != null) {
-          if (!isObj(ap.calculator.defaults)) err(`${cp}.defaults`, 'object');
-          else
-            for (const [k, v] of Object.entries(ap.calculator.defaults)) {
-              const range = reg[k];
-              if (!range) err(`${cp}.defaults.${k}`, 'unknown parameter');
-              else if (typeof v !== 'number' || v < range.min || v > range.max) err(`${cp}.defaults.${k}`, `${range.min}–${range.max}`);
-            }
-        }
+    for (const k of Object.keys(tp)) if (!['heading', 'items'].includes(k)) err(`tips.${k}`, 'unknown field');
+    if (!isStr(tp.heading)) err('tips.heading', 'required');
+    if (!Array.isArray(tp.items) || tp.items.length < LIMITS.tips[0] || tp.items.length > LIMITS.tips[1] || !tp.items.every((x) => isStr(x)))
+      err('tips.items', `${LIMITS.tips[0]}–${LIMITS.tips[1]} short lines`);
+    else tp.items.forEach((t, i) => { if (wordCount(t) > LIMITS.tipWords) warn(`tips.items[${i}]`, `${wordCount(t)} words (≤${LIMITS.tipWords})`); });
+  }
+
+  // ---- quiet extras ----
+  if (a.calculator != null) {
+    const cp = 'calculator';
+    const c = a.calculator;
+    if (!isObj(c)) err(cp, '{ calculator, defaults? }');
+    else {
+      for (const k of Object.keys(c)) if (!['calculator', 'defaults'].includes(k)) err(`${cp}.${k}`, 'unknown field');
+      const reg = CALCULATORS[c.calculator];
+      if (!reg) err(`${cp}.calculator`, `not in the registry (${Object.keys(CALCULATORS).join(', ')})`);
+      else if (c.defaults != null) {
+        if (!isObj(c.defaults)) err(`${cp}.defaults`, 'object');
+        else
+          for (const [k, v] of Object.entries(c.defaults)) {
+            const range = reg[k];
+            if (!range) err(`${cp}.defaults.${k}`, 'unknown parameter');
+            else if (typeof v !== 'number' || v < range.min || v > range.max) err(`${cp}.defaults.${k}`, `${range.min}–${range.max}`);
+          }
       }
     }
-    const g = ap.gymon;
-    if (g != null) {
-      const gp = 'apply.gymon';
-      const only = (keys) => {
-        for (const k of Object.keys(g)) if (!['kind', ...keys].includes(k)) err(`${gp}.${k}`, `unknown field for "${g.kind}"`);
-      };
-      if (!isObj(g) || !GYMON_KINDS.includes(g.kind)) err(`${gp}.kind`, GYMON_KINDS.join(' | '));
-      else if (g.kind === 'log-example') {
-        only(['caption', 'exercise', 'sessions', 'text']);
-        if (!isStr(g.exercise)) err(`${gp}.exercise`, 'required');
-        if (!isStr(g.caption)) err(`${gp}.caption`, 'required');
-        if (!Array.isArray(g.sessions) || g.sessions.length < 1 || g.sessions.length > 3) err(`${gp}.sessions`, '1–3 sessions');
-        (Array.isArray(g.sessions) ? g.sessions : []).forEach((ses, i) => {
-          if (!isObj(ses) || !isStr(ses.label) || !Array.isArray(ses.sets) || ses.sets.length < 1 || ses.sets.length > 6)
-            return err(`${gp}.sessions[${i}]`, '{ label, sets: 1–6 }');
-          ses.sets.forEach((st, j) => {
-            const num = (v) => typeof v === 'number' && v >= 0 && v <= 1000;
-            if (!isObj(st) || !num(st.kg) || !num(st.reps) || (st.previous != null && !(isObj(st.previous) && num(st.previous.kg) && num(st.previous.reps))))
-              err(`${gp}.sessions[${i}].sets[${j}]`, '{ kg, reps, previous: { kg, reps } | null }');
-          });
+  }
+  const g = a.gymon;
+  if (g != null) {
+    const gp = 'gymon';
+    const only = (keys) => {
+      for (const k of Object.keys(g)) if (!['kind', ...keys].includes(k)) err(`${gp}.${k}`, `unknown field for "${g.kind}"`);
+    };
+    if (!isObj(g) || !GYMON_KINDS.includes(g.kind)) err(`${gp}.kind`, GYMON_KINDS.join(' | '));
+    else if (g.kind === 'log-example') {
+      only(['caption', 'exercise', 'sessions', 'text']);
+      if (!isStr(g.exercise)) err(`${gp}.exercise`, 'required');
+      if (!isStr(g.caption)) err(`${gp}.caption`, 'required');
+      if (!Array.isArray(g.sessions) || g.sessions.length < 1 || g.sessions.length > 3) err(`${gp}.sessions`, '1–3 sessions');
+      (Array.isArray(g.sessions) ? g.sessions : []).forEach((ses, i) => {
+        if (!isObj(ses) || !isStr(ses.label) || !Array.isArray(ses.sets) || ses.sets.length < 1 || ses.sets.length > 6)
+          return err(`${gp}.sessions[${i}]`, '{ label, sets: 1–6 }');
+        ses.sets.forEach((st, j) => {
+          const num = (v) => typeof v === 'number' && v >= 0 && v <= 1000;
+          if (!isObj(st) || !num(st.kg) || !num(st.reps) || (st.previous != null && !(isObj(st.previous) && num(st.previous.kg) && num(st.previous.reps))))
+            err(`${gp}.sessions[${i}].sets[${j}]`, '{ kg, reps, previous: { kg, reps } | null }');
         });
-      } else {
-        only(['heading', 'text', 'points']);
-        if (!isStr(g.text)) err(`${gp}.text`, 'required');
-        if (g.points != null && !(Array.isArray(g.points) && g.points.every((x) => isStr(x)))) err(`${gp}.points`, 'strings');
-      }
+      });
+    } else {
+      only(['heading', 'text', 'points']);
+      if (!isStr(g.text)) err(`${gp}.text`, 'required');
+      if (g.points != null && !(Array.isArray(g.points) && g.points.every((x) => isStr(x)))) err(`${gp}.points`, 'strings');
     }
   }
   if (!isObj(a.cta) || !CTA_SLOTS.includes(a.cta.slot) || Object.keys(a.cta).some((k) => k !== 'slot'))
@@ -414,7 +437,7 @@ export function validateArticle(a, ctx = {}) {
     if (STUDY_DETAIL.test(plainText(u.text))) warn(u.path, 'study detail in the body (p-values, ±, "n =") — it belongs in the sources list');
 
     // Numbers must come from a cited, fully-read source quote.
-    if (u.kind === 'gymon-example' || u.kind === 'heading') continue;
+    if (u.kind === 'gymon-example' || u.kind === 'heading' || u.kind === 'quote') continue;
     const nums = numbersIn(plainText(u.text));
     if (!nums.length) continue;
     if (u.kind === 'gymon') {
@@ -430,7 +453,7 @@ export function validateArticle(a, ctx = {}) {
     const check = nums.filter((n) => !years.has(n));
     if (!check.length) continue;
     if (!cited.length) {
-      if (u.kind !== 'step') warn(u.path, `number(s) ${check.join(', ')} without a citation`);
+      if (u.kind !== 'tip') warn(u.path, `number(s) ${check.join(', ')} without a citation`);
       continue;
     }
     const inRead = new Set(cited.filter((r) => r.fullTextRead).flatMap((r) => quoteNumbers(r.quote)));
@@ -444,16 +467,16 @@ export function validateArticle(a, ctx = {}) {
   }
   for (const id of refs.keys()) if (!used.has(id)) warn('references', `${id} is never cited`);
   if (ctx.publishedSlugs && (ctx.publishedSlugs[lang] || []).length >= LIMITS.internalLinks[0] && internal.length < LIMITS.internalLinks[0])
-    warn('cards', `${internal.length} internal links (${LIMITS.internalLinks[0]}–${LIMITS.internalLinks[1]} expected)`);
+    warn('beats', `${internal.length} internal links (${LIMITS.internalLinks[0]}–${LIMITS.internalLinks[1]} expected)`);
 
-  // Truncation (SEO §9.5: a hard failure) — the last step must end a sentence.
-  const steps = isObj(ap) && Array.isArray(ap.steps) ? ap.steps : [];
-  const lastText = steps.length && isObj(steps[steps.length - 1]) ? steps[steps.length - 1].text : null;
-  if (steps.length && (!isStr(lastText) || !/[.!?:)"”׳]\s*(\[\[[^\]]+\]\])?\s*$/.test(lastText.trim())))
-    err('apply.steps', 'the article ends mid-sentence (truncated?)');
+  // Truncation (SEO §9.5: a hard failure) — the last tip must end a sentence.
+  const tipItems = isObj(tp) && Array.isArray(tp.items) ? tp.items : [];
+  const lastText = tipItems.length ? tipItems[tipItems.length - 1] : null;
+  if (tipItems.length && (!isStr(lastText) || !/[.!?:)"”׳]\s*(\[\[[^\]]+\]\])?\s*$/.test(lastText.trim())))
+    err('tips.items', 'the article ends mid-sentence (truncated?)');
 
   const words = units.reduce((n, u) => n + wordCount(u.text), 0);
   const [wlo, whi] = LIMITS.words[lang];
-  if (words < wlo || words > whi) warn('length', `${words} words (${wlo}–${whi} expected for a 2–3 minute read)`);
+  if (words < wlo || words > whi) warn('length', `${words} words (${wlo}–${whi}: short enough to feel like scrolling)`);
   return { errors, warnings, stats: { words, readTime: Math.max(1, Math.round(words / (lang === 'he' ? 200 : 230))), refs: refs.size } };
 }

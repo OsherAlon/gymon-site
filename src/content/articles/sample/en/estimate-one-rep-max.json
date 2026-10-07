@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "lang": "en",
   "slug": "estimate-one-rep-max",
   "pillar": "tools",
@@ -16,130 +16,52 @@
   "editor": "osher-alon",
   "aiAssisted": true,
   "sample": true,
-  "lengthBand": "500-700",
+  "lengthBand": "short",
   "title": "How to estimate your 1RM without maxing out",
   "heroTitle": "Estimate Your 1RM",
   "description": "One hard set of a few reps can estimate your one-rep max, no max attempt needed. How to do it, where it misleads, and how to track it.",
   "primaryQuery": "1rm calculator",
   "imageAlt": "Abstract rising steps in Gymon's blue-grey, a placeholder image for this sample article",
-  "bottomLine": "One hard set of a few reps can replace a max test, if you read the result as an estimate.",
-  "cards": [
+  "hook": "Ever wondered what you could lift for a single rep? Good news: you don't have to find out the hard way.",
+  "bottomLine": "One heavy set of a few reps can estimate your max, close enough to track your progress.",
+  "beats": [
     {
-      "label": "The idea",
-      "heading": "A normal hard set already holds the answer",
-      "text": "Testing a true one-rep max takes a long warm-up, a spotter and a fair bit of nerve. A formula gets you close from a set you were going to do anyway [[r2]]. You put in the weight and the reps, and an estimated max comes out the other end."
+      "heading": "A heavy set already knows your max",
+      "text": "Put the weight and the reps into a simple formula, and out comes an estimate [[r2]]. No spotter, no drama, no testing day."
     },
     {
-      "label": "The catch",
-      "heading": "The same formula doesn't fit everyone",
-      "text": "Research suggests that people who are used to long sets squeeze out more reps at the same load [[r1]]. In one small study, endurance runners did about twice as many reps as weightlifters at 70% of their max [[r1]]. So if you estimate from a light, long set, the number can flatter you by a fair margin."
+      "heading": "Light, long sets can flatter you",
+      "text": "People used to long sets squeeze out more reps at the same weight [[r1]]. In one small study, runners did about twice as many reps as lifters at 70% of their max [[r1]]."
     },
     {
-      "label": "Sweet spot",
-      "heading": "Heavier sets give steadier estimates",
-      "text": "The gap between the two groups closed as the weight got heavier [[r1]]. That makes a heavy set of a few reps a lot more trustworthy than a long set of fifteen. Pick a weight that feels genuinely heavy, but one you can still move with clean form."
+      "heading": "Heavier sets give steadier numbers",
+      "text": "The gap between people shrank as the weight went up [[r1]]. So pick a set that feels genuinely heavy, but still clean."
     },
     {
-      "label": "Which formula",
-      "heading": "Epley and Brzycki tell a similar story",
-      "text": "Both formulas turn your reps into an estimated max, and the calculator below shows them side by side. Epley's version began as a coaching chart rather than a study [[r1]]. That is one more reason to read the result as a rough guide, not a precise figure."
-    },
-    {
-      "label": "What it is for",
-      "heading": "It works best as a trend line",
-      "text": "A single estimate on its own says very little, because a good or bad day can move it. The same lift, done the same way week after week, shows whether your strength is moving. That holds even when no single number is exactly right."
+      "heading": "Watch the trend, not the number",
+      "text": "One estimate can wobble with a good or a bad day. The same lift, logged the same way each week, tells you if you are getting stronger."
     }
   ],
-  "apply": {
-    "steps": [
-      {
-        "title": "Pick a lift you know well",
-        "text": "Choose one you already do every week with steady form, like a squat, bench press or row."
-      },
-      {
-        "title": "Warm up, then do one hard set",
-        "text": "Use a weight you can lift only a few times, and stop before your form starts to break."
-      },
-      {
-        "title": "Enter the weight and reps",
-        "text": "Put them into the calculator below and write down the estimate it gives you, with the date."
-      },
-      {
-        "title": "Keep the set the same",
-        "text": "Same lift, same depth, same rest before it, so next time is a fair comparison."
-      },
-      {
-        "title": "Compare over weeks",
-        "text": "A rising estimate means you are getting stronger, even in weeks when the bar barely moves."
-      },
-      {
-        "title": "Retest every few weeks",
-        "text": "Use the estimate as a check-in, not a workout goal, and keep most of your sets well short of failure."
-      }
-    ],
-    "calculator": {
-      "calculator": "one-rep-max",
-      "defaults": {
-        "weightKg": 80,
-        "reps": 5
-      }
-    },
-    "gymon": {
-      "kind": "log-example",
-      "exercise": "Bench press",
-      "caption": "Two runs of the same bench workout, a week apart. PREVIOUS shows last session's numbers next to each set.",
-      "sessions": [
-        {
-          "label": "Week 1",
-          "sets": [
-            {
-              "previous": null,
-              "kg": 60,
-              "reps": 8
-            },
-            {
-              "previous": null,
-              "kg": 60,
-              "reps": 7
-            },
-            {
-              "previous": null,
-              "kg": 60,
-              "reps": 6
-            }
-          ]
-        },
-        {
-          "label": "Week 2",
-          "sets": [
-            {
-              "previous": {
-                "kg": 60,
-                "reps": 8
-              },
-              "kg": 62.5,
-              "reps": 7
-            },
-            {
-              "previous": {
-                "kg": 60,
-                "reps": 7
-              },
-              "kg": 62.5,
-              "reps": 6
-            },
-            {
-              "previous": {
-                "kg": 60,
-                "reps": 6
-              },
-              "kg": 62.5,
-              "reps": 6
-            }
-          ]
-        }
-      ],
-      "text": "Week 1's best set, 60 kg for 8, gives an Epley estimate of 76 kg. Week 2's, 62.5 kg for 7, gives 77 kg. The weight went up and the reps dipped, so the log alone looks flat. The estimate shows that strength still moved."
+  "pullQuote": {
+    "ref": "r1",
+    "lead": "And one of the best-known formulas started life as…",
+    "text": "A poundage chart, not based on scientific research.",
+    "attribution": "Richens & Cleather (2014), on where the Epley formula came from"
+  },
+  "tips": {
+    "heading": "Try it this week",
+    "items": [
+      "Pick a lift you already do, like a squat or a bench press.",
+      "Warm up, then do one heavy set of a few reps, and stop before your form slips.",
+      "Pop the weight and reps into the calculator below.",
+      "Repeat in a few weeks: same lift, same depth, same rest."
+    ]
+  },
+  "calculator": {
+    "calculator": "one-rep-max",
+    "defaults": {
+      "weightKg": 80,
+      "reps": 5
     }
   },
   "references": [

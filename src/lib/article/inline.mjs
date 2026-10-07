@@ -92,7 +92,8 @@ export function renderInline(text, opts = {}) {
           )}">${label}</button>`
         : `<a class="cite-btn" href="#ref-${escHtml(id)}">${label}</a>`;
     });
-    return `<sup class="cite" dir="ltr">[${parts.join(', ')}]</sup>`;
+    // v3: a small superscript number, no brackets — research stays out of the reader's way.
+    return `<sup class="cite" dir="ltr">${parts.join(',')}</sup>`;
   };
   let out = '';
   let last = 0;

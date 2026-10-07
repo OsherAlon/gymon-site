@@ -18,11 +18,11 @@ test('closed schema: unknown fields fail, v1 shapes are rejected', () => {
   const a = clone(load('en'));
   a.mdx = '<Thing/>';
   a.sections = [];
-  a.cards[0].badge = 'Limited evidence';
+  a.beats[0].badge = 'Limited evidence';
   const r = codes(validateArticle(a));
   assert.ok(r.some((e) => e.startsWith('mdx: unknown field')));
   assert.ok(r.some((e) => e.startsWith('sections: unknown field')));
-  assert.ok(r.some((e) => e.startsWith('cards[0].badge: unknown field')));
+  assert.ok(r.some((e) => e.startsWith('beats[0].badge: unknown field')));
 });
 
 test('YMYL topic guard rejects supplements, weight loss, injury, pregnancy', () => {
@@ -40,7 +40,7 @@ test('YMYL topic guard rejects supplements, weight loss, injury, pregnancy', () 
 
 test('references: unknown id, commercial host, tracking params, tier mismatch', () => {
   const a = clone(load('en'));
-  a.cards[0].text += ' [[r9]]';
+  a.beats[0].text += ' [[r9]]';
   a.references[0].url = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC4042664/?utm_source=x';
   a.references[1].tier = 'AUTHORITY';
   const r = codes(validateArticle(a));
@@ -51,31 +51,44 @@ test('references: unknown id, commercial host, tracking params, tier mismatch', 
 
 test('numbers: an unread full text cannot carry a number; a wrong number is flagged; spelled-out numbers count', () => {
   const a = clone(load('en'));
-  a.cards[0].text = 'Brzycki found 25 reps at a heavy load. That is a lot [[r2]].';
+  a.beats[0].text = 'Brzycki found 25 reps at a heavy load. That is a lot [[r2]].';
   let r = validateArticle(a);
   assert.ok(codes(r).some((e) => /attributed to a source whose full text was not read/.test(e)));
   const b = clone(load('en'));
-  b.cards[1].text = 'In one small study, runners did 41.2 reps. That is a lot [[r1]].';
+  b.beats[1].text = 'In one small study, runners did 41.2 reps. That is a lot [[r1]].';
   r = validateArticle(b);
   assert.ok(r.warnings.some((w) => /number 41.2 is not in the quote/.test(w.message)));
   const c = clone(load('en'));
-  c.cards[4].text = 'Most people gain 12% a month. That is the claim.';
+  c.beats[3].text = 'Most people gain 12% a month. That is the claim.';
   assert.ok(validateArticle(c).warnings.some((w) => /without a citation/.test(w.message)));
   // Execution 1541: the quote said "Fifty-five untrained young women".
   assert.deepEqual(spelledNumbersIn('Fifty-five untrained young women; eight runners'), ['55', '8']);
   const d = clone(load('en'));
-  d.cards[1].text = 'Eight runners took part. In all, 8 of them finished [[r1]].';
+  d.beats[1].text = 'Eight runners took part. In all, 8 of them finished [[r1]].';
   assert.ok(!validateArticle(d).warnings.some((w) => /number 8 is not in the quote/.test(w.message)));
 });
 
-test('v2 readability: one-sentence bottom line, one number per card, no study detail in the body', () => {
+test('v3 readability: hook and one-sentence takeaway, one number per beat, no study detail, no refs in headlines', () => {
   const a = clone(load('en'));
   a.bottomLine = 'One. Two. Three.';
-  a.cards[1].text = 'Runners did 39.9 reps at 70% versus 17.9 for lifters [[r1]]. That is p < 0.05.';
+  delete a.hook;
+  a.beats[1].text = 'Runners did 39.9 reps at 70% versus 17.9 for lifters [[r1]]. That is p < 0.05.';
+  a.beats[2].heading += ' [[r1]]';
   const r = validateArticle(a);
-  assert.ok(codes(r).some((e) => /bottomLine: 3 sentences/.test(e)));
-  assert.ok(r.warnings.some((w) => /at most one key number per card/.test(w.message)));
+  const e = codes(r);
+  assert.ok(e.some((x) => /bottomLine: 3 sentences/.test(x)));
+  assert.ok(e.some((x) => /^hook: required/.test(x)));
+  assert.ok(e.some((x) => /beats\[2\]\.heading: no citation markers/.test(x)));
+  assert.ok(r.warnings.some((w) => /at most one key number per beat/.test(w.message)));
   assert.ok(r.warnings.some((w) => /study detail in the body/.test(w.message)));
+});
+
+test('pull quote: verbatim from the cited reference (English)', () => {
+  const a = clone(load('en'));
+  a.pullQuote.text = 'A chart invented on a napkin.';
+  assert.ok(codes(validateArticle(a)).some((e) => /pullQuote\.text: not found in the quote of r1/.test(e)));
+  a.pullQuote.ref = 'r7';
+  assert.ok(codes(validateArticle(a)).some((e) => /pullQuote\.ref/.test(e)));
 });
 
 test('certainty lives on the reference: "strong" needs a fully read primary/authority source', () => {
@@ -86,18 +99,18 @@ test('certainty lives on the reference: "strong" needs a fully read primary/auth
   assert.ok(codes(validateArticle(a)).some((e) => /references\[0\]\.finding: required/.test(e)));
 });
 
-test('apply: 3–6 steps, calculator defaults in range, Gymon block optional, truncation is a hard failure', () => {
+test('tips: 3–5 lines, calculator defaults in range, extras optional, truncation is a hard failure', () => {
   const a = clone(load('en'));
-  a.apply.steps = a.apply.steps.slice(0, 2);
-  a.apply.calculator.defaults.reps = 30;
+  a.tips.items = a.tips.items.slice(0, 2);
+  a.calculator.defaults.reps = 30;
   const r = codes(validateArticle(a));
-  assert.ok(r.some((e) => /apply\.steps: 3–6/.test(e)));
-  assert.ok(r.some((e) => /defaults\.reps: 1–12/.test(e)));
+  assert.ok(r.some((e) => /tips\.items: 3–5/.test(e)));
+  assert.ok(r.some((e) => /calculator\.defaults\.reps: 1–12/.test(e)));
   const b = clone(load('en'));
-  delete b.apply.gymon;
-  delete b.apply.calculator;
+  delete b.calculator;
+  delete b.pullQuote;
   assert.deepEqual(codes(validateArticle(b)), []);
-  b.apply.steps[b.apply.steps.length - 1].text = 'A rising estimate means you are getting';
+  b.tips.items[b.tips.items.length - 1] = 'Repeat in a few weeks with the same';
   assert.ok(codes(validateArticle(b)).some((e) => /ends mid-sentence/.test(e)));
 });
 
@@ -110,7 +123,7 @@ test('a non-sample article must carry its review date (build mode)', () => {
 
 test('pipeline context: off-list URLs, fabricated quote numbers, unpublished internal links', () => {
   const a = clone(load('en'));
-  a.cards[0].text += ' See [rest](/blog/rest-between-sets).';
+  a.beats[0].text += ' See [rest](/blog/rest-between-sets).';
   const r = validateArticle(a, {
     mode: 'pipeline',
     allowedUrls: [a.references[0].url],
