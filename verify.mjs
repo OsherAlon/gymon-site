@@ -103,6 +103,10 @@ for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   if (!/<h1[^>]*>Gymon<\/h1>/.test(html)) fail(`${path}: the H1 is not in the served HTML`);
   if (!/src="\/app\/screen-[a-z-]+-(en|he)\.(png|webp)"/.test(html)) fail(`${path}: no app screen in the phone`);
   for (const p of ['privacy', 'terms', 'support']) if (!html.includes(`${path === '/' ? '' : '/he'}/${p}"`)) fail(`${path} has no link to ${p}`);
+  // Feature marquee: the section is there, with at least 6 cards in its first (readable) copy.
+  const firstRun = html.split('class="marquee-run')[1]?.split('class="marquee-run')[0] ?? '';
+  if (!/class="home-features/.test(html)) fail(`${path}: no feature section`);
+  else if ((firstRun.match(/<article/g) || []).length < 6) fail(`${path}: fewer than 6 feature cards`);
 }
 
 // ----------------------------------------------------------------- hosting --

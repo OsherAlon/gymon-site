@@ -15,6 +15,14 @@
 @plugin '@tailwindcss/typography';
 
 @theme {
+  /* Home marquee (testimonials-with-marquee adaptation): Tailwind v4 theme tokens instead of a
+     tailwind.config.js. `max-w-container` = 1280px. The animate token is in the @theme inline
+     block below: its value uses var(--duration), which only exists on the marquee element. */
+  --container-container: 1280px;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - var(--gap))); }
+  }
   --color-background: #e4EDF2;
   --color-foreground: #0B1115;
   --color-card: #ffffff;
@@ -35,6 +43,12 @@
   --color-highlight: #3fc6dc;
 
   --font-sans: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
+}
+
+/* `inline`: the utility gets the value itself, so var(--duration) resolves on the element
+   (a :root custom property holding var(--duration) would compute to nothing). */
+@theme inline {
+  --animate-marquee: marquee var(--duration) infinite linear;
 }
 
 @layer base {
@@ -1173,4 +1187,34 @@ body:has(.home-v2) {
 }
 .home-links a:hover {
   border-color: var(--color-brand);
+}
+
+/* Home marquee: LTR moves left; in RTL the copies sit to the LEFT of the first one, so the loop
+   moves right instead (same distance, no jump at the seam). */
+.marquee-run {
+  animation: marquee var(--duration) infinite linear;
+}
+[dir='rtl'] .marquee-run {
+  animation-name: marquee-rtl;
+}
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100% + var(--gap))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-run,
+  [dir='rtl'] .marquee-run {
+    animation: none;
+  }
+  .marquee-run[aria-hidden='true'],
+  .marquee-fade {
+    display: none;
+  }
+  .marquee {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .marquee article {
+    scroll-snap-align: start;
+  }
 }

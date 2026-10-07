@@ -38,6 +38,24 @@ export const copy = {
       screenAlt: "The Gymon app's home screen: this week's workouts and today's steps.",
     },
     nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support', blog: 'Blog' },
+    // Home "what's inside" marquee (2026-10-07). Feature cards, NOT testimonials: Gymon has no
+    // users yet and invented reviews are prohibited. Every claim is checked against the shipped
+    // app (gymon app/src + departments/legal/app_store_listing_draft.md). Data-driven, so real
+    // reviews (with permission) can replace these later.
+    features: {
+      title: "What's inside Gymon",
+      description: 'A quick look at what the app does.',
+      items: [
+        { icon: 'plan', title: 'A plan built for you', tag: 'Short questionnaire', text: 'Answer a few questions about your goal, experience, equipment and training days, and get a weekly plan with sets, reps and rest.' },
+        { icon: 'log', title: "Last time's numbers, right there", tag: 'Workout log', text: 'Every set shows the weight and reps from the last run of the same workout, so the next small step is clear.' },
+        { icon: 'timer', title: 'A rest timer that starts itself', tag: 'Workout log', text: 'Mark a set as done and the rest timer starts. Timed exercises like running get a stopwatch instead.' },
+        { icon: 'chat', title: 'Build a workout in a chat', tag: 'Chat with Gymon', text: 'Say what you want to train, how much time you have and what to avoid, and Gymon builds the workout with you.' },
+        { icon: 'trend', title: 'Your best set, per exercise', tag: 'History', text: 'See past sessions of each exercise, the best set in each, and how your volume moves over time.' },
+        { icon: 'lang', title: 'Fully in Hebrew, right to left', tag: 'Language', text: 'Every screen works in Hebrew from right to left, and in English.' },
+        { icon: 'book', title: 'How-to for every exercise', tag: 'Exercise library', text: 'Each exercise in the library comes with instructions on how to do it, in Hebrew too.' },
+        { icon: 'health', title: 'Steps from Apple Health', tag: 'Optional', text: 'With your permission, Gymon reads steps and workouts from Health. It never writes to Health, and the data stays on your phone.' },
+      ],
+    },
     support: {
       title: 'Support',
       contactTitle: 'Contact',
@@ -180,6 +198,20 @@ export const copy = {
       screenAlt: 'מסך הבית באפליקציית Gymon: האימונים של השבוע והצעדים של היום.',
     },
     nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג' },
+    features: {
+      title: 'מה יש ב-Gymon',
+      description: 'הצצה קצרה למה שהאפליקציה עושה.',
+      items: [
+        { icon: 'plan', title: 'תוכנית שנבנית במיוחד', tag: 'שאלון קצר', text: 'עונים על כמה שאלות על המטרה, הניסיון, הציוד וימי האימון, ומקבלים תוכנית שבועית עם סטים, חזרות ומנוחה.' },
+        { icon: 'log', title: 'המספרים מהפעם הקודמת, מול העיניים', tag: 'יומן אימון', text: 'ליד כל סט מופיעים המשקל והחזרות מהפעם הקודמת של אותו אימון, כך שהצעד הבא ברור.' },
+        { icon: 'timer', title: 'טיימר מנוחה שמתחיל לבד', tag: 'יומן אימון', text: 'מסמנים סט כבוצע וטיימר המנוחה מתחיל. בתרגילים מבוססי זמן, כמו ריצה, יש שעון עצר.' },
+        { icon: 'chat', title: 'בונים אימון בשיחה', tag: 'שיחה עם Gymon', text: 'מספרים מה רוצים לאמן, כמה זמן יש וממה להימנע, ו-Gymon בונה איתכם את האימון.' },
+        { icon: 'trend', title: 'הסט הטוב ביותר בכל תרגיל', tag: 'היסטוריה', text: 'רואים את האימונים הקודמים בכל תרגיל, את הסט הטוב ביותר בכל אחד ואת מגמת הנפח לאורך זמן.' },
+        { icon: 'lang', title: 'עברית מלאה, מימין לשמאל', tag: 'שפה', text: 'כל המסכים עובדים בעברית מימין לשמאל, וגם באנגלית.' },
+        { icon: 'book', title: 'הוראות ביצוע לכל תרגיל', tag: 'מאגר תרגילים', text: 'לכל תרגיל במאגר יש הוראות ביצוע, גם בעברית.' },
+        { icon: 'health', title: 'צעדים מ-Apple Health', tag: 'לבחירה', text: 'בהרשאה, Gymon קורא צעדים ואימונים מ-Health. שום דבר לא נכתב ל-Health, והנתונים נשארים בטלפון.' },
+      ],
+    },
     support: {
       title: 'תמיכה',
       contactTitle: 'יצירת קשר',

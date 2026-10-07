@@ -6,6 +6,7 @@
  */
 import BlogLayout from '@/layouts/BlogLayout.astro';
 import HomeHero from '@/components/ui/home-hero';
+import FeatureMarquee from '@/components/ui/FeatureMarquee.astro';
 import { copy } from '../copy.mjs';
 import { urlFor } from '@/lib/legal';
 import type { Lang } from '@/lib/source';
@@ -26,5 +27,6 @@ const links = (['privacy', 'terms', 'support', 'blog'] as const).map((p) => ({ h
     <ul class="home-links mx-auto w-full max-w-md px-4">
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
     </ul>
+    <FeatureMarquee title={t.features.title} description={t.features.description} items={t.features.items} />
   </div>
 </BlogLayout>
