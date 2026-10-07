@@ -4,19 +4,21 @@
  * one JSON file in the closed schema of src/lib/article/schema.mjs. Zero JS except the 1RM
  * calculator's small script; reference previews use the native `popover` attribute.
  *
- * Order (v3, user decision 2026-10-07, overrides §8a where they differ): H1 → relatable hook →
+ * Order (v3, user decision 2026-10-07, overrides §8a where they differ): scroll-linked hero
+ * (ArticleHero, restored by user decision) → H1 → relatable hook →
  * one-sentence takeaway ("in short") → quiet trust line → article image → 3–6 beats (headline IS the
  * point + 1–3 short lines) → optional pull quote → "try it" list → quiet extras (calculator, Gymon
  * block) → end CTA → sources (collapsed; all study detail) → editor → how it was made → related.
- * No scroll-linked hero, TOC, FAQ, quiz, cards, evidence badges or inline CTA.
+ * No TOC, FAQ, quiz, cards, evidence badges or inline CTA.
  *
  * The article text is server HTML and always visible: nothing here is opacity:0 and nothing waits
- * on hydration or on scrolling. The H1 is in the first screen.
+ * on hydration or on scrolling (the hero is scroll-LINKED CSS, see ArticleHero.astro).
  */
 import BlogLayout from '@/layouts/BlogLayout.astro';
+import ArticleHero from '@/components/ArticleHero.astro';
 import HeHint from '@/components/HeHint.astro';
 import OneRepMax from '@/components/OneRepMax.astro';
-import { articleUrl, blogCopy, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
+import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
 import { urlFor } from '@/lib/legal';
 import { DOMAIN, type Lang } from '@/lib/source';
 import { renderInline } from '@/lib/article/inline.mjs';
@@ -80,6 +82,7 @@ const logCols: string[] = c.gymon.cols;
   langs={langs}
   otherHref={otherHref}
   noindex={!!a.sample}
+  mainClass="-mt-(--topbar-h)"
 >
   <Fragment slot="head">
     <meta property="og:type" content="article">
@@ -99,11 +102,20 @@ const logCols: string[] = c.gymon.cols;
   </Fragment>
 
   {heHint && <HeHint href={heHint} />}
+  {/* Restored 2026-10-07 (user decision): the scroll-linked hero stays on every article. */}
+  <ArticleHero
+    image={a.image}
+    imageAlt={a.imageAlt}
+    bgImage={BLOG_HERO_BG}
+    heroTitle={a.heroTitle}
+    date={`${date(a.updatedAt ?? a.createdAt)} · ${t.readTime(readTime)}`}
+    scrollLabel={t.scrollToRead}
+  />
 
   {/* v3 (user decision 2026-10-07, reference: Headspace articles): "it should feel like scrolling,
       not reading". The first screen carries the title, a relatable hook and the takeaway. Then one
       idea per screen: a plain headline that IS the point, 1–3 short lines. Effortful things (the
-      calculator, the sources) sit low and quiet. No dark full-screen hero before the H1. */}
+      calculator, the sources) sit low and quiet. */}
   <article class="doc doc3 mx-auto w-full max-w-2xl px-5 pt-8 sm:px-8">
     {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
 
