@@ -1183,7 +1183,8 @@ body:has(.doc3) {
 
 /* Home (/ and /he/): white ground and the four links, in the look of the original list
    (white rows, thin border, 12px radius, bold). User decision 2026-10-07. */
-body:has(.home-v2) {
+body:has(.home-v2),
+body:has(.pricing-page) {
   background: #ffffff;
 }
 .home-links {

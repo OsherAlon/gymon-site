@@ -37,13 +37,42 @@ export const copy = {
       tagline: 'Gymon is an app for tracking personal workouts.',
       screenAlt: "The Gymon app's home screen: this week's workouts and today's steps.",
     },
-    nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support', blog: 'Blog' },
+    nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support', blog: 'Blog', pricing: 'Pricing' },
     // Home "what's inside" marquee (2026-10-07). Feature cards, NOT testimonials: Gymon has no
     // users yet and invented reviews are prohibited. Every claim is checked against the shipped
     // app (gymon app/src + departments/legal/app_store_listing_draft.md). Data-driven, so real
     // reviews (with permission) can replace these later.
     // Home zigzag showcase (2026-10-07): one row per App Store screenshot, texts describe what
     // that screen shows (evidence in the commit message). Order: logger, chat, plan, progress, summary.
+    // Pricing page (2026-10-07). Real App Store Connect prices (Israel storefront), the trial and
+    // the renewal terms as in the app's paywall (questionnaire.json paywall.*) and the store copy
+    // (gymon departments/legal/app_store_listing_draft.md §3). Premium vs free from
+    // app/src/lib/entitlementRules.ts. Save % = floor((1 − 149.90 / (12 × 19.90)) × 100) = 37,
+    // the same formula as app/src/lib/paywallOffer.ts.
+    pricing: {
+      title: 'Pricing',
+      description: 'Gymon Premium: ₪19.90 a month or ₪149.90 a year, with a 14-day free trial for eligible new subscribers.',
+      heading: 'One plan. All of Gymon.',
+      sub: 'Try it free for 14 days, then choose monthly or yearly.',
+      badge: '14-day free trial',
+      cardTitle: 'Gymon Premium',
+      cardDescription: 'Everything in the app, on iPhone.',
+      plans: [
+        { id: 'yearly', name: 'Yearly', price: '₪149.90', period: 'per year', perMonth: '₪12.49 a month', save: 'Save 37%', featured: true },
+        { id: 'monthly', name: 'Monthly', price: '₪19.90', period: 'per month' },
+      ],
+      premiumTitle: 'Premium includes',
+      premium: ['Unlimited workouts in My workouts', 'Train with every workout in your plan', 'Chat with Gymon', 'Workout history', 'Personal records'],
+      freeTitle: 'Free, without a subscription',
+      free: ['One workout in My workouts, to train with and log', 'Your other workouts stay saved and open with Premium'],
+      cta: 'Start your 14-day free trial',
+      ctaSoon: 'Coming soon to the App Store',
+      terms: [
+        'The free trial is for eligible new subscribers. Payment is charged to your Apple ID when the trial ends, or when you confirm the purchase if no trial applies.',
+        'The subscription renews automatically unless cancelled at least 24 hours before the end of the current period. Manage or cancel in your Apple ID settings (Settings › your name › Subscriptions). Deleting your Gymon account does not cancel the subscription.',
+        'Prices shown are the App Store prices in Israel. Prices are set by the App Store and may differ by country or region and currency; the App Store shows your price before you buy.',
+      ],
+    },
     showcase: [
       { key: 'logger', tag: 'Workout log', title: 'Log a set in seconds', text: "Weight and reps for each set, with last time's numbers already filled in. Mark a set as done and the rest timer starts.", alt: 'The workout log in Gymon: sets with weight and reps, three marked done.' },
       { key: 'chat', tag: 'Chat with Gymon', title: 'Stuck? Ask Gymon', text: "Ask about a lift that won't budge and get practical ideas for the next workout.", alt: 'A chat with Gymon about a bench press that has stalled.' },
@@ -206,7 +235,31 @@ export const copy = {
       tagline: 'Gymon היא אפליקציה למעקב אחר אימוני כושר אישיים.',
       screenAlt: 'מסך הבית באפליקציית Gymon: האימונים של השבוע והצעדים של היום.',
     },
-    nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג' },
+    nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג', pricing: 'מחירים' },
+    pricing: {
+      title: 'מחירים',
+      description: 'Gymon Premium: ‏19.90 ₪ לחודש או 149.90 ₪ לשנה, עם 14 ימי ניסיון חינם למנויים חדשים שזכאים לכך.',
+      heading: 'מנוי אחד. כל Gymon.',
+      sub: '14 ימים חינם לניסיון, ואחר כך מנוי חודשי או שנתי.',
+      badge: '14 ימי ניסיון חינם',
+      cardTitle: 'Gymon Premium',
+      cardDescription: 'כל מה שיש באפליקציה, באייפון.',
+      plans: [
+        { id: 'yearly', name: 'שנתי', price: '₪149.90', period: 'לשנה', perMonth: '₪12.49 לחודש', save: 'חיסכון 37%', featured: true },
+        { id: 'monthly', name: 'חודשי', price: '₪19.90', period: 'לחודש' },
+      ],
+      premiumTitle: 'מה כלול ב-Premium',
+      premium: ["אימונים ללא הגבלה ב'האימונים שלי'", 'אפשר להתאמן בכל האימונים שבתוכנית', 'שיחה עם Gymon', 'היסטוריית האימונים', 'שיאים אישיים'],
+      freeTitle: 'בחינם, בלי מנוי',
+      free: ["אימון אחד ב'האימונים שלי', להתאמן בו ולתעד אותו", 'שאר האימונים נשמרים ונפתחים עם Premium'],
+      cta: 'מתחילים 14 ימי ניסיון חינם',
+      ctaSoon: 'בקרוב ב-App Store',
+      terms: [
+        'תקופת הניסיון מיועדת למנויים חדשים שזכאים לה. החיוב נעשה בחשבון ה-Apple בתום תקופת הניסיון, או באישור הרכישה כשאין תקופת ניסיון.',
+        'המנוי מתחדש אוטומטית אלא אם בוטל לפחות 24 שעות לפני תום התקופה. ניהול וביטול: הגדרות ← השם ← מינויים. מחיקת החשבון ב-Gymon אינה מבטלת את המנוי.',
+        'המחירים המוצגים הם מחירי ה-App Store בישראל. המחירים נקבעים ב-App Store ועשויים להשתנות לפי מדינה או אזור ומטבע; ה-App Store מציג את המחיר לפני הרכישה.',
+      ],
+    },
     showcase: [
       { key: 'logger', tag: 'יומן אימון', title: 'מתעדים סט בשניות', text: 'משקל וחזרות לכל סט, והמספרים מהפעם הקודמת כבר ממולאים. מסמנים סט כבוצע וטיימר המנוחה מתחיל.', alt: 'יומן האימון ב-Gymon: סטים עם משקל וחזרות, שלושה מסומנים כבוצעו.' },
       { key: 'chat', tag: 'שיחה עם Gymon', title: 'נתקעים? שואלים את Gymon', text: 'שואלים על תרגיל שלא מתקדם ומקבלים רעיונות מעשיים לאימון הבא.', alt: 'שיחה עם Gymon על לחיצת חזה שנתקעה.' },

@@ -40,7 +40,7 @@ const inBlog = page === 'blog' || page.startsWith('blog/');
 <header class="top">
 <a class="brand" href={urlFor(lang, 'index')}>Gymon</a>
 <div class="top-actions">
-<a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>
+<a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>{wide && <a class="top-link" href={urlFor(lang, 'pricing')} aria-current={page === 'pricing' ? 'page' : undefined}>{t.nav.pricing}</a>}
 <a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
 <AppStoreButton lang={lang} href={APP_STORE_URL} />
 <PlaySoon lang={lang} where="bar" />

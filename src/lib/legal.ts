@@ -11,7 +11,7 @@ import { source, type Lang } from './source';
 type Json = Record<string, any>;
 type Spec = { section: string; blocks: Record<string, any>[] }[];
 
-export type Page = 'index' | 'privacy' | 'terms' | 'support' | 'blog' | `blog/${string}`;
+export type Page = 'index' | 'privacy' | 'terms' | 'support' | 'blog' | 'pricing' | `blog/${string}`;
 
 // The blog index is a directory (`blog/index.html`, next to `blog/<slug>.html`),
 // so its URL carries the slash — `/blog` would be a 301 from GitHub Pages.

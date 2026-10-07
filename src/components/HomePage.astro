@@ -21,7 +21,7 @@ const rows = [
   { h1: true, title: t.home.title, text: t.home.tagline, alt: t.home.screenAlt, src: `/app/screen-home-${lang}.webp` },
   ...t.showcase.map((r: any) => ({ tag: r.tag, title: r.title, text: r.text, alt: r.alt, src: `/app/screen-${r.key}-${lang}.webp` })),
 ];
-const links = (['privacy', 'terms', 'support', 'blog'] as const).map((p) => ({ href: urlFor(lang, p), label: t.nav[p] }));
+const links = (['privacy', 'terms', 'support', 'blog', 'pricing'] as const).map((p) => ({ href: urlFor(lang, p), label: t.nav[p] }));
 ---
 <BlogLayout lang={lang} page="index" title="Gymon" description={t.home.tagline}>
   <div class="home-v2">

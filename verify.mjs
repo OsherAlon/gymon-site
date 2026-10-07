@@ -114,6 +114,19 @@ for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   else if ((firstRun.match(/<article/g) || []).length < 6) fail(`${path}: fewer than 6 feature cards`);
 }
 
+// --------------------------------------------------------------- pricing --
+
+for (const path of ['/pricing', '/he/pricing']) {
+  const { status, html } = await load(path);
+  console.log(`${status} ${path}`);
+  if (status !== 200) { fail(`${path}: status ${status}`); continue; }
+  for (const price of ['149.90', '19.90']) if (!html.includes(price)) fail(`${path}: price ${price} missing`);
+  if (!/class="[^"]*pricing-cta/.test(html)) fail(`${path}: no CTA`);
+  if (/<(s|del|strike)\b|line-through/.test(html.split('<main')[1] ?? '')) fail(`${path}: a strikethrough price`);
+  if (/testimonial|carousel/i.test(html.split('<main')[1] ?? '')) fail(`${path}: a testimonial block`);
+  if (!html.includes(path.startsWith('/he') ? '/he/pricing' : '"/pricing"')) fail(`${path}: no top-bar link to the pricing page`);
+}
+
 // ----------------------------------------------------------------- hosting --
 
 if (!base) {

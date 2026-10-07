@@ -1,0 +1,39 @@
+---
+/**
+ * /pricing and /he/pricing (2026-10-07). The card is server-rendered React (no client directive,
+ * no JS): both plans are always visible, so there is nothing to animate or toggle.
+ */
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import SinglePricingCard from '@/components/ui/single-pricing-card';
+import { copy, APP_STORE_URL } from '../copy.mjs';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const p = (copy as any)[lang].pricing;
+---
+<BlogLayout lang={lang} page="pricing" title={`${p.title} · Gymon`} description={p.description}>
+  <div class="pricing-page mx-auto w-full max-w-[1280px] px-5 pt-10 pb-16 md:px-12 md:pt-16 lg:px-20">
+    <header class="mx-auto mb-10 max-w-2xl text-center">
+      <h1 class="text-foreground text-4xl leading-tight font-bold text-balance md:text-5xl">{p.heading}</h1>
+      <p class="text-muted-foreground mt-4 text-lg">{p.sub}</p>
+    </header>
+    <SinglePricingCard
+      lang={lang}
+      badge={p.badge}
+      title={p.cardTitle}
+      description={p.cardDescription}
+      plans={p.plans}
+      premiumTitle={p.premiumTitle}
+      premium={p.premium}
+      freeTitle={p.freeTitle}
+      free={p.free}
+      ctaLabel={p.cta}
+      ctaSoon={p.ctaSoon}
+      href={APP_STORE_URL}
+      terms={p.terms}
+    />
+  </div>
+</BlogLayout>
