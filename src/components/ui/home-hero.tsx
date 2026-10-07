@@ -22,7 +22,7 @@ export default function HomeHero({ title, tagline, screenSrc, screenAlt }: Props
         </div>
       }
     >
-      <img src={screenSrc} alt={screenAlt} width={840} height={1720} className="h-full w-full object-cover object-top" decoding="async" />
+      <img src={screenSrc} alt={screenAlt} width={660} height={1434} className="h-full w-full object-cover object-top" decoding="async" />
     </PhoneScrollHero>
   );
 }

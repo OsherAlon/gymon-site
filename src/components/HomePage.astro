@@ -22,7 +22,7 @@ const links = (['privacy', 'terms', 'support', 'blog'] as const).map((p) => ({ h
     {/* client:load — the hero is the first thing on the page, so client:visible would hydrate at
         load anyway; client:load skips the IntersectionObserver round-trip. First paint is the
         server-rendered HTML either way. */}
-    <HomeHero client:load title={t.home.title} tagline={t.home.tagline} screenSrc={`/app/screen-plan-ready-${lang}.png`} screenAlt={t.home.screenAlt} />
+    <HomeHero client:load title={t.home.title} tagline={t.home.tagline} screenSrc={`/app/screen-home-${lang}.webp`} screenAlt={t.home.screenAlt} />
     <ul class="home-links mx-auto w-full max-w-md px-4">
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
     </ul>
