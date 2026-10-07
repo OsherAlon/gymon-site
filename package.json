@@ -8,7 +8,8 @@
     "preview": "astro preview --port 4391",
     "serve": "node scripts/serve.mjs",
     "verify": "node verify.mjs",
-    "check": "astro check"
+    "check": "astro check",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.0.0",
