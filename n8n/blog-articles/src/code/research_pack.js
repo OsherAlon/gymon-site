@@ -24,23 +24,32 @@ const sourceUrl = cleanUrl(plan.source_url);
 const srcText = clip(src.results && src.results[0] && src.results[0].raw_content, SOURCE_CHARS);
 
 const allowed = [sourceUrl];
+const read = srcText ? [sourceUrl] : [];  // URLs whose own page text is in the pack (→ fullTextRead)
 const blocks = [];
-blocks.push(`### Source article [${tierOf(sourceUrl)}]\n${plan.source_title}\n${sourceUrl}\n\n${srcText || '(could not be fetched — rely on the search results)'}`);
+blocks.push(`### Source article [${srcText ? 'EXTRACTED' : 'SNIPPET'}] [${tierOf(sourceUrl)}]\n${plan.source_title}\n${sourceUrl}\n\n${srcText || '(could not be fetched — rely on the search results)'}`);
 const pageMap = {};
 for (const p of pages) pageMap[cleanUrl(p.url)] = p.raw_content;
 const readUrls = [...new Set(picked.urls.map(cleanUrl))];
 readUrls.forEach((u, i) => {
   if (!pageMap[u]) return;
   allowed.push(u);
-  blocks.push(`### Page ${i + 1} (read in full) [${tierOf(u)}]\n${u}\n\n${clip(pageMap[u], PAGE_CHARS)}`);
+  read.push(u);
+  blocks.push(`### Page ${i + 1} [EXTRACTED] [${tierOf(u)}]\n${u}\n\n${clip(pageMap[u], PAGE_CHARS)}`);
 });
 const digest = (picked.digest || []).map((r, i) => {
   const u = cleanUrl(r.url);
   allowed.push(u);
-  return `${i + 1}. [${tierOf(u)}] ${r.title}\n   ${u}\n   ${r.snippet}`;
+  return `${i + 1}. [SNIPPET] [${tierOf(u)}] ${r.title}\n   ${u}\n   ${r.snippet}`;
 });
 blocks.push(`### Search results (snippets only)\n${digest.join('\n') || '(none)'}`);
 
 const allowedUrls = [...new Set(allowed.filter(Boolean))];
 const research = blocks.join('\n\n');
-return [{ json: { research, allowed_urls: allowedUrls, allowed_with_tier: allowedUrls.map(u => `[${tierOf(u)}] ${u}`), research_chars: research.length }, pairedItem: { item: 0 } }];
+const extracted = [...new Set(read)];
+return [{ json: {
+  research,
+  allowed_urls: allowedUrls,
+  read_urls: extracted,
+  allowed_with_tier: allowedUrls.map(u => `[${tierOf(u)}] [${extracted.includes(u) ? 'EXTRACTED' : 'SNIPPET'}] ${u}`),
+  research_chars: research.length,
+}, pairedItem: { item: 0 } }];

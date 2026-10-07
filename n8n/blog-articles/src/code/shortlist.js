@@ -11,9 +11,13 @@ const MAX_CANDIDATES = 30;
 const usedRows = $('Get used sources').all().map(i => i.json).filter(r => r && r.source_url);
 const used = new Set(usedRows.map(r => String(r.source_url).trim()));
 const usedTopics = usedRows.map(r => r.topic).filter(Boolean).slice(-60);
+// Published articles (status committed): no-repeat list for the topic picker, link targets for the writer.
+const published = $('Get published articles').all().map(i => i.json).filter(r => r && r.slug && r.status === 'committed')
+  .map(r => ({ slug: r.slug, title_en: r.title_en, title_he: r.title_he, pillar: r.pillar || '' }));
 
-const relevant = /(strength|resistance (training|exercise)|weight[- ]?(lifting|training)|lifting|hypertroph|muscle|squat|deadlift|bench press|\bsets?\b|\breps?\b|repetition|training volume|progressive overload|rest interval|inter-set|recovery|warm[- ]?up|stretching|mobility|sleep|protein|creatine|exercise|workout|fitness|athlet|sarcopenia|power training|1rm|one-repetition|tendon|deload|periodi[sz]|adherence|physical activity)/i;
-const exclude = /\b(mice|mouse|murine|rats?|zebrafish|in vitro|drosophila|cell line)\b/i;
+// No supplement / nutrition / injury terms: those topics are never written (no credentialed reviewer).
+const relevant = /(strength|resistance (training|exercise)|weight[- ]?(lifting|training)|lifting|hypertroph|muscle|squat|deadlift|bench press|\bsets?\b|\breps?\b|repetition|training volume|progressive overload|rest interval|inter-set|warm[- ]?up|exercise|workout|fitness|power training|1rm|one-repetition|deload|periodi[sz]|adherence|training frequency|split)/i;
+const exclude = /\b(mice|mouse|murine|rats?|zebrafish|in vitro|drosophila|cell line|supplement\w*|creatine|caffeine|diet\w*|weight loss|obes\w*|injur\w*|pain|rehab\w*|pregnan\w*|postpartum|menopaus\w*|diabet\w*|cancer|patients?|disease)\b/i;
 
 const cutoff = Date.now() - MAX_AGE_DAYS * 864e5;
 const seen = new Set();
@@ -55,4 +59,4 @@ while (picked.length < MAX_CANDIDATES && added) {
   }
 }
 
-return [{ json: { candidates: picked, used_topics: usedTopics, used_slugs: usedRows.map(r => r.slug).filter(Boolean), candidate_count: all.length, counts: count } }];
+return [{ json: { candidates: picked, used_topics: usedTopics, published, used_slugs: usedRows.map(r => r.slug).filter(Boolean), candidate_count: all.length, counts: count } }];
