@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "slug": "estimate-one-rep-max",
+  "pillar": "tools",
+  "tags": [
+    "one-rep-max",
+    "strength"
+  ],
+  "intent": "do",
+  "ymylLevel": "low",
+  "lengthBand": "600-900",
+  "image": "/blog/mock/progressive-overload.svg",
+  "imageAiGenerated": false,
+  "createdAt": "2026-10-07",
+  "reviewedAt": null,
+  "editor": "osher-alon",
+  "aiAssisted": true,
+  "sample": true,
+  "cta": {
+    "slot": "log-sets"
+  },
+  "lang": "en",
+  "title": "How to estimate your 1RM without maxing out",
+  "heroTitle": "Estimate Your 1RM",
+  "description": "One hard set of a few reps can estimate a one-rep max without a max attempt. What the estimate is good for, where it misleads, and how to log it.",
+  "primaryQuery": "1rm calculator",
+  "imageAlt": "Abstract rising steps in Gymon's blue-grey, a placeholder image for this sample article",
+  "tldr": "One hard set of a few reps can estimate a one-rep max (1RM) without a max attempt. Read the result as an estimate: people with different training backgrounds complete different numbers of reps at the same share of their 1RM [[r1]].",
+  "keyTakeaways": [
+    {
+      "text": "A one-rep max can be estimated from one set taken close to failure, using a formula such as Brzycki's [[r2]]."
+    },
+    {
+      "text": "In one small study, endurance runners did 39.9 reps at 70% of their leg-press 1RM, and weightlifters did 17.9 [[r1]]."
+    },
+    {
+      "text": "The estimate is most useful for tracking change over weeks, not as an exact target."
+    }
+  ],
+  "sections": [
+    {
+      "heading": "A hard set can stand in for a max attempt",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A one-rep max (1RM) is the most weight that can be lifted once with good form. Testing it directly means working up to a true maximum, which takes time and a spotter. An estimate uses a set taken close to failure instead: the weight and the reps go into a formula, and the formula returns a likely 1RM."
+        },
+        {
+          "type": "p",
+          "text": "Brzycki published one widely used equation for this in 1993 [[r2]]. Epley's version comes from a coaching chart, and a later study that traced the evidence behind rep-max tables describes that chart as not based on scientific research [[r1]]."
+        }
+      ]
+    },
+    {
+      "heading": "Reps at a given load differ from person to person",
+      "blocks": [
+        {
+          "type": "claim",
+          "evidence": "limited",
+          "refs": [
+            "r1"
+          ],
+          "text": "One small study suggests why a single table **may** not fit everyone: at 70% of 1RM on the leg press, endurance runners completed 39.9 reps on average and weightlifters 17.9."
+        },
+        {
+          "type": "p",
+          "text": "The same study found no clear difference at 90% of 1RM: 10.8 reps for the runners and 7.0 for the weightlifters [[r1]]. Each group had eight people, so the numbers describe a trend, not a rule."
+        },
+        {
+          "type": "takeaway",
+          "text": "An estimate from a heavy set of few reps leaves less room for this difference than one from a long, light set."
+        }
+      ]
+    },
+    {
+      "heading": "The estimate is a trend line, not a verdict",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The estimate earns its keep over time. When the same lift, done the same way, gives a higher estimate across several weeks, strength is moving, even if no single number is exact."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Use the same exercise and the same technique each time.",
+            "Use a set that ended close to failure, not a comfortable one.",
+            "Compare estimates with each other, not with someone else's max."
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Gymon's program-refresh check reads the Epley estimate the same way: it only asks about swapping an exercise once the estimate for that lift has stopped improving across several sessions."
+        }
+      ]
+    },
+    {
+      "heading": "Apply it: estimate from your next hard set",
+      "apply": true,
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Take a set that ended close to failure, enter the weight and the reps, and read the estimate. Next time, log the same lift the same way and compare."
+        },
+        {
+          "type": "calculator",
+          "calculator": "one-rep-max",
+          "defaults": {
+            "weightKg": 80,
+            "reps": 5
+          }
+        },
+        {
+          "type": "gymon",
+          "kind": "log-example",
+          "exercise": "Bench press",
+          "caption": "Two runs of the same workout. The PREVIOUS column shows last session's numbers next to each set.",
+          "sessions": [
+            {
+              "label": "Week 1",
+              "sets": [
+                {
+                  "previous": null,
+                  "kg": 60,
+                  "reps": 8
+                },
+                {
+                  "previous": null,
+                  "kg": 60,
+                  "reps": 7
+                },
+                {
+                  "previous": null,
+                  "kg": 60,
+                  "reps": 6
+                }
+              ]
+            },
+            {
+              "label": "Week 2",
+              "sets": [
+                {
+                  "previous": {
+                    "kg": 60,
+                    "reps": 8
+                  },
+                  "kg": 62.5,
+                  "reps": 7
+                },
+                {
+                  "previous": {
+                    "kg": 60,
+                    "reps": 7
+                  },
+                  "kg": 62.5,
+                  "reps": 6
+                },
+                {
+                  "previous": {
+                    "kg": 60,
+                    "reps": 6
+                  },
+                  "kg": 62.5,
+                  "reps": 6
+                }
+              ]
+            }
+          ],
+          "text": "Week 1's best set (60 kg for 8) gives an Epley estimate of 76 kg; week 2's (62.5 kg for 7) gives 77 kg. The weight went up, the reps dipped, and the estimate shows that strength still moved."
+        },
+        {
+          "type": "cta"
+        }
+      ]
+    },
+    {
+      "heading": "Where the estimate misleads",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A formula cannot know training history. The study above suggests that people used to long sets do more reps at a given share of their max, which pushes an estimate from a light set upward [[r1]]."
+        },
+        {
+          "type": "callout",
+          "kind": "note",
+          "text": "An estimate is not a reason to attempt a true max. A set close to failure already gives most of the information."
+        },
+        {
+          "type": "p",
+          "text": "The most useful reading of any estimate is relative: higher than last month, or not."
+        }
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "q": "Which formula is more accurate, Epley or Brzycki?",
+      "a": "Neither is accurate for everyone. Both turn one hard set into an estimate, and they drift apart as the reps go up. The calculator shows both so the spread is visible. Comparing estimates from the same formula over time matters more than the choice of formula.",
+      "refs": [
+        "r1"
+      ]
+    },
+    {
+      "q": "How many reps should the set have?",
+      "a": "Fewer is usually better. In the study cited here, reps at the same share of 1RM differed between groups at lighter loads but not clearly at the heaviest one, so a heavy set of few reps leaves less room for that difference.",
+      "refs": [
+        "r1"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "question": "What does an estimated 1RM measure best?",
+      "options": [
+        "Exact strength on a given day",
+        "Change in strength over weeks",
+        "Muscle size"
+      ],
+      "correctIndex": 1,
+      "explanation": "The formulas cannot know training history, so the estimate is most useful when compared with earlier estimates of the same lift."
+    },
+    {
+      "question": "In the leg-press study, which group did more reps at 70% of 1RM?",
+      "options": [
+        "Weightlifters",
+        "Endurance runners",
+        "Neither"
+      ],
+      "correctIndex": 1,
+      "explanation": "The runners averaged 39.9 reps and the weightlifters 17.9.",
+      "refs": [
+        "r1"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "id": "r1",
+      "title": "The relationship between the number of repetitions performed at given intensities is different in endurance and strength trained athletes",
+      "authors": [
+        "Richens B",
+        "Cleather DJ"
+      ],
+      "year": 2014,
+      "venue": "Biology of Sport 31(2):157–161",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4042664/",
+      "doi": "10.5604/20831862.1099047",
+      "pmid": "24899782",
+      "tier": "PRIMARY",
+      "type": "cross-sectional",
+      "fullTextRead": true,
+      "quote": "Eight weightlifters and eight endurance runners each completed a one repetition maximum test on the leg press and completed repetitions to fatigue at 90, 80 and 70% of their one repetition maximum. The endurance runners completed significantly more repetitions than the weightlifters at 70% (39.9 ± 17.6 versus 17.9 ± 2.8; p < 0.05) and 80% (19.8 ± 6.4 versus 11.8 ± 2.7; p < 0.05) of their one repetition maximum but not at 90% (10.8 ± 3.9 versus 7.0 ± 2.1; p > 0.05) of one repetition maximum. … Epley [ 8 ] A poundage chart, not based on scientific research."
+    },
+    {
+      "id": "r2",
+      "title": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue",
+      "authors": [
+        "Brzycki M"
+      ],
+      "year": 1993,
+      "venue": "Journal of Physical Education, Recreation & Dance 64(1):88–90",
+      "url": "https://doi.org/10.1080/07303084.1993.10606684",
+      "doi": "10.1080/07303084.1993.10606684",
+      "tier": "PRIMARY",
+      "type": "other",
+      "fullTextRead": false,
+      "quote": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue"
+    }
+  ]
+}

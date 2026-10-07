@@ -17,6 +17,10 @@ export interface Reference {
   type: string;
   fullTextRead: boolean;
   quote: string;
+  /** What the source found, in plain words, with size and population. Shown only in the sources list. */
+  finding: string;
+  /** How sure the evidence is. Shown only in the sources list, never as a badge in the body. */
+  certainty: Evidence;
 }
 
 export interface LoggedSet {
@@ -25,26 +29,24 @@ export interface LoggedSet {
   previous: { kg: number; reps: number } | null;
 }
 
-export type Block =
-  | { type: 'p'; text: string }
-  | { type: 'list'; ordered?: boolean; items: string[] }
-  | { type: 'takeaway'; text: string }
-  | { type: 'claim'; evidence: Evidence; refs?: string[]; text: string }
-  | { type: 'callout'; kind: 'note' | 'myth' | 'safety'; text: string }
-  | { type: 'table'; caption: string; columns: string[]; rows: string[][]; refs?: string[] }
-  | { type: 'calculator'; calculator: 'one-rep-max'; defaults?: { weightKg?: number; reps?: number } }
-  | { type: 'cta' }
-  | { type: 'gymon'; kind: 'log-example'; caption: string; exercise: string; sessions: { label: string; sets: LoggedSet[] }[]; text?: string }
-  | { type: 'gymon'; kind: 'plan-logic' | 'teardown-finding'; heading?: string; text: string; points?: string[] };
+export type GymonBlock =
+  | { kind: 'log-example'; caption: string; exercise: string; sessions: { label: string; sets: LoggedSet[] }[]; text?: string }
+  | { kind: 'plan-logic' | 'teardown-finding'; heading?: string; text: string; points?: string[] };
 
-export interface Section {
+/** One idea: a small label, a headline that states the answer, 2–3 short sentences. */
+export interface Card {
+  label: string;
   heading: string;
-  apply?: boolean;
-  blocks: Block[];
+  text: string;
+}
+
+export interface Step {
+  title: string;
+  text: string;
 }
 
 export interface ArticleData {
-  schemaVersion: 1;
+  schemaVersion: 2;
   lang: Lang;
   slug: string;
   title: string;
@@ -65,11 +67,14 @@ export interface ArticleData {
   editor: 'osher-alon';
   aiAssisted: true;
   sample?: boolean;
-  tldr: string;
-  keyTakeaways: { text: string; refs?: string[] }[];
-  sections: Section[];
-  faq?: { q: string; a: string; refs?: string[] }[];
-  quiz?: { question: string; options: string[]; correctIndex: number; explanation: string; refs?: string[] }[];
+  /** ONE sentence. */
+  bottomLine: string;
+  cards: Card[];
+  apply: {
+    steps: Step[];
+    gymon?: GymonBlock;
+    calculator?: { calculator: 'one-rep-max'; defaults?: { weightKg?: number; reps?: number } };
+  };
   references: Reference[];
   cta: { slot: 'log-sets' | 'track-progress' | 'plan-builder' };
 }

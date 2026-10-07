@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { validateArticle, hebrewLint, numbersIn, quoteInResearch, ymylGuard } from '../src/lib/article/validate.mjs';
+import { validateArticle, hebrewLint, numbersIn, quoteInResearch, ymylGuard, spelledNumbersIn } from '../src/lib/article/validate.mjs';
 
 const load = (lang) => JSON.parse(readFileSync(new URL(`../src/content/articles/sample/${lang}/estimate-one-rep-max.json`, import.meta.url), 'utf8'));
 const clone = (o) => JSON.parse(JSON.stringify(o));
@@ -14,13 +14,15 @@ test('the sample pair passes with no errors', () => {
   }
 });
 
-test('closed schema: unknown fields and blocks fail', () => {
+test('closed schema: unknown fields fail, v1 shapes are rejected', () => {
   const a = clone(load('en'));
   a.mdx = '<Thing/>';
-  a.sections[0].blocks.push({ type: 'scrollytelling', text: 'x' });
+  a.sections = [];
+  a.cards[0].badge = 'Limited evidence';
   const r = codes(validateArticle(a));
   assert.ok(r.some((e) => e.startsWith('mdx: unknown field')));
-  assert.ok(r.some((e) => /unknown block "scrollytelling"/.test(e)));
+  assert.ok(r.some((e) => e.startsWith('sections: unknown field')));
+  assert.ok(r.some((e) => e.startsWith('cards[0].badge: unknown field')));
 });
 
 test('YMYL topic guard rejects supplements, weight loss, injury, pregnancy', () => {
@@ -38,7 +40,7 @@ test('YMYL topic guard rejects supplements, weight loss, injury, pregnancy', () 
 
 test('references: unknown id, commercial host, tracking params, tier mismatch', () => {
   const a = clone(load('en'));
-  a.sections[0].blocks[0].text += ' [[r9]]';
+  a.cards[0].text += ' [[r9]]';
   a.references[0].url = 'https://pmc.ncbi.nlm.nih.gov/articles/PMC4042664/?utm_source=x';
   a.references[1].tier = 'AUTHORITY';
   const r = codes(validateArticle(a));
@@ -47,42 +49,55 @@ test('references: unknown id, commercial host, tracking params, tier mismatch', 
   assert.ok(r.some((e) => /references\[1\]\.tier/.test(e)));
 });
 
-test('numbers: an unread full text cannot carry a number; a wrong number is flagged', () => {
+test('numbers: an unread full text cannot carry a number; a wrong number is flagged; spelled-out numbers count', () => {
   const a = clone(load('en'));
-  a.sections[0].blocks[1].text = 'Brzycki found 25 reps at 70% [[r2]].';
+  a.cards[0].text = 'Brzycki found 25 reps at a heavy load. That is a lot [[r2]].';
   let r = validateArticle(a);
   assert.ok(codes(r).some((e) => /attributed to a source whose full text was not read/.test(e)));
   const b = clone(load('en'));
-  b.keyTakeaways[1].text = 'In one small study, runners did 41.2 reps at 70% [[r1]].';
+  b.cards[1].text = 'In one small study, runners did 41.2 reps. That is a lot [[r1]].';
   r = validateArticle(b);
   assert.ok(r.warnings.some((w) => /number 41.2 is not in the quote/.test(w.message)));
   const c = clone(load('en'));
-  c.keyTakeaways[2].text = 'Most people gain 12% a month.';
+  c.cards[4].text = 'Most people gain 12% a month. That is the claim.';
   assert.ok(validateArticle(c).warnings.some((w) => /without a citation/.test(w.message)));
+  // Execution 1541: the quote said "Fifty-five untrained young women".
+  assert.deepEqual(spelledNumbersIn('Fifty-five untrained young women; eight runners'), ['55', '8']);
+  const d = clone(load('en'));
+  d.cards[1].text = 'Eight runners took part. In all, 8 of them finished [[r1]].';
+  assert.ok(!validateArticle(d).warnings.some((w) => /number 8 is not in the quote/.test(w.message)));
 });
 
-test('evidence: a "strong" claim needs a fully read primary/authority source', () => {
+test('v2 readability: one-sentence bottom line, one number per card, no study detail in the body', () => {
   const a = clone(load('en'));
-  a.sections[1].blocks[0] = { type: 'claim', evidence: 'strong', refs: ['r2'], text: 'Formulas reliably predict a max.' };
-  assert.ok(codes(validateArticle(a)).some((e) => /needs a PRIMARY\/AUTHORITY reference whose full text was read/.test(e)));
+  a.bottomLine = 'One. Two. Three.';
+  a.cards[1].text = 'Runners did 39.9 reps at 70% versus 17.9 for lifters [[r1]]. That is p < 0.05.';
+  const r = validateArticle(a);
+  assert.ok(codes(r).some((e) => /bottomLine: 3 sentences/.test(e)));
+  assert.ok(r.warnings.some((w) => /at most one key number per card/.test(w.message)));
+  assert.ok(r.warnings.some((w) => /study detail in the body/.test(w.message)));
 });
 
-test('registry limits: one calculator in the apply section, defaults in range, one CTA', () => {
+test('certainty lives on the reference: "strong" needs a fully read primary/authority source', () => {
   const a = clone(load('en'));
-  a.sections[3].blocks.push({ type: 'calculator', calculator: 'one-rep-max', defaults: { reps: 30 } });
-  a.sections[0].blocks.push({ type: 'cta' });
+  a.references[1].certainty = 'strong';
+  assert.ok(codes(validateArticle(a)).some((e) => /references\[1\]\.certainty: "strong" needs a PRIMARY\/AUTHORITY source/.test(e)));
+  delete a.references[0].finding;
+  assert.ok(codes(validateArticle(a)).some((e) => /references\[0\]\.finding: required/.test(e)));
+});
+
+test('apply: 3–6 steps, calculator defaults in range, Gymon block optional, truncation is a hard failure', () => {
+  const a = clone(load('en'));
+  a.apply.steps = a.apply.steps.slice(0, 2);
+  a.apply.calculator.defaults.reps = 30;
   const r = codes(validateArticle(a));
-  assert.ok(r.some((e) => /at most one calculator/.test(e)));
+  assert.ok(r.some((e) => /apply\.steps: 3–6/.test(e)));
   assert.ok(r.some((e) => /defaults\.reps: 1–12/.test(e)));
-  assert.ok(r.some((e) => /contextual CTA belongs in the "apply" section/.test(e)));
-});
-
-test('exactly one Gymon-unique block, and truncation is a hard failure', () => {
-  const a = clone(load('en'));
-  a.sections[3].blocks = a.sections[3].blocks.filter((b) => b.type !== 'gymon');
-  assert.ok(codes(validateArticle(a)).some((e) => /exactly one Gymon-unique block/.test(e)));
   const b = clone(load('en'));
-  b.sections[4].blocks[2].text = 'The most useful reading of any estimate is';
+  delete b.apply.gymon;
+  delete b.apply.calculator;
+  assert.deepEqual(codes(validateArticle(b)), []);
+  b.apply.steps[b.apply.steps.length - 1].text = 'A rising estimate means you are getting';
   assert.ok(codes(validateArticle(b)).some((e) => /ends mid-sentence/.test(e)));
 });
 
@@ -95,7 +110,7 @@ test('a non-sample article must carry its review date (build mode)', () => {
 
 test('pipeline context: off-list URLs, fabricated quote numbers, unpublished internal links', () => {
   const a = clone(load('en'));
-  a.sections[0].blocks[0].text += ' See [rest](/blog/rest-between-sets).';
+  a.cards[0].text += ' See [rest](/blog/rest-between-sets).';
   const r = validateArticle(a, {
     mode: 'pipeline',
     allowedUrls: [a.references[0].url],
@@ -108,14 +123,15 @@ test('pipeline context: off-list URLs, fabricated quote numbers, unpublished int
   assert.ok(r.warnings.some((w) => /not found verbatim in the research pack/.test(w.message)));
 });
 
-test('Hebrew lint: gendered forms, slash forms, en-dash ranges, × sets, false friends', () => {
-  const t = 'נסה להוסיף משקל. מתאמן/ת יכול לבצע 8–12 חזרות או 3×10, כמו כפיפות ברכיים.';
+test('Hebrew lint: gendered forms, slash forms, en-dash ranges, × sets, false friends, transliterations', () => {
+  const t = 'נסה להוסיף משקל. מתאמן/ת יכול לבצע 8–12 חזרות או 3×10, כמו כפיפות ברכיים, עם פרוגרסיב אוברלואד.';
   const out = hebrewLint(t).join('\n');
   assert.match(out, /gendered form "נסה"/);
   assert.match(out, /slash form/);
   assert.match(out, /8–12/);
   assert.match(out, /3×10/);
   assert.match(out, /כפיפות ברכיים/);
+  assert.match(out, /"פרוגרסיב" is English in Hebrew letters — write "עומס הדרגתי"/);
   // The required neutral forms are not flagged.
   assert.deepEqual(hebrewLint('נסו להוסיף משקל. יש לבצע 8 עד 12 חזרות, 3 סטים של 10. מתאמנים רושמים כל סט.'), []);
 });
