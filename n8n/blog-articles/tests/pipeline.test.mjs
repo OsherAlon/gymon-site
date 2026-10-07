@@ -160,6 +160,17 @@ test('Parse + Prepare (new): code owns tier, fullTextRead, dates and the closed 
   assert.throws(() => run('Parse article (EN)', { input: [{ text: '{"title": "How to' }] }), /invalid JSON|no JSON object/);
 });
 
+test('Parse article (EN): reads an OpenRouter completion, and names a max_tokens cut-off (execution 1539)', () => {
+  const en = sample('en');
+  const ok = { choices: [{ finish_reason: 'stop', message: { role: 'assistant', content: JSON.stringify(en) } }], usage: { completion_tokens: 9000 } };
+  const parsed = run('Parse article (EN)', { input: [ok] })[0].json;
+  assert.equal(parsed.article.title, en.title);
+  assert.equal(parsed.references.length, en.references.length);
+  const cut = { choices: [{ finish_reason: 'length', message: { content: '{"title": "How to' } }], usage: { completion_tokens: 16000, completion_tokens_details: { reasoning_tokens: 15200 } } };
+  assert.throws(() => run('Parse article (EN)', { input: [cut] }), /cut off at max_tokens.*reasoning_tokens/);
+  assert.throws(() => run('Parse article (EN)', { input: [{ error: { message: 'x' } }] }), /no completion in the response/);
+});
+
 test('Build commit files: writes build-valid JSON with review date, and refuses a file the build would reject', () => {
   const row = {
     article_id: 'x', slug: 'estimate-one-rep-max', round: 1, title_en: 'T',

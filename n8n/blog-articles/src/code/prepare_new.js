@@ -2,10 +2,11 @@
 // everything the shared validation chain needs. Code owns: lang, slug, pillar, tags, dates,
 // image fields, editor, and the reference tier / fullTextRead (from the research pack).
 /*__LIB_LITE__*/
+/*__LLM_TEXT__*/
 const plan = $('Topic plan').first().json;
 const pack = $('Research pack').first().json;
 const en = $('Parse article (EN)').first().json;
-const he = writerFields(parseLooseJson($input.first().json.text, 'Hebrew version'));
+const he = writerFields(parseLooseJson(llmText($input.first().json, 'Hebrew version'), 'Hebrew version'));
 const today = $now.setZone('Asia/Jerusalem').toFormat('yyyy-MM-dd');
 const refs = codeReferences(en.references, pack.read_urls);
 const article_en = canonical({ ...codeFields(plan, 'en', today), ...en.article, references: refs });

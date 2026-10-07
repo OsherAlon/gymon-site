@@ -10,10 +10,9 @@ const CRED_GMAIL = { gmailOAuth2: { id: '2MntuHdkPCPZn4Fb', name: 'osheralon5@gm
 const CRED_TAVILY = { tavilyApi: { id: 'c35RkiJeUqxZ9eXO', name: 'osheralon5@gmail.com' } };
 const CRED_CLOUDINARY = { cloudinaryApi: { id: '9N3ayVo3Ijc7tDs4', name: 'osheralon5@gmail.com_DEV AI' } };
 
-const MODEL_WRITE = 'anthropic/claude-sonnet-5.5';
-const MODEL_REWRITE = 'anthropic/claude-sonnet-5.5';
-// maxTokens on Sonnet 5.5 must cover hidden reasoning + the visible JSON: execution 1531 billed 6,000
-// completion tokens for ~2,600 tokens of visible text and was cut off (finish_reason: length).
+// The writer, Hebrew and rewrite calls are HTTP nodes: their model, max_tokens and reasoning effort
+// are written inside each jsonBody expression (Sonnet 5.5, effort low). Hidden reasoning is billed
+// as completion: execution 1531 cut off at 6,000 and execution 1539 at 16,000 max tokens.
 const MODEL_EDIT = 'anthropic/claude-sonnet-5.5';
 const MODEL_FAST = 'anthropic/claude-haiku-4.5';
 const IMAGE_MODEL = { __rl: true, mode: 'id', value: 'models/gemini-3-pro-image-preview' };
@@ -266,28 +265,44 @@ const researchPack = node({
   output: [{ research: '### Source article…', allowed_urls: ['https://example.org/a'], read_urls: ['https://example.org/a'], allowed_with_tier: ['[PRIMARY] [EXTRACTED] https://example.org/a'], research_chars: 12000 }],
 });
 
-const writerModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.5, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
+// The three long Sonnet calls go straight to the OpenRouter API (HTTP), not through a chain node:
+// the chain node cannot set the reasoning effort, and in execution 1539 hidden reasoning used
+// 15,200 of the 16,000 max tokens, so the article JSON was cut off. A Set node holds the prompts
+// so the long system prompt never sits inside an expression.
+const writerRequest = node({
+  type: 'n8n-nodes-base.set',
+  version: 3.4,
+  config: {
+    name: 'Writer request',
+    parameters: { mode: 'manual', assignments: { assignments: [
+      { id: 'wrs', name: 'system', value: __WRITER_SYSTEM__, type: 'string' },
+      { id: 'wru', name: 'user', value: expr(__WRITER_USER__), type: 'string' },
+    ] }, options: {} },
+  },
+  output: [{ system: '…', user: '…' }],
 });
 
-// No output parser on purpose: the reply is parsed by the Parse article (EN) node and checked by
-// the site validator, so a schema slip becomes a flag for the reviewer instead of a crashed run.
-// (No quote characters in comments here: the SDK pre-parser does not skip comments.)
 const writeArticle = node({
-  type: '@n8n/n8n-nodes-langchain.chainLlm',
-  version: 1.7,
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.4,
   config: {
     name: 'Write article (EN)',
+    retryOnFail: true,
+    maxTries: 2,
+    waitBetweenTries: 5000,
     parameters: {
-      promptType: 'define',
-      text: expr(__WRITER_USER__),
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __WRITER_SYSTEM__ }] },
+      method: 'POST',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
+      authentication: 'predefinedCredentialType',
+      nodeCredentialType: 'openRouterApi',
+      sendBody: true,
+      specifyBody: 'json',
+      jsonBody: expr("{{ JSON.stringify({ model: 'anthropic/claude-sonnet-5.5', max_tokens: 32000, temperature: 0.5, reasoning: { effort: 'low' }, messages: [{ role: 'system', content: $json.system }, { role: 'user', content: $json.user }] }) }}"),
+      options: { timeout: 600000 },
     },
-    subnodes: { model: writerModel },
+    credentials: CRED_OPENROUTER,
   },
-  output: [{ text: '{"title":"…"}' }],
+  output: [{ choices: [{ finish_reason: 'stop', message: { content: '{"title":"…"}' } }], usage: { prompt_tokens: 14000, completion_tokens: 9000 } }],
 });
 
 const parseEn = node({
@@ -297,25 +312,40 @@ const parseEn = node({
   output: [{ article: { title: '…' }, references: [] }],
 });
 
-const hebrewModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
+const hebrewRequest = node({
+  type: 'n8n-nodes-base.set',
+  version: 3.4,
+  config: {
+    name: 'Hebrew request',
+    parameters: { mode: 'manual', assignments: { assignments: [
+      { id: 'hrs', name: 'system', value: __HEBREW_SYSTEM__, type: 'string' },
+      { id: 'hru', name: 'user', value: expr(__HEBREW_USER__), type: 'string' },
+    ] }, options: {} },
+  },
+  output: [{ system: '…', user: '…' }],
 });
 
 const hebrewVersion = node({
-  type: '@n8n/n8n-nodes-langchain.chainLlm',
-  version: 1.7,
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.4,
   config: {
     name: 'Hebrew version',
+    retryOnFail: true,
+    maxTries: 2,
+    waitBetweenTries: 5000,
     parameters: {
-      promptType: 'define',
-      text: expr(__HEBREW_USER__),
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __HEBREW_SYSTEM__ }] },
+      method: 'POST',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
+      authentication: 'predefinedCredentialType',
+      nodeCredentialType: 'openRouterApi',
+      sendBody: true,
+      specifyBody: 'json',
+      jsonBody: expr("{{ JSON.stringify({ model: 'anthropic/claude-sonnet-5.5', max_tokens: 40000, temperature: 0.4, reasoning: { effort: 'low' }, messages: [{ role: 'system', content: $json.system }, { role: 'user', content: $json.user }] }) }}"),
+      options: { timeout: 600000 },
     },
-    subnodes: { model: hebrewModel },
+    credentials: CRED_OPENROUTER,
   },
-  output: [{ text: '{"title":"…"}' }],
+  output: [{ choices: [{ finish_reason: 'stop', message: { content: '{"title":"…"}' } }], usage: { prompt_tokens: 12000, completion_tokens: 14000 } }],
 });
 
 const prepareNew = node({
@@ -1162,25 +1192,40 @@ const needsRewrite = ifElse({
   },
 });
 
-const rewriteModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 30000 } }, credentials: CRED_OPENROUTER },
+const rewriteRequest = node({
+  type: 'n8n-nodes-base.set',
+  version: 3.4,
+  config: {
+    name: 'Rewrite request',
+    parameters: { mode: 'manual', assignments: { assignments: [
+      { id: 'rrs', name: 'system', value: __REWRITE_SYSTEM__, type: 'string' },
+      { id: 'rru', name: 'user', value: expr(__REWRITE_USER__), type: 'string' },
+    ] }, options: {} },
+  },
+  output: [{ system: '…', user: '…' }],
 });
 
 const rewriteArticle = node({
-  type: '@n8n/n8n-nodes-langchain.chainLlm',
-  version: 1.7,
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.4,
   config: {
     name: 'Rewrite article',
+    retryOnFail: true,
+    maxTries: 2,
+    waitBetweenTries: 5000,
     parameters: {
-      promptType: 'define',
-      text: expr(__REWRITE_USER__),
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __REWRITE_SYSTEM__ }] },
+      method: 'POST',
+      url: 'https://openrouter.ai/api/v1/chat/completions',
+      authentication: 'predefinedCredentialType',
+      nodeCredentialType: 'openRouterApi',
+      sendBody: true,
+      specifyBody: 'json',
+      jsonBody: expr("{{ JSON.stringify({ model: 'anthropic/claude-sonnet-5.5', max_tokens: 48000, temperature: 0.4, reasoning: { effort: 'low' }, messages: [{ role: 'system', content: $json.system }, { role: 'user', content: $json.user }] }) }}"),
+      options: { timeout: 600000 },
     },
-    subnodes: { model: rewriteModel },
+    credentials: CRED_OPENROUTER,
   },
-  output: [{ text: '{"article_en":{},"article_he":{}}' }],
+  output: [{ choices: [{ finish_reason: 'stop', message: { content: '{"article_en":{},"article_he":{}}' } }], usage: { prompt_tokens: 20000, completion_tokens: 20000 } }],
 });
 
 const prepareFix = node({
@@ -1324,12 +1369,12 @@ const emailRevised = node({
 
 const label1 = sticky('## 1 · Collect sources\n11 English RSS feeds → drop used / older than 30 days / off-topic or YMYL → up to 30 candidates. Published articles are read too (no repeats, link targets).', [getUsedSources, getPublished, feedList, splitFeeds, readFeed, shortlist, anyCandidates], { color: 7 });
 const label2 = sticky('## 2 · Pick topic + guard\nSonnet plans an evergreen topic inside the 5 pillars. The code guard (the site validator) stops YMYL / off-pillar topics before any research is paid for.', [pickTopic, hasTopic, topicPlan, topicAllowed, topicRejected], { color: 7 });
-const label3 = sticky('## 3 · Research + write (JSON)\nTavily: source + 3 searches + 2 pages → Sonnet writes the EN article as closed-schema JSON with a Gymon-unique block → Sonnet adapts HE → code assembles both files.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writeArticle, parseEn, hebrewVersion, prepareNew], { color: 7 });
+const label3 = sticky('## 3 · Research + write (JSON)\nTavily: source + 3 searches + 2 pages → Sonnet writes the EN article as closed-schema JSON with a Gymon-unique block → Sonnet adapts HE → code assembles both files.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writerRequest, writeArticle, parseEn, hebrewRequest, hebrewVersion, prepareNew], { color: 7 });
 const label4 = sticky('## 4 · Automatic checks (before any email)\nThe SITE validator on both languages · every URL fetched · every DOI in Crossref · every PMID in PubMed · Haiku entailment + Hebrew check. Shared by new articles and fix rounds.', [validateArticles, referenceChecks, resolveReferences, referenceResults, factCheck, checkedArticle, isNew], { color: 7 });
 const label5 = sticky('## 5 · Image + save + email\nSonnet prompt → Gemini → Cloudinary → alt text from the final image (Haiku vision) → row in gymon_blog_articles → review email.', [imagePrompt, generateImage, uploadImage, imageAlt, articleRecord, insertArticle, logSource, emailNew, loadForEmail, buildEmail, sendReviewEmail], { color: 7 });
 const label7 = sticky('## 6 · Review page (GET /webhook/gymon-blog/review)\nBoth articles rendered with the site renderer, every flag, reference checks, review checklist. Approve is disabled while errors remain.', [getArticleReview, getVersionsReview, renderPage, respondPage], { color: 7 });
 const label8 = sticky('## 7 · Approve → GitHub (POST /webhook/gymon-blog/approve)\nServer re-checks token, errors and checklist → two JSON files (validated again) + jpg committed to blog/incoming. ⚠️ needs a GitHub credential.', [getArticleApprove, canApprove, markApproved, buildFiles, getBranch, createCommit, markCommitted], { color: 7 });
-const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → Sonnet rewrites the JSON → the same checks as a new article → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteArticle, prepareFix, revisedRecord, updateArticle], { color: 7 });
+const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → Sonnet rewrites the JSON → the same checks as a new article → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteRequest, rewriteArticle, prepareFix, revisedRecord, updateArticle], { color: 7 });
 
 const noteOverview = sticky(__NOTE_OVERVIEW__, [], { color: 7, width: 560, height: 520 });
 
@@ -1355,8 +1400,10 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
       .to(pickPages)
       .to(readPages)
       .to(researchPack)
+      .to(writerRequest)
       .to(writeArticle)
       .to(parseEn)
+      .to(hebrewRequest)
       .to(hebrewVersion)
       .to(prepareNew)
       .to(validateArticles))
@@ -1411,7 +1458,7 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(getArticleFix)
   .to(canFix
     .onTrue(respondFix.to(routeFix).to(routeSet).to(saveVersion).to(markRevising).to(needsRewrite
-      .onTrue(rewriteArticle.to(prepareFix))
+      .onTrue(rewriteRequest.to(rewriteArticle.to(prepareFix)))
       .onFalse(prepareFix)))
     .onFalse(rejectFix))
   .add(prepareFix)

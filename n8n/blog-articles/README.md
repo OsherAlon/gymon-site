@@ -54,7 +54,7 @@ indentation, imports and exports are stripped from the inlined code to stay unde
    searches** (the last one for a position stand), then extracts the **2 best pages**. *Research pack*
    tags every URL PRIMARY / AUTHORITY / SECONDARY and `[EXTRACTED]` (page text is in the pack) or
    `[SNIPPET]`; commercial pages are dropped and tracking parameters stripped.
-4. **Write**: **one Sonnet call** writes the English article as JSON (answer first: `tldr` + key
+4. **Write**: **one Sonnet call** (HTTP to OpenRouter, reasoning effort low) writes the English article as JSON (answer first: `tldr` + key
    takeaways; claims carry a reference marker `[[r1]]` and a verbatim quote from the pack; exactly one
    Gymon block taken from `gymon_material.md`; one end CTA slot). *Parse article (EN)* parses it and
    fills the code-owned fields. Sonnet then writes the Hebrew version (gender-neutral, numbers and
@@ -104,10 +104,20 @@ those 6,000 — so writer and Hebrew maxTokens are 16,000 (rewrite 24,000). Expe
 topic $0.02 + writer ~$0.08 + Hebrew ~$0.08 + check ~$0.01 + image prompt ~$0.01 + image $0.14
 + 5 Tavily credits ≈ $0.35–0.40 before the doctrine rebuild.
 
-**After the rebuild (estimate, not yet measured): ≈ $0.40–0.45.** Added: the closed schema and the
-Gymon material in the writer/Hebrew prompts (~6k more input tokens each, ≈ $0.02–0.03), the Haiku
-fact check (~10k in / 1.5k out ≈ $0.02) and the vision alt text (≈ $0.005). Crossref/NCBI/URL checks
-are free. Measure it on the first paid run. Models are the `MODEL_*` constants in the template.
+**After the rebuild (estimate): ≈ $0.45–0.55.** Added: the closed schema and the Gymon material in the
+writer/Hebrew prompts (~14k input tokens for the writer, measured), the Haiku fact check (≈ $0.02) and
+the vision alt text (≈ $0.005). Crossref/NCBI/URL checks are free.
+
+**Execution 1539 (first paid run after the rebuild, 2026-10-07) failed at *Parse article (EN)*:** the
+writer billed 14,204 in / 16,000 out and returned only ~3,200 characters of JSON (`finish_reason:
+length`). About 15,200 of the 16,000 completion tokens were hidden reasoning; the run cost ≈ $0.22 in
+Sonnet plus 5 Tavily credits. The LangChain OpenRouter node cannot set the reasoning effort, so the
+writer, Hebrew and rewrite calls are now **HTTP requests to `https://openrouter.ai/api/v1/chat/completions`**
+(OpenRouter credential) with `reasoning: { effort: 'low' }` and max_tokens 32,000 / 40,000 / 48,000. A Set
+node (*Writer request*, *Hebrew request*, *Rewrite request*) holds the system prompt and the user
+expression, so the long prompt never sits inside an expression. `llm_text.js` reads the reply and stops
+with the token usage if `finish_reason` is `length`. Models and effort are written inside each
+`jsonBody` in the template; the other Sonnet/Haiku calls are still chain nodes.
 
 ## Gotcha: unicode escapes in Code nodes
 
