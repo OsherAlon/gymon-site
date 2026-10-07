@@ -99,6 +99,10 @@ for (const path of pages) {
 for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   const { html } = await load(path);
   if (!html.includes(`href="${href}"`)) fail(`${path} has no link to ${href}`);
+  // PhoneScrollHero island: the H1 and the app screen are server-rendered (no hydration needed to read them).
+  if (!/<h1[^>]*>Gymon<\/h1>/.test(html)) fail(`${path}: the H1 is not in the served HTML`);
+  if (!/src="\/app\/screen-[a-z-]+-(en|he)\.png"/.test(html)) fail(`${path}: no app screen in the phone`);
+  for (const p of ['privacy', 'terms', 'support']) if (!html.includes(`${path === '/' ? '' : '/he'}/${p}"`)) fail(`${path} has no link to ${p}`);
 }
 
 // ----------------------------------------------------------------- hosting --

@@ -1,0 +1,30 @@
+---
+/**
+ * Home page (/ and /he/). Was the plain LegacyLayout list; now a Tailwind page with the
+ * PhoneScrollHero island on a white ground (user decision 2026-10-07). Same headline, tagline and
+ * the same four links (privacy, terms, support, blog). The legal pages keep LegacyLayout.
+ */
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import HomeHero from '@/components/ui/home-hero';
+import { copy } from '../copy.mjs';
+import { urlFor } from '@/lib/legal';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = (copy as any)[lang];
+const links = (['privacy', 'terms', 'support', 'blog'] as const).map((p) => ({ href: urlFor(lang, p), label: t.nav[p] }));
+---
+<BlogLayout lang={lang} page="index" title="Gymon" description={t.home.tagline}>
+  <div class="home-v2">
+    {/* client:load — the hero is the first thing on the page, so client:visible would hydrate at
+        load anyway; client:load skips the IntersectionObserver round-trip. First paint is the
+        server-rendered HTML either way. */}
+    <HomeHero client:load title={t.home.title} tagline={t.home.tagline} screenSrc={`/app/screen-plan-ready-${lang}.png`} screenAlt={t.home.screenAlt} />
+    <ul class="home-links mx-auto w-full max-w-md px-4">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+  </div>
+</BlogLayout>

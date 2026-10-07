@@ -35,6 +35,7 @@ export const copy = {
     home: {
       title: 'Gymon',
       tagline: 'Gymon is an app for tracking personal workouts.',
+      screenAlt: 'A Gymon app screen: the training plan is ready.',
     },
     nav: { home: 'Home', privacy: 'Privacy Policy', terms: 'Terms of Use', support: 'Support', blog: 'Blog' },
     support: {
@@ -176,6 +177,7 @@ export const copy = {
     home: {
       title: 'Gymon',
       tagline: 'Gymon היא אפליקציה למעקב אחר אימוני כושר אישיים.',
+      screenAlt: 'מסך באפליקציית Gymon: תוכנית האימונים מוכנה.',
     },
     nav: { home: 'דף הבית', privacy: 'מדיניות פרטיות', terms: 'תנאי שימוש', support: 'תמיכה', blog: 'בלוג' },
     support: {
