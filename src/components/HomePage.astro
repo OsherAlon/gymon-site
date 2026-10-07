@@ -1,11 +1,10 @@
 ---
 /**
- * Home page (/ and /he/). Was the plain LegacyLayout list; now a Tailwind page with the
- * PhoneScrollHero island on a white ground (user decision 2026-10-07). Same headline, tagline and
+ * Home page (/ and /he/). Was the plain LegacyLayout list; now a Tailwind page on a white
+ * ground whose opening is row 1 of the zigzag showcase (user decisions 2026-10-07). Same headline, tagline and
  * the same four links (privacy, terms, support, blog). The legal pages keep LegacyLayout.
  */
 import BlogLayout from '@/layouts/BlogLayout.astro';
-import HomeHero from '@/components/ui/home-hero';
 import FeatureMarquee from '@/components/ui/FeatureMarquee.astro';
 import ZigzagShowcase from '@/components/ui/zigzag-showcase';
 import { copy } from '../copy.mjs';
@@ -17,17 +16,18 @@ interface Props {
 }
 const { lang } = Astro.props;
 const t = (copy as any)[lang];
-const rows = t.showcase.map((r: any) => ({ tag: r.tag, title: r.title, text: r.text, alt: r.alt, src: `/app/screen-${r.key}-${lang}.webp` }));
+const rows = [
+  // Row 1: the page's opening — the only H1, the tagline, the app's home screen.
+  { h1: true, title: t.home.title, text: t.home.tagline, alt: t.home.screenAlt, src: `/app/screen-home-${lang}.webp` },
+  ...t.showcase.map((r: any) => ({ tag: r.tag, title: r.title, text: r.text, alt: r.alt, src: `/app/screen-${r.key}-${lang}.webp` })),
+];
 const links = (['privacy', 'terms', 'support', 'blog'] as const).map((p) => ({ href: urlFor(lang, p), label: t.nav[p] }));
 ---
 <BlogLayout lang={lang} page="index" title="Gymon" description={t.home.tagline}>
   <div class="home-v2">
-    {/* client:load — the hero is the first thing on the page, so client:visible would hydrate at
-        load anyway; client:load skips the IntersectionObserver round-trip. First paint is the
-        server-rendered HTML either way. */}
-    <HomeHero client:load title={t.home.title} tagline={t.home.tagline} screenSrc={`/app/screen-home-${lang}.webp`} screenAlt={t.home.screenAlt} />
-    {/* client:visible — below the fold, so it hydrates on approach; the rows are server-rendered. */}
-    <ZigzagShowcase client:visible rows={rows} />
+    {/* client:load — row 1 (the H1 and the home screen) is above the fold and animates from the
+        first scroll. All rows are server-rendered, so first paint does not wait for it. */}
+    <ZigzagShowcase client:load rows={rows} />
     <ul class="home-links mx-auto w-full max-w-md px-4">
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
     </ul>
