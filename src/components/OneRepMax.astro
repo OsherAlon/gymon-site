@@ -1,0 +1,75 @@
+---
+/**
+ * 1RM calculator — the first entry of the calculator registry (user decision 2026-10-03).
+ *
+ * UX doctrine §3: it must deliver its point with ZERO interaction, so the server renders it
+ * pre-filled with its result visible; the small script only recomputes on input. Inputs are
+ * labelled, `dir="ltr"`, `inputmode`, ≥16px (no iOS focus zoom); the result is `aria-live`.
+ * Formulas: src/lib/calculators.mjs (unit-tested). No data leaves the page.
+ */
+import { CALCULATORS } from '@/lib/article/schema.mjs';
+import { oneRepMax } from '@/lib/calculators.mjs';
+import { copy } from '../copy.mjs';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  lang: Lang;
+  defaults?: { weightKg?: number; reps?: number };
+}
+const { lang, defaults = {} } = Astro.props;
+const reg = CALCULATORS['one-rep-max'];
+const t = (copy as any)[lang].blog.article.calc['one-rep-max'];
+const w = defaults.weightKg ?? reg.weightKg.default;
+const r = defaults.reps ?? reg.reps.default;
+const res = oneRepMax(w, r);
+const nf = new Intl.NumberFormat(lang === 'he' ? 'he-IL' : 'en-US', { maximumFractionDigits: 1 });
+const uid = `orm-${Math.random().toString(36).slice(2, 8)}`;
+---
+<figure class="calc not-prose" data-calc="one-rep-max" data-lang={lang}
+  data-range={t.range('{lo}', '{hi}')} data-unit={t.unit} data-bad-weight={t.invalidWeight} data-bad-reps={t.invalidReps}>
+  <figcaption class="calc-title">{t.title}</figcaption>
+  <div class="calc-inputs">
+    <label for={`${uid}-w`}>{t.weight}</label>
+    <input id={`${uid}-w`} name="weight" type="number" inputmode="decimal" dir="ltr" step="0.5"
+      min={reg.weightKg.min} max={reg.weightKg.max} value={w} />
+    <label for={`${uid}-r`}>{t.reps}</label>
+    <input id={`${uid}-r`} name="reps" type="number" inputmode="numeric" dir="ltr" step="1"
+      min={reg.reps.min} max={reg.reps.max} value={r} />
+  </div>
+  <output class="calc-result" for={`${uid}-w ${uid}-r`} aria-live="polite">
+    {res.ok && (
+      <Fragment>
+        <span class="calc-label">{t.result} ({t.epley})</span>
+        <span class="calc-value" data-out="epley">{nf.format(res.epley)} {t.unit}</span>
+        <span class="calc-sub" data-out="range">{t.range(nf.format(res.low), nf.format(res.high))}</span>
+      </Fragment>
+    )}
+  </output>
+  <p class="calc-note">{t.note}</p>
+</figure>
+
+<script>
+  import { oneRepMax } from '@/lib/calculators.mjs';
+
+  for (const root of document.querySelectorAll<HTMLElement>('[data-calc="one-rep-max"]')) {
+    const lang = root.dataset.lang === 'he' ? 'he-IL' : 'en-US';
+    const nf = new Intl.NumberFormat(lang, { maximumFractionDigits: 1 });
+    const w = root.querySelector<HTMLInputElement>('input[name="weight"]')!;
+    const r = root.querySelector<HTMLInputElement>('input[name="reps"]')!;
+    const value = root.querySelector<HTMLElement>('[data-out="epley"]');
+    const range = root.querySelector<HTMLElement>('[data-out="range"]');
+    const update = () => {
+      const res = oneRepMax(parseFloat(w.value.replace(',', '.')), Number(r.value));
+      if (!value || !range) return;
+      if (res.ok) {
+        value.textContent = `${nf.format(res.epley)} ${root.dataset.unit || 'kg'}`;
+        range.textContent = (root.dataset.range || '').replace('{lo}', nf.format(res.low)).replace('{hi}', nf.format(res.high));
+      } else {
+        value.textContent = '—';
+        range.textContent = (res.reason === 'weight' ? root.dataset.badWeight : root.dataset.badReps) || '';
+      }
+    };
+    w.addEventListener('input', update);
+    r.addEventListener('input', update);
+  }
+</script>
