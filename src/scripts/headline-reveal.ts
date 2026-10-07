@@ -5,8 +5,9 @@
  *
  * Applies ONLY to [data-reveal] elements: the article H1, the "In short" line and the section
  * headings. Server HTML stays visible: nothing is hidden until this script runs, and only right
- * before a heading animates. Headings already in view play at once; the rest play once when they
- * reach 85% of the viewport and are never re-hidden on scroll up. Reduced motion: plain text.
+ * before a heading animates. Headings already in view play at once; the rest play the moment they
+ * enter the viewport ("top bottom", so an un-played heading is never on screen hidden) and are
+ * never re-hidden on scroll up. Reduced motion: plain text.
  * RTL: the bar grows from the right and exits to the left. SplitText waits for the fonts and
  * re-splits on resize (autoSplit); a heading that already played is not animated again.
  *
@@ -77,14 +78,14 @@ async function run() {
           return b;
         });
         gsap.set(lines, { opacity: 0 });
-        const inView = el.getBoundingClientRect().top < window.innerHeight * 0.85;
+        const inView = el.getBoundingClientRect().top < window.innerHeight;
         const tl = gsap.timeline({
           defaults: { ease: 'expo.inOut' },
           onComplete: () => {
             played = true;
             blocks.forEach((b) => b.remove());
           },
-          ...(inView ? {} : { scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } }),
+          ...(inView ? {} : { scrollTrigger: { trigger: el, start: 'top bottom', toggleActions: 'play none none none' } }),
         });
         tl.to(blocks, { scaleX: 1, transformOrigin: from, duration: DURATION, stagger: STAGGER })
           .set(lines, { opacity: 1 }, `<${DURATION / 2}`)
