@@ -28,12 +28,13 @@ const CRED_GITHUB = { githubApi: newCredential('GitHub — gymon-site') };
 const IF_OPTS = { caseSensitive: true, leftValue: '', typeValidation: 'loose', version: 2 };
 
 
+
 const scheduleTrigger = trigger({
   type: 'n8n-nodes-base.scheduleTrigger',
   version: 1.3,
   config: {
-    name: 'Sun + Wed 09:00',
-    parameters: { rule: { interval: [{ field: 'weeks', weeksInterval: 1, triggerAtDay: [0, 3], triggerAtHour: 9, triggerAtMinute: 0 }] } },
+    name: 'Sunday 09:00 (weekly)',
+    parameters: { rule: { interval: [{ field: 'weeks', weeksInterval: 1, triggerAtDay: [0], triggerAtHour: 9, triggerAtMinute: 0 }] } },
   },
   output: [{}],
 });
@@ -55,6 +56,22 @@ const getUsedSources = node({
     parameters: { resource: 'row', operation: 'get', dataTableId: T_SOURCES, returnAll: true },
   },
   output: [{ id: 1, source_url: 'https://example.org/a', topic: 'Rest between sets', slug: 'rest-between-sets' }],
+});
+
+const getPublished = node({
+  type: 'n8n-nodes-base.dataTable',
+  version: 1.1,
+  config: {
+    name: 'Get published articles',
+    executeOnce: true,
+    alwaysOutputData: true,
+    parameters: {
+      resource: 'row', operation: 'get', dataTableId: T_ARTICLES, matchType: 'allConditions',
+      filters: { conditions: [{ keyName: 'status', condition: 'eq', keyValue: 'committed' }] },
+      returnAll: true,
+    },
+  },
+  output: [{ slug: 'progressive-overload', title_en: 'Progressive overload', title_he: 'פרוגרסיב אוברלואד', pillar: 'progressive-overload', status: 'committed' }],
 });
 
 const feedList = node({
@@ -92,7 +109,6 @@ const shortlist = node({
   config: { name: 'Shortlist candidates', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_SHORTLIST__ } },
   output: [{ candidates: [{ title: 'Rest intervals and hypertrophy', link: 'https://example.org/a', snippet: '…', host: 'example.org', date: '2026-09-30' }], used_topics: [], used_slugs: [], candidate_count: 1 }],
 });
-
 
 const anyCandidates = ifElse({
   version: 2.2,
@@ -151,28 +167,32 @@ const hasTopic = ifElse({
 });
 
 const topicPlan = node({
-  type: 'n8n-nodes-base.set',
-  version: 3.4,
-  config: {
-    name: 'Topic plan',
-    parameters: {
-      mode: 'manual',
-      assignments: { assignments: [
-        { id: 'tp1', name: 'topic', value: expr('{{ $json.output.topic }}'), type: 'string' },
-        { id: 'tp2', name: 'angle', value: expr('{{ $json.output.angle }}'), type: 'string' },
-        { id: 'tp3', name: 'slug', value: expr(__SLUG_EXPR__), type: 'string' },
-        { id: 'tp4', name: 'source_url', value: expr("{{ ($('Shortlist candidates').first().json.candidates[$json.output.candidate_index] || {}).link || $json.output.source_url }}"), type: 'string' },
-        { id: 'tp5', name: 'source_title', value: expr("{{ ($('Shortlist candidates').first().json.candidates[$json.output.candidate_index] || {}).title || $json.output.source_title }}"), type: 'string' },
-        { id: 'tp6', name: 'primary_keyword_en', value: expr('{{ $json.output.primary_keyword_en }}'), type: 'string' },
-        { id: 'tp7', name: 'primary_keyword_he', value: expr('{{ $json.output.primary_keyword_he }}'), type: 'string' },
-        { id: 'tp8', name: 'search_queries', value: expr('{{ $json.output.search_queries || [] }}'), type: 'array' },
-      ] },
-      options: {},
-    },
-  },
-  output: [{ topic: 'How long to rest between sets', angle: '…', slug: 'rest-between-sets', source_url: 'https://example.org/a', source_title: 'Rest intervals', primary_keyword_en: 'rest between sets', primary_keyword_he: 'מנוחה בין סטים', search_queries: ['rest interval meta-analysis'] }],
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Topic plan', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_TOPIC_PLAN__ } },
+  output: [{ topic: 'How many sets per muscle per week?', angle: '…', slug: 'sets-per-muscle-per-week', pillar: 'sets-reps-volume', intent: 'know', ymyl_level: 'low', length_band: '900-1400', tags: ['volume', 'sets'], source_url: 'https://example.org/a', source_title: 'Volume meta-analysis', primary_keyword_en: 'sets per muscle per week', primary_keyword_he: 'כמה סטים לכל שריר בשבוע', paa_en: [], paa_he: [], gymon_element: { kind: 'plan-logic', use: '…' }, search_queries: ['weekly set volume hypertrophy meta-analysis'], published: [], guard_ok: true, guard_reason: '' }],
 });
 
+const topicAllowed = ifElse({
+  version: 2.2,
+  config: {
+    name: 'Topic allowed?',
+    parameters: {
+      conditions: {
+        options: IF_OPTS,
+        conditions: [{ leftValue: expr('{{ $json.guard_ok === true }}'), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
+        combinator: 'and',
+      },
+    },
+  },
+});
+
+const topicRejected = node({
+  type: 'n8n-nodes-base.noOp',
+  version: 1,
+  config: { name: 'Stop: topic not allowed (YMYL / pillar guard)' },
+  output: [{}],
+});
 
 const fetchSource = node({
   type: '@tavily/n8n-nodes-tavily.tavily',
@@ -243,21 +263,18 @@ const researchPack = node({
   type: 'n8n-nodes-base.code',
   version: 2,
   config: { name: 'Research pack', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PACK__ } },
-  output: [{ research: '### Source article…', allowed_urls: ['https://example.org/a'], research_chars: 12000 }],
+  output: [{ research: '### Source article…', allowed_urls: ['https://example.org/a'], read_urls: ['https://example.org/a'], allowed_with_tier: ['[PRIMARY] [EXTRACTED] https://example.org/a'], research_chars: 12000 }],
 });
 
 const writerModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.6, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Sonnet — writer', parameters: { model: MODEL_WRITE, options: { temperature: 0.5, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
 });
 
-const writerParser = outputParser({
-  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
-  version: 1.3,
-  config: { name: 'Article format (EN)', parameters: { schemaType: 'fromJson', jsonSchemaExample: __WRITER_EXAMPLE__ } },
-});
-
+// No output parser on purpose: the reply is parsed by the Parse article (EN) node and checked by
+// the site validator, so a schema slip becomes a flag for the reviewer instead of a crashed run.
+// (No quote characters in comments here: the SDK pre-parser does not skip comments.)
 const writeArticle = node({
   type: '@n8n/n8n-nodes-langchain.chainLlm',
   version: 1.7,
@@ -266,24 +283,24 @@ const writeArticle = node({
     parameters: {
       promptType: 'define',
       text: expr(__WRITER_USER__),
-      hasOutputParser: true,
       messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __WRITER_SYSTEM__ }] },
     },
-    subnodes: { model: writerModel, outputParser: writerParser },
+    subnodes: { model: writerModel },
   },
-  output: [{ output: { title: 'How long to rest between sets for strength', description: '…', image_alt: '…', body_md: 'Intro…\n\n## Section', sources: [{ title: 'Meta-analysis', url: 'https://example.org/a' }] } }],
+  output: [{ text: '{"title":"…"}' }],
+});
+
+const parseEn = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Parse article (EN)', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PARSE_EN__ } },
+  output: [{ article: { title: '…' }, references: [] }],
 });
 
 const hebrewModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
   config: { name: 'Sonnet — Hebrew', parameters: { model: MODEL_WRITE, options: { temperature: 0.4, maxTokens: 16000 } }, credentials: CRED_OPENROUTER },
-});
-
-const hebrewParser = outputParser({
-  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
-  version: 1.3,
-  config: { name: 'Article format (HE)', parameters: { schemaType: 'fromJson', jsonSchemaExample: __HEBREW_EXAMPLE__ } },
 });
 
 const hebrewVersion = node({
@@ -294,42 +311,114 @@ const hebrewVersion = node({
     parameters: {
       promptType: 'define',
       text: expr(__HEBREW_USER__),
-      hasOutputParser: true,
       messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __HEBREW_SYSTEM__ }] },
     },
-    subnodes: { model: hebrewModel, outputParser: hebrewParser },
+    subnodes: { model: hebrewModel },
   },
-  output: [{ output: { title: 'כמה לנוח בין סטים', description: '…', image_alt: '…', body_md: 'פתיחה…' } }],
+  output: [{ text: '{"title":"…"}' }],
+});
+
+const prepareNew = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Prepare (new)', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PREPARE_NEW__ } },
+  output: [{ mode: 'new', article_en: {}, article_he: {}, research_text: '…', allowed_urls: [], read_urls: [], published: [] }],
+});
+
+const validateArticles = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Validate articles', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_VALIDATE__ } },
+  output: [{ mode: 'new', validation: { en: { errors: [], warnings: [] }, he: { errors: [], warnings: [] }, cross: [] } }],
+});
+
+const referenceChecks = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Reference checks', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_REF_CHECKS__ } },
+  output: [{ kind: 'doi', ref: 'r1', url: 'https://api.crossref.org/works/10.1000%2Fx?mailto=gymon.official@gmail.com' }],
+});
+
+const resolveReferences = node({
+  type: 'n8n-nodes-base.httpRequest',
+  version: 4.4,
+  config: {
+    name: 'Resolve references',
+    onError: 'continueRegularOutput',
+    parameters: {
+      method: 'GET',
+      url: expr('{{ $json.url }}'),
+      sendHeaders: true,
+      headerParameters: { parameters: [
+        { name: 'User-Agent', value: 'GymonBlogReferenceCheck/1.0 (mailto:gymon.official@gmail.com)' },
+        { name: 'Accept', value: 'application/json, text/html;q=0.9, */*;q=0.8' },
+      ] },
+      options: {
+        batching: { batch: { batchSize: 2, batchInterval: 1100 } },
+        timeout: 15000,
+        redirect: { redirect: { followRedirects: true, maxRedirects: 10 } },
+        response: { response: { fullResponse: true, neverError: true, responseFormat: 'text' } },
+      },
+    },
+  },
+  output: [{ statusCode: 200, body: '{}' }],
+});
+
+const referenceResults = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Reference results', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_REF_RESULTS__ } },
+  output: [{ mode: 'new', factcheck_input: '…', counts: { errors: 0, warnings: 0 }, ref_report: [] }],
 });
 
 const checkModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Haiku — check', parameters: { model: MODEL_FAST, options: { temperature: 0 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Haiku — fact check', parameters: { model: MODEL_FAST, options: { temperature: 0, maxTokens: 4000 } }, credentials: CRED_OPENROUTER },
 });
 
 const checkParser = outputParser({
   type: '@n8n/n8n-nodes-langchain.outputParserStructured',
   version: 1.3,
-  config: { name: 'Check format', parameters: { schemaType: 'fromJson', jsonSchemaExample: __CHECK_EXAMPLE__ } },
+  config: { name: 'Fact-check format', parameters: { schemaType: 'fromJson', jsonSchemaExample: __CHECK_EXAMPLE__ } },
 });
 
-const complianceCheck = node({
+const factCheck = node({
   type: '@n8n/n8n-nodes-langchain.chainLlm',
   version: 1.7,
   config: {
-    name: 'Compliance check',
+    name: 'Fact check',
     parameters: {
       promptType: 'define',
-      text: expr(__CHECK_USER__),
+      text: expr('{{ $json.factcheck_input }}'),
       hasOutputParser: true,
       messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __CHECK_SYSTEM__ }] },
     },
     subnodes: { model: checkModel, outputParser: checkParser },
   },
-  output: [{ output: { gendered_hebrew: [], medical_promises: [], unsupported_claims: [], other: [], verdict: 'ok' } }],
+  output: [{ output: { entailment: [], medical_promises: [], gendered_hebrew: [], fabricated_experience: [], literal_translation: [], other: [], verdict: 'ok' } }],
 });
 
+const checkedArticle = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Checked article', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_CHECKED__ } },
+  output: [{ mode: 'new', blocking: 0 }],
+});
+
+const isNew = ifElse({
+  version: 2.2,
+  config: {
+    name: 'New article?',
+    parameters: {
+      conditions: {
+        options: IF_OPTS,
+        conditions: [{ leftValue: expr("{{ $json.mode === 'new' }}"), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
+        combinator: 'and',
+      },
+    },
+  },
+});
 
 const imagePromptModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
@@ -375,7 +464,7 @@ const uploadImage = node({
       resource_type_file: 'image',
       additionalFieldsFile: {
         folder: 'gymon-blog/drafts',
-        public_id: expr("{{ $('Topic plan').item.json.slug }}-r1-{{ $now.toFormat('yyMMddHHmmss') }}"),
+        public_id: expr("{{ $('Topic plan').first().json.slug }}-r1-{{ $now.toFormat('yyMMddHHmmss') }}"),
         tags: 'gymon-blog,draft',
       },
     },
@@ -384,19 +473,43 @@ const uploadImage = node({
   output: [{ public_id: 'gymon-blog/drafts/rest-between-sets-r1', secure_url: 'https://res.cloudinary.com/demo/image/upload/v1/gymon-blog/drafts/rest-between-sets-r1.png' }],
 });
 
+const altModel = languageModel({
+  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
+  version: 1,
+  config: { name: 'Haiku — image alt', parameters: { model: MODEL_FAST, options: { temperature: 0.2 } }, credentials: CRED_OPENROUTER },
+});
+
+const altParser = outputParser({
+  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
+  version: 1.3,
+  config: { name: 'Image alt format', parameters: { schemaType: 'fromJson', jsonSchemaExample: '{"image_alt_en": "A barbell with matte black plates on a grey rubber floor", "image_alt_he": "מוט עם משקולות שחורות על רצפת גומי אפורה"}' } },
+});
+
+// Alt text from the FINAL image (SEO doctrine §4, Images), not from the prompt.
+const imageAlt = node({
+  type: '@n8n/n8n-nodes-langchain.chainLlm',
+  version: 1.7,
+  config: {
+    name: 'Image alt',
+    parameters: {
+      promptType: 'define',
+      text: expr("Article title: {{ $('Checked article').first().json.article_en.title }}"),
+      hasOutputParser: true,
+      messages: { messageValues: [
+        { type: 'SystemMessagePromptTemplate', message: __ALT_SYSTEM__ },
+        { type: 'HumanMessagePromptTemplate', messageType: 'imageUrl', imageUrl: expr("{{ String($json.secure_url || '').replace('/upload/', '/upload/c_fill,g_auto,ar_16:9,w_1024,q_auto,f_jpg/') }}"), imageDetail: 'low' },
+      ] },
+    },
+    subnodes: { model: altModel, outputParser: altParser },
+  },
+  output: [{ output: { image_alt_en: 'A barbell with matte black plates on a grey rubber floor', image_alt_he: 'מוט עם משקולות שחורות על רצפת גומי אפורה' } }],
+});
 
 const articleRecord = node({
-  type: 'n8n-nodes-base.set',
-  version: 3.4,
-  config: {
-    name: 'Article record',
-    parameters: {
-      mode: 'manual',
-      assignments: { assignments: __RECORD_ASSIGNMENTS__ },
-      options: {},
-    },
-  },
-  output: [{ article_id: '261004090000-rest-between-sets', slug: 'rest-between-sets', status: 'pending_review', round: 1, review_token: 'abc', title_en: '…', title_he: '…', image_url: 'https://res.cloudinary.com/…' }],
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Article record', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_ARTICLE_RECORD__ } },
+  output: [{ article_id: '261004090000-rest-between-sets', slug: 'rest-between-sets', status: 'pending_review', round: 1, review_token: 'abc' }],
 });
 
 const insertArticle = node({
@@ -421,11 +534,11 @@ const logSource = node({
       columns: {
         mappingMode: 'defineBelow',
         value: {
-          source_url: expr("{{ $('Topic plan').item.json.source_url }}"),
-          source_title: expr("{{ $('Topic plan').item.json.source_title }}"),
-          topic: expr("{{ $('Topic plan').item.json.topic }}"),
-          slug: expr("{{ $('Topic plan').item.json.slug }}"),
-          article_id: expr("{{ $('Article record').item.json.article_id }}"),
+          source_url: expr("{{ $('Topic plan').first().json.source_url }}"),
+          source_title: expr("{{ $('Topic plan').first().json.source_title }}"),
+          topic: expr("{{ $('Topic plan').first().json.topic }}"),
+          slug: expr("{{ $('Topic plan').first().json.slug }}"),
+          article_id: expr("{{ $('Article record').first().json.article_id }}"),
         },
         matchingColumns: [],
         schema: [
@@ -447,7 +560,7 @@ const emailNew = node({
   version: 3.4,
   config: {
     name: 'Email: new article',
-    parameters: { mode: 'manual', assignments: { assignments: [{ id: 'en1', name: 'article_id', value: expr("{{ $('Article record').item.json.article_id }}"), type: 'string' }] }, options: {} },
+    parameters: { mode: 'manual', assignments: { assignments: [{ id: 'en1', name: 'article_id', value: expr("{{ $('Article record').first().json.article_id }}"), type: 'string' }] }, options: {} },
   },
   output: [{ article_id: 1 }],
 });
@@ -494,7 +607,6 @@ const sendReviewEmail = node({
   },
   output: [{ id: 'msg-1' }],
 });
-
 
 const reviewRequest = trigger({
   type: 'n8n-nodes-base.webhook',
@@ -561,7 +673,6 @@ const respondPage = node({
   },
 });
 
-
 const approveRequest = trigger({
   type: 'n8n-nodes-base.webhook',
   version: 2.1,
@@ -591,7 +702,7 @@ const canApprove = ifElse({
     parameters: {
       conditions: {
         options: IF_OPTS,
-        conditions: [{ leftValue: expr("{{ !!$json.article_id && !!$json.review_token && $json.review_token === $('Approve request').item.json.body?.t && $json.status === 'pending_review' }}"), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
+        conditions: [{ leftValue: expr(__APPROVE_CONDITION__), operator: { type: 'boolean', operation: 'true', singleValue: true } }],
         combinator: 'and',
       },
     },
@@ -617,11 +728,18 @@ const markApproved = node({
       filters: { conditions: [{ keyName: 'article_id', condition: 'eq', keyValue: expr('{{ $json.article_id }}') }] },
       columns: {
         mappingMode: 'defineBelow',
-        value: { status: 'approved', published_date: expr("{{ $now.setZone('Asia/Jerusalem').toFormat('yyyy-MM-dd') }}") },
+        value: {
+          status: 'approved',
+          published_date: expr("{{ $now.setZone('Asia/Jerusalem').toFormat('yyyy-MM-dd') }}"),
+          reviewed_at: expr("{{ $now.setZone('Asia/Jerusalem').toISO() }}"),
+          review_checklist: expr(__CHECKLIST_RECORD__),
+        },
         matchingColumns: [],
         schema: [
           { id: 'status', displayName: 'status', required: false, defaultMatch: false, display: true, type: 'string', canBeUsedToMatch: true },
           { id: 'published_date', displayName: 'published_date', required: false, defaultMatch: false, display: true, type: 'string', canBeUsedToMatch: true },
+          { id: 'reviewed_at', displayName: 'reviewed_at', required: false, defaultMatch: false, display: true, type: 'string', canBeUsedToMatch: true },
+          { id: 'review_checklist', displayName: 'review_checklist', required: false, defaultMatch: false, display: true, type: 'string', canBeUsedToMatch: true },
         ],
       },
       options: {},
@@ -901,7 +1019,6 @@ const committedEmail = node({
   output: [{ id: 'msg-2' }],
 });
 
-
 const fixRequest = trigger({
   type: 'n8n-nodes-base.webhook',
   version: 2.1,
@@ -1048,13 +1165,7 @@ const needsRewrite = ifElse({
 const rewriteModel = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 24000 } }, credentials: CRED_OPENROUTER },
-});
-
-const rewriteParser = outputParser({
-  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
-  version: 1.3,
-  config: { name: 'Revised article format', parameters: { schemaType: 'fromJson', jsonSchemaExample: __REWRITE_EXAMPLE__ } },
+  config: { name: 'Sonnet — rewrite', parameters: { model: MODEL_REWRITE, options: { temperature: 0.4, maxTokens: 30000 } }, credentials: CRED_OPENROUTER },
 });
 
 const rewriteArticle = node({
@@ -1065,12 +1176,18 @@ const rewriteArticle = node({
     parameters: {
       promptType: 'define',
       text: expr(__REWRITE_USER__),
-      hasOutputParser: true,
       messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __REWRITE_SYSTEM__ }] },
     },
-    subnodes: { model: rewriteModel, outputParser: rewriteParser },
+    subnodes: { model: rewriteModel },
   },
-  output: [{ output: { title_en: '…', description_en: '…', image_alt_en: '…', body_en: '…', title_he: '…', description_he: '…', image_alt_he: '…', body_he: '…' } }],
+  output: [{ text: '{"article_en":{},"article_he":{}}' }],
+});
+
+const prepareFix = node({
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Prepare (fix)', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_PREPARE_FIX__ } },
+  output: [{ mode: 'fix', route: 'text', article_en: {}, article_he: {} }],
 });
 
 const needsImage = ifElse({
@@ -1140,16 +1257,16 @@ const uploadImageFix = node({
   output: [{ public_id: 'gymon-blog/drafts/rest-between-sets-r2', secure_url: 'https://res.cloudinary.com/demo/image/upload/v1/gymon-blog/drafts/rest-between-sets-r2.png' }],
 });
 
-const altModel = languageModel({
+const altModelFix = languageModel({
   type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
   version: 1,
-  config: { name: 'Haiku — image alt', parameters: { model: MODEL_FAST, options: { temperature: 0.2 } }, credentials: CRED_OPENROUTER },
+  config: { name: 'Haiku — image alt (fix)', parameters: { model: MODEL_FAST, options: { temperature: 0.2 } }, credentials: CRED_OPENROUTER },
 });
 
-const altParser = outputParser({
+const altParserFix = outputParser({
   type: '@n8n/n8n-nodes-langchain.outputParserStructured',
   version: 1.3,
-  config: { name: 'Image alt format', parameters: { schemaType: 'fromJson', jsonSchemaExample: '{"image_alt_en": "A barbell with matte black plates in a concrete gym", "image_alt_he": "מוט עם משקולות שחורות בחדר כושר מבטון"}' } },
+  config: { name: 'Image alt format (fix)', parameters: { schemaType: 'fromJson', jsonSchemaExample: '{"image_alt_en": "A barbell with matte black plates on a grey rubber floor", "image_alt_he": "מוט עם משקולות שחורות על רצפת גומי אפורה"}' } },
 });
 
 const imageAltFix = node({
@@ -1159,61 +1276,23 @@ const imageAltFix = node({
     name: 'Image alt (fix)',
     parameters: {
       promptType: 'define',
-      text: expr("Image prompt:\n{{ $('Image prompt (fix)').first().json.text }}"),
+      text: expr("Article title: {{ $('Checked article').first().json.article_en.title }}"),
       hasOutputParser: true,
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __ALT_SYSTEM__ }] },
+      messages: { messageValues: [
+        { type: 'SystemMessagePromptTemplate', message: __ALT_SYSTEM__ },
+        { type: 'HumanMessagePromptTemplate', messageType: 'imageUrl', imageUrl: expr("{{ String($json.secure_url || '').replace('/upload/', '/upload/c_fill,g_auto,ar_16:9,w_1024,q_auto,f_jpg/') }}"), imageDetail: 'low' },
+      ] },
     },
-    subnodes: { model: altModel, outputParser: altParser },
+    subnodes: { model: altModelFix, outputParser: altParserFix },
   },
-  output: [{ output: { image_alt_en: 'A barbell with matte black plates in a concrete gym', image_alt_he: 'מוט עם משקולות שחורות בחדר כושר מבטון' } }],
-});
-
-const revisedArticle = node({
-  type: 'n8n-nodes-base.set',
-  version: 3.4,
-  config: {
-    name: 'Revised article',
-    parameters: { mode: 'manual', assignments: { assignments: __REVISED_ASSIGNMENTS__ }, options: {} },
-  },
-  output: [{ status: 'pending_review', round: 2, title_en: '…', body_en: '…', title_he: '…', body_he: '…', image_url: 'https://res.cloudinary.com/…' }],
-});
-
-const recheckModel = languageModel({
-  type: '@n8n/n8n-nodes-langchain.lmChatOpenRouter',
-  version: 1,
-  config: { name: 'Haiku — re-check', parameters: { model: MODEL_FAST, options: { temperature: 0 } }, credentials: CRED_OPENROUTER },
-});
-
-const recheckParser = outputParser({
-  type: '@n8n/n8n-nodes-langchain.outputParserStructured',
-  version: 1.3,
-  config: { name: 'Re-check format', parameters: { schemaType: 'fromJson', jsonSchemaExample: __CHECK_EXAMPLE__ } },
-});
-
-const recheck = node({
-  type: '@n8n/n8n-nodes-langchain.chainLlm',
-  version: 1.7,
-  config: {
-    name: 'Compliance re-check',
-    parameters: {
-      promptType: 'define',
-      text: expr(__RECHECK_USER__),
-      hasOutputParser: true,
-      messages: { messageValues: [{ type: 'SystemMessagePromptTemplate', message: __CHECK_SYSTEM__ }] },
-    },
-    subnodes: { model: recheckModel, outputParser: recheckParser },
-  },
-  output: [{ output: { gendered_hebrew: [], medical_promises: [], unsupported_claims: [], other: [], verdict: 'ok' } }],
+  output: [{ output: { image_alt_en: '…', image_alt_he: '…' } }],
 });
 
 const revisedRecord = node({
-  type: 'n8n-nodes-base.set',
-  version: 3.4,
-  config: {
-    name: 'Revised record',
-    parameters: { mode: 'raw', jsonOutput: expr("{{ JSON.stringify(Object.assign({}, $('Revised article').first().json, { check_notes: JSON.stringify($json.output || {}) })) }}"), options: {} },
-  },
-  output: [{ status: 'pending_review', round: 2, check_notes: '{}' }],
+  type: 'n8n-nodes-base.code',
+  version: 2,
+  config: { name: 'Revised record', parameters: { mode: 'runOnceForAllItems', jsCode: __CODE_REVISED_RECORD__ } },
+  output: [{ status: 'pending_review', round: 2 }],
 });
 
 const updateArticle = node({
@@ -1243,17 +1322,16 @@ const emailRevised = node({
 });
 
 
+const label1 = sticky('## 1 · Collect sources\n11 English RSS feeds → drop used / older than 30 days / off-topic or YMYL → up to 30 candidates. Published articles are read too (no repeats, link targets).', [getUsedSources, getPublished, feedList, splitFeeds, readFeed, shortlist, anyCandidates], { color: 7 });
+const label2 = sticky('## 2 · Pick topic + guard\nSonnet plans an evergreen topic inside the 5 pillars. The code guard (the site validator) stops YMYL / off-pillar topics before any research is paid for.', [pickTopic, hasTopic, topicPlan, topicAllowed, topicRejected], { color: 7 });
+const label3 = sticky('## 3 · Research + write (JSON)\nTavily: source + 3 searches + 2 pages → Sonnet writes the EN article as closed-schema JSON with a Gymon-unique block → Sonnet adapts HE → code assembles both files.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writeArticle, parseEn, hebrewVersion, prepareNew], { color: 7 });
+const label4 = sticky('## 4 · Automatic checks (before any email)\nThe SITE validator on both languages · every URL fetched · every DOI in Crossref · every PMID in PubMed · Haiku entailment + Hebrew check. Shared by new articles and fix rounds.', [validateArticles, referenceChecks, resolveReferences, referenceResults, factCheck, checkedArticle, isNew], { color: 7 });
+const label5 = sticky('## 5 · Image + save + email\nSonnet prompt → Gemini → Cloudinary → alt text from the final image (Haiku vision) → row in gymon_blog_articles → review email.', [imagePrompt, generateImage, uploadImage, imageAlt, articleRecord, insertArticle, logSource, emailNew, loadForEmail, buildEmail, sendReviewEmail], { color: 7 });
+const label7 = sticky('## 6 · Review page (GET /webhook/gymon-blog/review)\nBoth articles rendered with the site renderer, every flag, reference checks, review checklist. Approve is disabled while errors remain.', [getArticleReview, getVersionsReview, renderPage, respondPage], { color: 7 });
+const label8 = sticky('## 7 · Approve → GitHub (POST /webhook/gymon-blog/approve)\nServer re-checks token, errors and checklist → two JSON files (validated again) + jpg committed to blog/incoming. ⚠️ needs a GitHub credential.', [getArticleApprove, canApprove, markApproved, buildFiles, getBranch, createCommit, markCommitted], { color: 7 });
+const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → Sonnet rewrites the JSON → the same checks as a new article → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteArticle, prepareFix, revisedRecord, updateArticle], { color: 7 });
 
-const label1 = sticky('## 1 · Collect sources\n13 English RSS feeds → drop used / older than 30 days / off-topic → up to 30 candidates. Output shows `counts`.', [getUsedSources, feedList, splitFeeds, readFeed, shortlist, anyCandidates], { color: 7 });
-const label2 = sticky('## 2 · Pick topic\nSonnet picks one candidate and plans an evergreen SEO topic (slug, keywords). `skip` ends the run.', [pickTopic, hasTopic, topicPlan], { color: 7 });
-const label3 = sticky('## 3 · Research + write\nTavily: source + 3 basic searches + 2 pages (capped) → one Sonnet call writes EN → Sonnet adapts HE → Haiku check.', [fetchSource, searchQueries, searchWeb, pickPages, readPages, researchPack, writeArticle, hebrewVersion, complianceCheck], { color: 7 });
-const label4 = sticky('## 4 · Hero image\nSonnet prompt → Gemini → Cloudinary (served as 16:9 JPEG).', [imagePrompt, generateImage, uploadImage], { color: 7 });
-const label5 = sticky('## 5 · Save draft + email\nRow in gymon_blog_articles, source in gymon_blog_sources, review email to gymon.official@gmail.com.', [articleRecord, insertArticle, logSource, emailNew, loadForEmail, buildEmail, sendReviewEmail], { color: 7 });
-const label7 = sticky('## 6 · Review page (GET /webhook/gymon-blog/review)\nToken-checked page: both languages, sources, versions, Approve / Send for fixes.', [getArticleReview, getVersionsReview, renderPage, respondPage], { color: 7 });
-const label8 = sticky('## 7 · Approve → GitHub (POST /webhook/gymon-blog/approve)\nOne commit (en.md, he.md, jpg) to gymon-site branch blog/incoming. ⚠️ needs a GitHub credential.', [getArticleApprove, canApprove, markApproved, buildFiles, getBranch, createCommit, markCommitted], { color: 7 });
-const label9 = sticky('## 8 · Fix request → redo (POST /webhook/gymon-blog/fix)\nHaiku routes text / image / both → previous version saved → redo → re-check → new email.', [getArticleFix, canFix, routeFix, saveVersion, rewriteArticle, revisedArticle, updateArticle], { color: 7 });
-
-const noteOverview = sticky(__NOTE_OVERVIEW__, [], { color: 7, width: 520, height: 460 });
+const noteOverview = sticky(__NOTE_OVERVIEW__, [], { color: 7, width: 560, height: 520 });
 
 export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .add(scheduleTrigger)
@@ -1261,32 +1339,46 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .add(manualTrigger)
   .to(getUsedSources)
   .add(getUsedSources)
+  .to(getPublished)
   .to(feedList)
   .to(splitFeeds)
   .to(readFeed)
   .to(shortlist)
   .to(anyCandidates.onTrue(pickTopic))
   .add(pickTopic)
-  .to(hasTopic.onTrue(
-    topicPlan
-      .to(fetchSource)
+  .to(hasTopic.onTrue(topicPlan))
+  .add(topicPlan)
+  .to(topicAllowed
+    .onTrue(fetchSource
       .to(searchQueries)
       .to(searchWeb)
       .to(pickPages)
       .to(readPages)
       .to(researchPack)
       .to(writeArticle)
+      .to(parseEn)
       .to(hebrewVersion)
-      .to(complianceCheck)
-      .to(imagePrompt)
-      .to(generateImage)
-      .to(uploadImage)
-      .to(articleRecord)
-      .to(insertArticle)
-      .to(logSource)
-      .to(emailNew)
-      .to(loadForEmail)
-  ))
+      .to(prepareNew)
+      .to(validateArticles))
+    .onFalse(topicRejected))
+
+  .add(validateArticles)
+  .to(referenceChecks)
+  .to(resolveReferences)
+  .to(referenceResults)
+  .to(factCheck)
+  .to(checkedArticle)
+  .to(isNew
+    .onTrue(imagePrompt.to(generateImage).to(uploadImage).to(imageAlt).to(articleRecord).to(insertArticle).to(logSource).to(emailNew).to(loadForEmail))
+    .onFalse(needsImage))
+  .add(needsImage
+    .onTrue(fixImagePrompt.to(generateImageFix).to(uploadImageFix).to(imageAltFix).to(revisedRecord))
+    .onFalse(revisedRecord))
+  .add(revisedRecord)
+  .to(updateArticle)
+  .to(emailRevised)
+  .to(loadForEmail)
+
   .add(loadForEmail)
   .to(buildEmail)
   .to(sendReviewEmail)
@@ -1319,18 +1411,11 @@ export default workflow('gymon-blog-articles', 'Gymon Blog — Articles')
   .to(getArticleFix)
   .to(canFix
     .onTrue(respondFix.to(routeFix).to(routeSet).to(saveVersion).to(markRevising).to(needsRewrite
-      .onTrue(rewriteArticle.to(needsImage))
-      .onFalse(needsImage)))
+      .onTrue(rewriteArticle.to(prepareFix))
+      .onFalse(prepareFix)))
     .onFalse(rejectFix))
-  .add(needsImage
-    .onTrue(fixImagePrompt.to(generateImageFix).to(uploadImageFix).to(imageAltFix).to(revisedArticle))
-    .onFalse(revisedArticle))
-  .add(revisedArticle)
-  .to(recheck)
-  .to(revisedRecord)
-  .to(updateArticle)
-  .to(emailRevised)
-  .to(loadForEmail)
+  .add(prepareFix)
+  .to(validateArticles)
   .add(noteOverview)
   .add(label1)
   .add(label2)
