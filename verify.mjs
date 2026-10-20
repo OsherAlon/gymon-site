@@ -18,6 +18,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { privacyPolicy, termsOfService } from './src/documents.mjs';
+import { BLOG_PUBLIC } from './src/copy.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(process.env.GYMON_REPO ?? join(ROOT, '..', 'gymon'));
@@ -98,7 +99,8 @@ for (const path of pages) {
 
 for (const [path, href] of [['/', '/blog/'], ['/he/', '/he/blog/']]) {
   const { html } = await load(path);
-  if (!html.includes(`href="${href}"`)) fail(`${path} has no link to ${href}`);
+  if (BLOG_PUBLIC && !html.includes(`href="${href}"`)) fail(`${path} has no link to ${href}`);
+  if (!BLOG_PUBLIC && /href="[^"]*\/blog\b/.test(html)) fail(`${path} links to the blog, but BLOG_PUBLIC is false`);
   // The page opens with the cinematic hero: exactly one H1, server-rendered, starting with "Gymon",
   // and a <noscript> fallback that shows it without JS.
   const h1s = html.match(/<h1[\s\S]*?<\/h1>/g) || [];
@@ -179,7 +181,25 @@ function docArticles(dir = join(ROOT, 'src', 'content', 'articles')) {
 
 const docs = docArticles();
 const posts = [...docs, ...articles().filter((p) => !docs.some((d) => d.slug === p.slug && d.lang === p.lang))];
-for (const lang of ['en', 'he']) {
+
+// Blog off (BLOG_PUBLIC false in src/copy.mjs): no blog URL may answer, and no built file may
+// mention /blog (no links, no assets, no island chunk).
+if (!BLOG_PUBLIC) {
+  const paths = ['/blog/', '/he/blog/', ...posts.map((p) => `${p.lang === 'en' ? '' : '/he'}/blog/${p.slug}`)];
+  for (const path of paths) {
+    const { status } = await load(path);
+    if (status !== 404) fail(`${path}: status ${status}, but BLOG_PUBLIC is false (expect 404)`);
+  }
+  console.log(`blog off: ${paths.length} blog URL(s) checked absent`);
+  if (!base) {
+    const walkAll = (dir) => readdirSync(dir).flatMap((n) => (statSync(join(dir, n)).isDirectory() ? walkAll(join(dir, n)) : [join(dir, n)]));
+    const hits = walkAll(join(ROOT, 'docs')).filter((f) => /\.(html|js|css|xml|txt)$/.test(f) && readFileSync(f, 'utf8').includes('/blog'));
+    for (const f of hits) fail(`${f.slice(ROOT.length + 1)} mentions /blog, but BLOG_PUBLIC is false`);
+    console.log(`blog off: ${hits.length} built file(s) mention /blog`);
+  }
+}
+
+for (const lang of BLOG_PUBLIC ? ['en', 'he'] : []) {
   const prefix = lang === 'en' ? '' : '/he';
   const index = `${prefix}/blog/`;
   const { status, html } = await load(index);
