@@ -7,8 +7,10 @@
 import ArticleDoc from '@/components/ArticleDoc.astro';
 import ArticlePage from '@/components/ArticlePage.astro';
 import { articles, docArticles } from '@/lib/blog';
+import { BLOG_PUBLIC } from '../../../copy.mjs';
 
 export async function getStaticPaths() {
+  if (!BLOG_PUBLIC) return []; // blog off: no article pages (src/copy.mjs)
   const docs = await docArticles('he');
   const md = (await articles('he')).filter((a) => !docs.some((d) => d.data.slug === a.data.slug));
   return [

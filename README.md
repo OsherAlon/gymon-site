@@ -25,6 +25,13 @@ and turn `/privacy` into a 301.
 English is at the fixed URLs. A device set to Hebrew is sent to `/he/…` unless the visitor picked a
 language on the site before (the inline script in `src/components/SiteHead.astro`).
 
+🔴 **The blog is off: `BLOG_PUBLIC = false` in `src/copy.mjs`** (user decision 2026-10-20 — the site ships
+without it until real, editor-reviewed articles exist). Off means: no Blog link in the top bar or the home
+links, the article routes emit nothing, and a build step in `astro.config.mjs` (`blogGate`) removes
+`docs/blog/`, `docs/he/blog/` (the index pages and `public/blog/`) and the blog index's `_astro/blog-section.*`
+chunk. `npm run verify` then checks that every blog URL is a 404 and that no built file mentions `/blog`.
+To publish the blog, set it to `true` and rebuild. Everything below describes the blog when it is on.
+
 The blog never redirects. An English article that also exists in Hebrew shows Hebrew-language
 devices a small dismissible bar, "המאמר קיים גם בעברית", that links to the Hebrew version. The
 dismissal is remembered in `localStorage` (`heHintDismissed`). These pages keep

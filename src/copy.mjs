@@ -9,6 +9,14 @@
  * from the app's `home.json`, so the steps name exactly what the screen says.
  */
 
+/**
+ * Is the blog public? false (user decision 2026-10-20): the site ships without the blog until
+ * real, editor-reviewed articles exist. Off = no Blog link anywhere (top bar, home links), no
+ * /blog/** or /he/blog/** pages or assets in docs/ (astro.config.mjs removes them), and
+ * verify.mjs checks that they are absent. Turning the blog back on is this one line.
+ */
+export const BLOG_PUBLIC = false;
+
 export const SUPPORT_EMAIL = 'gymon.official@gmail.com';
 export const APPLE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
 

@@ -1,10 +1,11 @@
 // @ts-check
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import { BLOG_PUBLIC } from './src/copy.mjs';
 
 const SITE = 'https://gymon.app';
 const OUT = fileURLToPath(new URL('./docs/', import.meta.url));
@@ -50,6 +51,29 @@ function clean(url) {
  * itself, so the sitemap can never disagree with the page. en/he alternates +
  * x-default → English, like the pages' own hreflang links.
  */
+/**
+ * Blog gate (BLOG_PUBLIC in src/copy.mjs). With the blog off, the article routes emit nothing
+ * (their getStaticPaths return []), but two things still land in docs/blog/ and docs/he/blog/:
+ * the static index pages (src/pages/blog/index.astro has no getStaticPaths to return [] from)
+ * and public/blog/ (hero background, mock images — public/ is copied as-is), plus the index's
+ * island chunk in _astro/. This removes them after the build. It runs before @astrojs/sitemap, whose filter skips missing files.
+ */
+/** @returns {import('astro').AstroIntegration} */
+function blogGate() {
+  return {
+    name: 'gymon-blog-gate',
+    hooks: {
+      'astro:build:done': ({ logger }) => {
+        if (BLOG_PUBLIC) return;
+        for (const dir of ['blog', 'he/blog']) rmSync(OUT + dir, { recursive: true, force: true });
+        // The blog index's React island chunk is referenced only by the removed index pages.
+        for (const f of readdirSync(OUT + '_astro')) if (f.startsWith('blog-section.')) rmSync(OUT + '_astro/' + f);
+        logger.info('BLOG_PUBLIC is false: removed docs/blog/, docs/he/blog/ and the blog-section chunk');
+      },
+    },
+  };
+}
+
 export default defineConfig({
   site: SITE,
   outDir: './docs',
@@ -60,6 +84,7 @@ export default defineConfig({
   build: { format: 'preserve' },
   integrations: [
     react(),
+    blogGate(),
     sitemap({
       i18n: { defaultLocale: 'en', locales: { en: 'en', he: 'he' } },
       filter: (page) => {

@@ -4,7 +4,7 @@
  * `set:html`; the page chrome lives in `src/layouts/LegacyLayout.astro`.
  */
 
-import { copy, SUPPORT_EMAIL, APPLE_SUBSCRIPTIONS_URL } from '../copy.mjs';
+import { copy, SUPPORT_EMAIL, APPLE_SUBSCRIPTIONS_URL, BLOG_PUBLIC } from '../copy.mjs';
 import { privacyPolicy, termsOfService } from '../documents.mjs';
 import { source, type Lang } from './source';
 
@@ -112,7 +112,7 @@ export function homePage(lang: Lang) {
 <h1>${esc(t.home.title)}</h1>
 <p class="tagline">${esc(t.home.tagline)}</p>
 <ul class="links">
-${(['privacy', 'terms', 'support', 'blog'] as const).map((p) => `<li><a href="${urlFor(lang, p)}">${esc(t.nav[p])}</a></li>`).join('\n')}
+${(['privacy', 'terms', 'support', 'blog'] as const).filter((p) => BLOG_PUBLIC || p !== 'blog').map((p) => `<li><a href="${urlFor(lang, p)}">${esc(t.nav[p])}</a></li>`).join('\n')}
 </ul>
 </div>`;
   return { title: 'Gymon', main };
