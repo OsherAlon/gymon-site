@@ -14,7 +14,7 @@ if (typeof window !== 'undefined') gsap.registerPlugin(ScrollTrigger, useGSAP);
  *  - the two glass badges are moments the logger screenshot really shows (rest 1:30, a 40 kg × 6
  *    set), no streaks or claims;
  *  - Gymon dark card (#0B1115 → near-black) with the cyan accent; the page around it stays white;
- *  - CTA: the official App Store badge (disabled "coming soon" while APP_STORE_URL is null) and a
+ *  - CTA: the official App Store badge (linked to APP_STORE_URL; disabled if it is null) and a
  *    Google Play "coming soon" text pill — not Google's badge;
  *  - one H1 (tagline1 + tagline2 as spans), server-rendered and visible without JS: the
  *    .gsap-reveal hiding only applies while the timeline is armed, and a <noscript> style and a
