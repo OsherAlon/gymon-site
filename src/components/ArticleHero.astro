@@ -1,0 +1,58 @@
+---
+/**
+ * Article hero — scroll-LINKED, never scroll-BLOCKING (user decision 2026-10-03,
+ * ARTICLE_UX_DOCTRINE "Option C" + SEO_DOCTRINE rule 7). Replaces the
+ * ScrollExpandMedia React island, which held the page and hid the article.
+ *
+ * Same look: the fixed site-wide background, the article image growing from a
+ * portrait box to near-full width, the short heroTitle split sliding apart, the
+ * dark-to-light overlay. It is driven by the page's own scroll position through
+ * CSS scroll-driven animations (`animation-timeline: scroll(root)`) over a tall
+ * section with a `position: sticky` stage. Only transform, opacity and clip-path
+ * animate, so there is no layout shift. Zero JavaScript.
+ *
+ * Where scroll-driven animations are unsupported (Firefox stable, Safari < 26), or
+ * with prefers-reduced-motion: reduce, the hero is its static end state: the
+ * expanded image, no tall section, no motion. Styles: src/styles/global.css ("ah-").
+ *
+ * The split title and date line are decorative (aria-hidden); the page's single h1
+ * (the full title) follows the hero. The article image keeps its alt text.
+ */
+interface Props {
+  image: string;
+  bgImage: string;
+  /** Short title (2–4 words), split first word / rest. */
+  heroTitle: string;
+  /** e.g. "Oct 3, 2026 · 5 min read" */
+  date: string;
+  scrollLabel: string;
+  imageAlt?: string;
+}
+
+const { image, bgImage, heroTitle, date, scrollLabel, imageAlt = '' } = Astro.props;
+const words = heroTitle.split(/\s+/);
+const first = words[0] ?? '';
+const rest = words.slice(1).join(' ');
+---
+<section class="ah">
+  <div class="ah-stage">
+    <div class="ah-bg" aria-hidden="true">
+      <img src={bgImage} alt="" width="1920" height="1080" decoding="async" fetchpriority="low" />
+      <div class="ah-bg-tint"></div>
+    </div>
+    <div class="ah-frame">
+      <div class="ah-box">
+        <img class="ah-img" src={image} alt={imageAlt} width="1600" height="900" decoding="async" fetchpriority="high" />
+        <div class="ah-shade" aria-hidden="true"></div>
+      </div>
+      <div class="ah-title" aria-hidden="true">
+        <span class="ah-slide-start">{first}</span>
+        <span class="ah-slide-end">{rest}</span>
+      </div>
+      <div class="ah-meta" aria-hidden="true">
+        <p class="ah-date ah-slide-start">{date}</p>
+        <p class="ah-scroll ah-slide-end">{scrollLabel}</p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The URL robots.txt names. A sitemap index pointing at the file @astrojs/sitemap writes at build time (sitemap-0.xml). -->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><sitemap><loc>https://gymon.app/sitemap-0.xml</loc></sitemap></sitemapindex>

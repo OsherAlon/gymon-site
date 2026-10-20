@@ -1,0 +1,283 @@
+---
+/**
+ * The doctrine article template (ARTICLE_UX_DOCTRINE §8a, SEO_DOCTRINE §4–§5), rendered from
+ * one JSON file in the closed schema of src/lib/article/schema.mjs. Zero JS except the 1RM
+ * calculator's small script; reference previews use the native `popover` attribute.
+ *
+ * Order (v3, user decision 2026-10-07, overrides §8a where they differ): scroll-linked hero
+ * (ArticleHero, restored by user decision) → H1 → relatable hook →
+ * one-sentence takeaway ("in short") → quiet trust line → article image → 3–6 beats (headline IS the
+ * point + 1–3 short lines) → optional pull quote → "try it" list → quiet extras (calculator, Gymon
+ * block) → end CTA → sources (collapsed; all study detail) → editor → how it was made → related.
+ * No TOC, FAQ, quiz, cards, evidence badges or inline CTA.
+ *
+ * The article text is server HTML and always visible: nothing here is opacity:0 and nothing waits
+ * on hydration or on scrolling (the hero is scroll-LINKED CSS, see ArticleHero.astro).
+ */
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import ArticleHero from '@/components/ArticleHero.astro';
+import HeHint from '@/components/HeHint.astro';
+import OneRepMax from '@/components/OneRepMax.astro';
+import WaveText from '@/components/ui/wave-text';
+import WaveObserver from '@/components/WaveObserver.astro';
+import { articleUrl, blogCopy, BLOG_HERO_BG, docArticles, formatDate, languagesOf, type DocArticle } from '@/lib/blog';
+import { urlFor } from '@/lib/legal';
+import { DOMAIN, type Lang } from '@/lib/source';
+import { renderInline } from '@/lib/article/inline.mjs';
+import { readTimeOf } from '@/lib/article/validate.mjs';
+import { articleJsonLd, absolute, isoJerusalem } from '@/lib/article/seo';
+import { appStoreId, campaignUrl } from '@/lib/appStore';
+import { SUPPORT_EMAIL } from '../copy.mjs';
+
+interface Props {
+  article: DocArticle;
+}
+
+const { data: a } = Astro.props.article;
+const lang = a.lang as Lang;
+const he = lang === 'he';
+const t = blogCopy(lang);
+const c = (t as any).article;
+const date = (d: string) => formatDate(lang, new Date(`${d}T00:00:00Z`));
+
+// References are numbered in list order; every marker gets a tap preview (native popover).
+const refNo = new Map(a.references.map((r, i) => [r.id, i + 1]));
+const inl = (text: string) =>
+  renderInline(text, { lang, refNumber: (id: string) => refNo.get(id), refPopoverId: (id: string) => `refpop-${id}`, sourceLabel: c.source });
+
+const calc = a.calculator;
+const gy = a.gymon;
+const readTime = readTimeOf(a);
+
+const url = `https://${DOMAIN}${articleUrl(lang, a.slug)}`;
+const langs = await languagesOf(a.slug);
+const other: Lang = he ? 'en' : 'he';
+const otherHref = langs.includes(other) ? articleUrl(other, a.slug) : urlFor(other, 'blog');
+const heHint = !he && langs.includes('he') ? articleUrl('he', a.slug) : null;
+
+// Related: other articles in this language sharing the pillar or a tag (never samples next to real ones).
+const related = (await docArticles(lang))
+  .filter((x) => x.data.slug !== a.slug && !!x.data.sample === !!a.sample)
+  .map((x) => ({ x, score: (x.data.pillar === a.pillar ? 2 : 0) + x.data.tags.filter((tg) => a.tags.includes(tg)).length }))
+  .filter((r) => r.score > 0)
+  .sort((p, q) => q.score - p.score)
+  .slice(0, 3)
+  .map((r) => r.x.data);
+
+// Hebrew <title>: an RLM keeps "· Gymon" on the correct side of a Hebrew title.
+const pageTitle = he ? `${a.title}‏ · Gymon` : `${a.title} · Gymon`;
+const jsonLd = articleJsonLd(a, {
+  url,
+  blogUrl: `https://${DOMAIN}${urlFor(lang, 'blog')}`,
+  blogName: t.title,
+  editorName: c.editor.name,
+});
+const endHref = campaignUrl('blog-end');
+const slotText = c.ctaSlots[a.cta.slot];
+const logCols: string[] = c.gymon.cols;
+---
+<BlogLayout
+  lang={lang}
+  page={`blog/${a.slug}`}
+  title={pageTitle}
+  description={a.description}
+  langs={langs}
+  otherHref={otherHref}
+  noindex={!!a.sample}
+  mainClass="-mt-(--topbar-h)"
+>
+  <Fragment slot="head">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="Gymon">
+    <meta property="og:title" content={a.title}>
+    <meta property="og:description" content={a.description}>
+    <meta property="og:url" content={url}>
+    <meta property="og:image" content={absolute(a.image)}>
+    <meta property="og:image:alt" content={a.imageAlt}>
+    <meta property="og:locale" content={he ? 'he_IL' : 'en_US'}>
+    {langs.includes(other) && <meta property="og:locale:alternate" content={he ? 'en_US' : 'he_IL'}>}
+    <meta property="article:published_time" content={isoJerusalem(a.createdAt)}>
+    <meta property="article:modified_time" content={isoJerusalem(a.updatedAt ?? a.createdAt)}>
+    <meta name="twitter:card" content="summary_large_image">
+    {appStoreId && <meta name="apple-itunes-app" content={`app-id=${appStoreId}, app-argument=${url}`}>}
+    {jsonLd.map((j) => <script type="application/ld+json" set:html={j}></script>)}
+  </Fragment>
+
+  {heHint && <HeHint href={heHint} />}
+  {/* Restored 2026-10-07 (user decision): the scroll-linked hero stays on every article. */}
+  <ArticleHero
+    image={a.image}
+    imageAlt={a.imageAlt}
+    bgImage={BLOG_HERO_BG}
+    heroTitle={a.heroTitle}
+    date={`${date(a.updatedAt ?? a.createdAt)} · ${t.readTime(readTime)}`}
+    scrollLabel={t.scrollToRead}
+  />
+
+  {/* v3 (user decision 2026-10-07, reference: Headspace articles): "it should feel like scrolling,
+      not reading". The first screen carries the title, a relatable hook and the takeaway. Then one
+      idea per screen: a plain headline that IS the point, 1–3 short lines. Effortful things (the
+      calculator, the sources) sit low and quiet. */}
+  <article class="doc doc3 mx-auto w-full max-w-2xl px-5 pt-8 sm:px-8">
+    {a.sample && <p class="doc-sample" role="note">{c.sampleBanner}</p>}
+
+    <header class="doc3-head">
+      {/* Wave on the title (user-supplied Text_03), CSS only: no client directive, zero JS. */}
+      <WaveText as="h1" headingClassName="doc3-h1" text={a.title} />
+      <WaveObserver />
+      <p class="doc3-hook" set:html={inl(a.hook)} />
+      <p class="doc3-takeaway">
+        <span class="doc3-takeaway-label">{c.inShort}</span>
+        <span set:html={inl(a.bottomLine)} />
+      </p>
+      <p class="doc-trust doc3-meta">
+        <span>{c.drafted}</span>
+        <span aria-hidden="true"> · </span>
+        <span>{a.reviewedAt ? c.reviewed(c.editor.name, date(a.reviewedAt)) : c.notReviewed}</span>
+        <span aria-hidden="true"> · </span>
+        <span><time datetime={a.createdAt}>{c.published(date(a.createdAt))}</time></span>
+        {a.updatedAt && (
+          <Fragment><span aria-hidden="true"> · </span><span><time datetime={a.updatedAt}>{c.updated(date(a.updatedAt))}</time></span></Fragment>
+        )}
+        <span aria-hidden="true"> · </span>
+        <span>{t.readTime(readTime)}</span>
+      </p>
+    </header>
+
+    {a.beats.map((beat, i) => (
+      <section class="doc3-beat" aria-labelledby={`beat-${i + 1}`}>
+        <h2 id={`beat-${i + 1}`} class="doc3-beat-h" set:html={inl(beat.heading)} />
+        <p class="doc3-beat-p" set:html={inl(beat.text)} />
+      </section>
+    ))}
+
+    {a.pullQuote && (
+      <figure class="doc3-quote">
+        {a.pullQuote.lead && <p class="doc3-quote-lead" set:html={inl(a.pullQuote.lead)} />}
+        {/* No typed quote marks: in RTL they land on the wrong side. The rule and size mark it. */}
+        <blockquote lang={he ? 'he' : 'en'}><p>{a.pullQuote.text}</p></blockquote>
+        <figcaption><bdi dir={he ? 'rtl' : 'ltr'}>{a.pullQuote.attribution}</bdi><span set:html={inl(`[[${a.pullQuote.ref}]]`)} /></figcaption>
+      </figure>
+    )}
+
+    <section class="doc3-tips" aria-labelledby="tips-h">
+      <h2 id="tips-h" class="doc3-beat-h">{a.tips.heading}</h2>
+      <ol>
+        {a.tips.items.map((tip) => <li set:html={inl(tip)} />)}
+      </ol>
+    </section>
+
+    {(calc || gy) && (
+      <div class="doc3-extras">
+        {calc && <OneRepMax lang={lang} defaults={calc.defaults} uid="orm-extra" />}
+        {gy && gy.kind === 'log-example' && (
+          <figure class="doc-gymon">
+            <p class="doc-gymon-label">{c.gymon['log-example']}</p>
+            <p class="doc-gymon-caption" set:html={inl(gy.caption)} />
+            <div class="doc-table-scroll" tabindex="0" role="region" aria-label={gy.caption}>
+              <table class="doc-log">
+                <caption class="sr-only">{gy.exercise}</caption>
+                {gy.sessions.map((ses) => (
+                  <tbody>
+                    <tr class="doc-log-session"><th colspan="5" scope="colgroup">{gy.exercise} · {ses.label}</th></tr>
+                    <tr>{logCols.map((col) => <th scope="col">{col}</th>)}</tr>
+                    {ses.sets.map((st, si) => (
+                      <tr>
+                        <td>{si + 1}</td>
+                        <td class="doc-log-prev"><span dir="ltr">{st.previous ? `${st.previous.kg} × ${st.previous.reps}` : '—'}</span></td>
+                        <td>{st.kg}</td>
+                        <td>{st.reps}</td>
+                        <td aria-label="✓">✓</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
+              </table>
+            </div>
+            {gy.text && <p set:html={inl(gy.text)} />}
+            <p class="doc-gymon-note">{c.gymon.illustrative}</p>
+          </figure>
+        )}
+        {gy && gy.kind !== 'log-example' && (
+          <aside class="doc-gymon">
+            <p class="doc-gymon-label">{c.gymon[gy.kind]}</p>
+            {gy.heading && <p class="doc-gymon-heading" set:html={inl(gy.heading)} />}
+            <p set:html={inl(gy.text)} />
+            {gy.points && gy.points.length > 0 && <ul>{gy.points.map((pt) => <li set:html={inl(pt)} />)}</ul>}
+          </aside>
+        )}
+      </div>
+    )}
+
+    {/* The one end-of-article CTA. Text link, not a second badge: the header already carries the
+        official App Store badge, and Apple allows one badge per layout. */}
+    <aside class="doc-cta-end" aria-labelledby="cta-end">
+      <h2 id="cta-end">{c.endCta.heading}</h2>
+      <p>{slotText}</p>
+      <p class="doc-cta-meta">
+        {endHref ? <a href={endHref} rel="noopener">{c.endCta.link}</a> : <span>{c.endCta.iphone} {c.endCta.soon}</span>}
+        <span> {c.endCta.android}</span>
+      </p>
+    </aside>
+
+    {/* Quiet by default: the study detail is one tap away, never in the reader's path. */}
+    <details id="sources" class="doc-sources doc3-sources">
+      <summary><span id="sources-h" class="doc3-sources-h">{c.sources}</span> <span class="doc3-sources-n">({a.references.length})</span> <span class="doc-sources-note">{c.sourcesNote}</span></summary>
+      <ol class="doc-refs">
+        {a.references.map((r) => (
+          <li id={`ref-${r.id}`}>
+            <bdi lang="en" dir="ltr" class="doc-ref-text">
+              {r.authors.length > 0 && <span>{r.authors.length > 3 ? `${r.authors[0]} et al.` : r.authors.join(', ')} </span>}
+              {r.year && <span>({r.year}). </span>}
+              <a href={r.url} rel="noopener">{r.title}</a>.
+              {r.venue && <span> {r.venue}.</span>}
+              {r.doi && <span> DOI <a href={`https://doi.org/${r.doi}`} rel="noopener">{r.doi}</a>.</span>}
+              {r.pmid && <span> PMID <a href={`https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/`} rel="noopener">{r.pmid}</a>.</span>}
+            </bdi>
+            <p class="doc-ref-finding"><strong>{c.found}:</strong> <span set:html={inl(r.finding)} /></p>
+            <span class="doc-ref-tags">
+              <span>{c.certainty}: {c.evidence[r.certainty]}</span>
+              <span>{c.type[r.type] ?? r.type}</span>
+              <span>{c.tier[r.tier]}</span>
+              {!r.fullTextRead && <span>{c.abstractOnly}</span>}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </details>
+
+    <section class="doc-editor" aria-labelledby="editor-h">
+      <h2 id="editor-h" class="doc-label">{c.editor.heading}</h2>
+      <p>{c.editor.bio}</p>
+    </section>
+
+    <footer class="doc-made">
+      <p>{a.sample ? c.howMadeSample : c.howMade}<a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></p>
+      {a.imageAiGenerated && <p>{c.aiImage}</p>}
+      <p>{t.disclaimer}</p>
+    </footer>
+
+    {related.length > 0 && (
+      <nav class="doc-related" aria-label={t.back}>
+        <ul>{related.map((r) => <li><a href={articleUrl(lang, r.slug)}>{r.title}</a></li>)}</ul>
+      </nav>
+    )}
+
+    <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground mt-6 inline-flex min-h-11 items-center gap-1 text-sm">
+      <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
+    </a>
+  </article>
+
+  {/* Reference previews: transient, tap-to-open (UX doctrine §6). Native popover, no JS. */}
+  {a.references.map((r) => (
+    <div id={`refpop-${r.id}`} popover class="doc-pop" lang={lang} dir={he ? 'rtl' : 'ltr'}>
+      <p class="doc-pop-head">{c.source} {refNo.get(r.id)}</p>
+      <p><bdi lang="en" dir="ltr">{r.authors.length > 3 ? `${r.authors[0]} et al.` : r.authors.join(', ')}{r.year ? ` (${r.year})` : ''}. {r.title}</bdi></p>
+      <blockquote lang="en" dir="ltr">“{r.quote}”</blockquote>
+      <p class="doc-pop-links">
+        <a href={r.url} rel="noopener">{c.openSource}</a>
+        <button type="button" popovertarget={`refpop-${r.id}`} popovertargetaction="hide">{c.close}</button>
+      </p>
+    </div>
+  ))}
+</BlogLayout>

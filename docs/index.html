@@ -1,43 +1,472 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gymon</title>
 <meta name="source-commit" content="9269db1f">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="light">
+<meta name="description" content="Gymon is an app for tracking personal workouts.">
+
+
+
 <link rel="icon" href="data:,">
 <link rel="canonical" href="https://gymon.app/">
-<link rel="alternate" hreflang="en" href="https://gymon.app/">
-<link rel="alternate" hreflang="he" href="https://gymon.app/he/">
+<link rel="alternate" hreflang="en" href="https://gymon.app/"><link rel="alternate" hreflang="he" href="https://gymon.app/he/">
 <link rel="alternate" hreflang="x-default" href="https://gymon.app/">
 <script>try{var s=localStorage.getItem('lang');if(s==='he'||(!s&&/^(he|iw)\b/i.test(navigator.language||'')))location.replace('/he'+location.pathname.replace(/\/$/,'')+location.hash)}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Epilogue:wght@400;600;700&display=swap">
-<link rel="stylesheet" href="/style.css">
-</head>
-<body>
+
+<link rel="stylesheet" href="/_astro/utils.DZqCyz47.css"></head>
+<body class="min-h-dvh">
+<div class="topbar topbar--wide">
 <header class="top">
 <a class="brand" href="/">Gymon</a>
+<div class="top-actions">
+<a class="top-link" href="/pricing">Pricing</a>
 <a class="lang" href="/he/" hreflang="he" lang="he" onclick="try{localStorage.setItem('lang','he')}catch(e){}">עברית</a>
-</header>
-<main>
-<div class="home">
-<h1>Gymon</h1>
-<p class="tagline">Gymon is an app for tracking personal workouts.</p>
-<ul class="links">
-<li><a href="/privacy">Privacy Policy</a></li>
-<li><a href="/terms">Terms of Use</a></li>
-<li><a href="/support">Support</a></li>
-</ul>
+<a class="app-store-badge" href="https://apps.apple.com/us/app/gymon-%D7%9E%D7%A2%D7%A7%D7%91-%D7%90%D7%99%D7%9E%D7%95%D7%A0%D7%99%D7%9D/id6817270194" rel="noopener"><img src="/badges/app-store-en-us.svg" alt="Download on the App Store" width="120" height="40" style="height:40px;width:auto;display:block"/></a>
+<span class="play-soon play-soon--bar" aria-disabled="true" aria-label="Google Play · Coming soon"><span class="play-soon-name" aria-hidden="true">Google Play</span><span class="play-soon-note" aria-hidden="true">Coming soon</span></span>
 </div>
+</header>
+</div>
+
+<main class="relative pb-10">
+
+  <div class="home-v2">
+    
+    <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();</script><script>(()=>{var g=Object.defineProperty;var w=(a,s,c)=>s in a?g(a,s,{enumerable:!0,configurable:!0,writable:!0,value:c}):a[s]=c;var l=(a,s,c)=>w(a,typeof s!="symbol"?s+"":s,c);var E=new Set(["__proto__","constructor","prototype"]);{let a={0:t=>y(t),1:t=>c(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(c(t)),5:t=>new Set(c(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>Number.POSITIVE_INFINITY*t},s=t=>{let[p,e]=t;return p in a?a[p](e):void 0},c=t=>t.map(s),y=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([p,e])=>[p,s(e)]));class f extends HTMLElement{constructor(){super(...arguments);l(this,"Component");l(this,"hydrator");l(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let r=this.querySelectorAll("astro-slot"),n={},d=this.querySelectorAll("template[data-astro-template]");for(let o of d){let i=o.closest(this.tagName);i!=null&&i.isSameNode(this)&&(n[o.getAttribute("data-astro-template")||"default"]=o.innerHTML,o.remove())}for(let o of r){let i=o.closest(this.tagName);i!=null&&i.isSameNode(this)&&(n[o.getAttribute("name")||"default"]=o.innerHTML)}let u;try{u=this.hasAttribute("props")?y(JSON.parse(this.getAttribute("props"))):{}}catch(o){let i=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(i+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${i}`,this.getAttribute("props"),o),o}let h;await this.hydrator(this)(this.Component,u,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});l(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),r.disconnect(),this.childrenConnectedCallback()},r=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});r.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}getRetryImportUrl(e){let r=new URL(e,document.baseURI);return r.searchParams.set("astro-retry",Date.now().toString()),r.toString()}async importWithRetry(e){try{return await import(e)}catch(r){return await new Promise(n=>setTimeout(n,1e3)),import(this.getRetryImportUrl(e))}}handleHydrationError(e){let r=this.getAttribute("component-url"),n=new CustomEvent("astro:hydration-error",{cancelable:!0,bubbles:!0,composed:!0,detail:{error:e,componentUrl:r}});this.dispatchEvent(n)&&console.error(`[astro-island] Error hydrating ${r}`,e)}async start(){let e=JSON.parse(this.getAttribute("opts")),r=this.getAttribute("client");if(Astro[r]===void 0){window.addEventListener(`astro:${r}`,()=>this.start(),{once:!0});return}try{await Astro[r](async()=>{let n=this.getAttribute("renderer-url");try{let[d,{default:u}]=await Promise.all([this.importWithRetry(this.getAttribute("component-url")),n?this.importWithRetry(n):Promise.resolve({default:()=>()=>{}})]),h=this.getAttribute("component-export")||"default";if(h.includes(".")){this.Component=d;for(let m of h.split(".")){if(E.has(m)||!this.Component||typeof this.Component!="object"&&typeof this.Component!="function"||!Object.hasOwn(this.Component,m))throw new Error(`Invalid component export path: ${h}`);this.Component=this.Component[m]}}else{if(E.has(h))throw new Error(`Invalid component export path: ${h}`);this.Component=d[h]}return this.hydrator=u,this.hydrate}catch(d){return this.handleHydrationError(d),()=>{}}},e,this)}catch(n){this.handleHydrationError(n)}}attributeChangedCallback(){this.hydrate()}}l(f,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",f)}})();</script><astro-island uid="1nhqWH" prefix="r3" component-url="/_astro/cinematic-hero.xeiU3MJ1.js" component-export="default" renderer-url="/_astro/client.RMePetAg.js" props="{&quot;lang&quot;:[0,&quot;en&quot;],&quot;brandName&quot;:[0,&quot;Gymon&quot;],&quot;tagline1&quot;:[0,&quot;Gymon&quot;],&quot;tagline2&quot;:[0,&quot;Every set, logged.&quot;],&quot;cardHeading&quot;:[0,&quot;A personal plan, a log and an AI coach.&quot;],&quot;cardDescription&quot;:[0,&quot;Gymon is an app for tracking personal workouts.&quot;],&quot;screenSrc&quot;:[0,&quot;/app/screen-home-en.webp&quot;],&quot;screenAlt&quot;:[0,&quot;The Gymon app&#39;s home screen: this week&#39;s workouts and today&#39;s steps.&quot;],&quot;badges&quot;:[1,[[0,{&quot;icon&quot;:[0,&quot;⏱️&quot;],&quot;title&quot;:[0,&quot;Rest timer&quot;],&quot;subtitle&quot;:[0,&quot;1:30&quot;]}],[0,{&quot;icon&quot;:[0,&quot;✅&quot;],&quot;title&quot;:[0,&quot;Set 3 done&quot;],&quot;subtitle&quot;:[0,&quot;40 kg × 6 reps&quot;]}]]],&quot;ctaHeading&quot;:[0,&quot;Now on iPhone&quot;],&quot;ctaDescription&quot;:[0,&quot;Start with 14 days free, then monthly or yearly.&quot;],&quot;ctaLink&quot;:[0,{&quot;href&quot;:[0,&quot;/pricing&quot;],&quot;label&quot;:[0,&quot;See pricing&quot;]}],&quot;appStoreHref&quot;:[0,&quot;https://apps.apple.com/us/app/gymon-%D7%9E%D7%A2%D7%A7%D7%91-%D7%90%D7%99%D7%9E%D7%95%D7%A0%D7%99%D7%9D/id6817270194&quot;],&quot;playSoon&quot;:[0,{&quot;name&quot;:[0,&quot;Google Play&quot;],&quot;soon&quot;:[0,&quot;Coming soon&quot;]}]}" ssr client="load" opts="{&quot;name&quot;:&quot;CinematicHero&quot;,&quot;value&quot;:true}" await-children><section aria-label="Gymon" class="cine relative flex h-[calc(100svh-var(--topbar-h))] w-full items-center justify-center overflow-hidden bg-white" style="perspective:1500px"><style>
+  .cine .gsap-reveal { visibility: hidden; }
+  .cine .film-grain { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; opacity: 0.05; mix-blend-mode: overlay;
+      background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)"/></svg>'); }
+  .cine .bg-grid-theme { background-size: 60px 60px;
+      background-image: linear-gradient(to right, color-mix(in srgb, var(--color-foreground) 5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-foreground) 5%, transparent) 1px, transparent 1px);
+      mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%); -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 70%); }
+  .cine .text-3d-matte { color: var(--color-foreground); text-shadow: 0 10px 30px color-mix(in srgb, var(--color-foreground) 20%, transparent), 0 2px 4px color-mix(in srgb, var(--color-foreground) 10%, transparent); }
+  .cine .text-silver-matte { background: linear-gradient(180deg, var(--color-foreground) 0%, color-mix(in srgb, var(--color-foreground) 55%, transparent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0);
+      filter: drop-shadow(0px 10px 20px color-mix(in srgb, var(--color-foreground) 15%, transparent)) drop-shadow(0px 2px 4px color-mix(in srgb, var(--color-foreground) 10%, transparent)); }
+  .cine .text-card-silver-matte { background: linear-gradient(180deg, #FFFFFF 0%, #A1A1AA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transform: translateZ(0);
+      filter: drop-shadow(0px 12px 24px rgba(0,0,0,0.8)) drop-shadow(0px 4px 8px rgba(0,0,0,0.6)); }
+  .cine .premium-depth-card { background: linear-gradient(145deg, #16252c 0%, #0B1115 55%, #05080a 100%);
+      box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6), 0 20px 40px -20px rgba(0, 0, 0, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.2), inset 0 -2px 4px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.04); position: relative; }
+  .cine .card-sheen { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 50;
+      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(63,198,220,0.08) 0%, transparent 40%); mix-blend-mode: screen; transition: opacity 0.3s ease; }
+  .cine .iphone-bezel { background-color: #111; box-shadow: inset 0 0 0 2px #52525B, inset 0 0 0 7px #000, 0 40px 80px -15px rgba(0,0,0,0.9), 0 15px 25px -5px rgba(0,0,0,0.7); transform-style: preserve-3d; }
+  .cine .hardware-btn { background: linear-gradient(90deg, #404040 0%, #171717 100%); box-shadow: -2px 0 5px rgba(0,0,0,0.8), inset -1px 0 1px rgba(255,255,255,0.15), inset 1px 0 2px rgba(0,0,0,0.8); border-left: 1px solid rgba(255,255,255,0.05); }
+  .cine .screen-glare { background: linear-gradient(110deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 45%); }
+  .cine .floating-ui-badge { background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255,255,255,0.2), inset 0 -1px 1px rgba(0,0,0,0.5); }
+  .cine .main-card { transform: translateY(calc(100svh + 200px)); }
+@media (prefers-reduced-motion: reduce) {
+  .cine { height: auto !important; display: block !important; padding: 32px 16px 48px; overflow: visible !important; }
+  .cine .gsap-reveal { visibility: visible !important; opacity: 1 !important; filter: none !important; transform: none !important; clip-path: none !important; }
+  .cine .hero-text-wrapper, .cine .cta-wrapper, .cine .cine-fg { position: static !important; inset: auto !important; transform: none !important; }
+  .cine .cine-fg { display: block !important; margin-block: 32px; }
+  .cine .main-card { transform: none !important; width: 100% !important; height: auto !important; min-height: 0; padding-block: 32px; }
+  .cine .cta-wrapper { margin-top: 32px; }
+  .cine .film-grain, .cine .bg-grid-theme { display: none; }
+}</style><noscript><style>
+  .cine { height: auto !important; display: block !important; padding: 32px 16px 48px; overflow: visible !important; }
+  .cine .gsap-reveal { visibility: visible !important; opacity: 1 !important; filter: none !important; transform: none !important; clip-path: none !important; }
+  .cine .hero-text-wrapper, .cine .cta-wrapper, .cine .cine-fg { position: static !important; inset: auto !important; transform: none !important; }
+  .cine .cine-fg { display: block !important; margin-block: 32px; }
+  .cine .main-card { transform: none !important; width: 100% !important; height: auto !important; min-height: 0; padding-block: 32px; }
+  .cine .cta-wrapper { margin-top: 32px; }
+  .cine .film-grain, .cine .bg-grid-theme { display: none; }
+</style></noscript><div class="film-grain" aria-hidden="true"></div><div class="bg-grid-theme pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="hero-text-wrapper absolute z-10 flex w-full flex-col items-center px-5 text-center"><h1 class="flex flex-col items-center leading-[0.95]"><span class="text-track gsap-reveal text-3d-matte text-6xl font-bold tracking-tight md:text-8xl lg:text-[7rem]">Gymon</span><span class="text-days gsap-reveal text-silver-matte mt-3 text-3xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">Every set, logged.</span></h1></div><div class="cta-wrapper gsap-reveal absolute z-10 flex w-full flex-col items-center px-5 text-center"><h2 class="text-silver-matte text-4xl font-bold tracking-tight md:text-6xl">Now on iPhone</h2><p class="text-muted-foreground mx-auto mt-4 max-w-md text-lg">Start with 14 days free, then monthly or yearly.</p><div class="mt-8 flex flex-wrap items-center justify-center gap-3"><a class="app-store-badge" href="https://apps.apple.com/us/app/gymon-%D7%9E%D7%A2%D7%A7%D7%91-%D7%90%D7%99%D7%9E%D7%95%D7%A0%D7%99%D7%9D/id6817270194" rel="noopener"><img src="/badges/app-store-en-us.svg" alt="Download on the App Store" width="144" height="48" style="height:48px;width:auto;display:block"/></a><span class="play-soon" aria-disabled="true" aria-label="Google Play · Coming soon"><span class="play-soon-name" aria-hidden="true">Google Play</span><span class="play-soon-note" aria-hidden="true">Coming soon</span></span></div><a href="/pricing" class="text-brand mt-5 text-sm font-semibold underline underline-offset-4">See pricing</a></div><div class="cine-fg pointer-events-none absolute inset-0 z-20 flex items-center justify-center"><div class="main-card premium-depth-card pointer-events-auto relative h-[92%] w-[92%] overflow-hidden rounded-[32px] md:h-[85%] md:w-[85%] md:rounded-[40px]"><div class="card-sheen" aria-hidden="true"></div><div class="relative z-10 flex h-full flex-col items-center justify-evenly gap-4 px-6 py-6 lg:grid lg:grid-cols-3 lg:gap-8 lg:px-14"><div class="card-right-text gsap-reveal order-1 text-center lg:order-3 lg:text-end"><p class="text-card-silver-matte text-6xl font-black tracking-tight uppercase md:text-[6rem] lg:text-[7rem]" aria-hidden="true">Gymon</p></div><div class="mockup-scroll-wrapper gsap-reveal order-2 flex justify-center" style="perspective:1200px"><div class="relative origin-center scale-[0.62] md:scale-[0.85] lg:scale-100" style="transform-style:preserve-3d"><div class="iphone-bezel relative h-[580px] w-[280px] rounded-[3rem]"><span class="hardware-btn absolute top-[110px] -start-[3px] h-[26px] w-[3px] rounded-s-sm" aria-hidden="true"></span><span class="hardware-btn absolute top-[150px] -start-[3px] h-[50px] w-[3px] rounded-s-sm" aria-hidden="true"></span><span class="hardware-btn absolute top-[210px] -start-[3px] h-[50px] w-[3px] rounded-s-sm" aria-hidden="true"></span><span class="hardware-btn absolute top-[170px] -end-[3px] h-[80px] w-[3px] rounded-e-sm" aria-hidden="true"></span><div class="absolute inset-[7px] overflow-hidden rounded-[2.5rem] bg-[#050914]"><img src="/app/screen-home-en.webp" alt="The Gymon app&#x27;s home screen: this week&#x27;s workouts and today&#x27;s steps." width="660" height="1434" class="h-full w-full object-cover object-top" decoding="async"/><div class="screen-glare pointer-events-none absolute inset-0" aria-hidden="true"></div><div class="absolute top-[5px] left-1/2 h-[28px] w-[100px] -translate-x-1/2 rounded-full bg-black" aria-hidden="true"></div></div></div><div class="floating-badge floating-ui-badge gsap-reveal absolute z-30 flex items-center gap-3 rounded-2xl px-4 py-3 text-start top-6 -start-[15px] lg:top-12 lg:-start-[80px]"><span class="text-xl" aria-hidden="true">⏱️</span><span class="flex flex-col"><span class="text-sm font-semibold whitespace-nowrap text-white">Rest timer</span><span class="text-xs whitespace-nowrap text-white/60">1:30</span></span></div><div class="floating-badge floating-ui-badge gsap-reveal absolute z-30 flex items-center gap-3 rounded-2xl px-4 py-3 text-start bottom-12 -end-[15px] lg:bottom-20 lg:-end-[80px]"><span class="text-xl" aria-hidden="true">✅</span><span class="flex flex-col"><span class="text-sm font-semibold whitespace-nowrap text-white">Set 3 done</span><span class="text-xs whitespace-nowrap text-white/60">40 kg × 6 reps</span></span></div></div></div><div class="card-left-text gsap-reveal order-3 max-w-md text-center lg:order-1 lg:text-start"><h2 class="text-2xl font-bold text-white md:text-3xl lg:text-4xl">A personal plan, a log and an AI coach.</h2><p class="mt-3 hidden text-base text-[#9fd8e3]/80 md:block lg:text-lg">Gymon is an app for tracking personal workouts.</p></div></div></div></div></section><!--astro:end--></astro-island>
+    
+    <script>(()=>{var a=(s,i,o)=>{let r=async()=>{await(await s())()},t=typeof i.value=="object"?i.value:void 0,c={rootMargin:t==null?void 0:t.rootMargin},n=new IntersectionObserver(e=>{for(let l of e)if(l.isIntersecting){n.disconnect(),r();break}},c);for(let e of o.children)n.observe(e)};(self.Astro||(self.Astro={})).visible=a;window.dispatchEvent(new Event("astro:visible"));})();</script><astro-island uid="Z20MHkp" prefix="r4" component-url="/_astro/zigzag-showcase.Bz4vAT7S.js" component-export="default" renderer-url="/_astro/client.RMePetAg.js" props="{&quot;rows&quot;:[1,[[0,{&quot;tag&quot;:[0,&quot;Workout log&quot;],&quot;title&quot;:[0,&quot;Log a set in seconds&quot;],&quot;text&quot;:[0,&quot;Weight and reps for each set, with last time&#39;s numbers already filled in. Mark a set as done and the rest timer starts.&quot;],&quot;alt&quot;:[0,&quot;The workout log in Gymon: sets with weight and reps, three marked done.&quot;],&quot;src&quot;:[0,&quot;/app/screen-logger-en.webp&quot;]}],[0,{&quot;tag&quot;:[0,&quot;Chat with Gymon&quot;],&quot;title&quot;:[0,&quot;Stuck? Ask Gymon&quot;],&quot;text&quot;:[0,&quot;Ask about a lift that won&#39;t budge and get practical ideas for the next workout.&quot;],&quot;alt&quot;:[0,&quot;A chat with Gymon about a bench press that has stalled.&quot;],&quot;src&quot;:[0,&quot;/app/screen-chat-en.webp&quot;]}],[0,{&quot;tag&quot;:[0,&quot;Your plan&quot;],&quot;title&quot;:[0,&quot;A week built around you&quot;],&quot;text&quot;:[0,&quot;Your goal, how often you train and where, turned into a typical week of workouts.&quot;],&quot;alt&quot;:[0,&quot;Gymon&#39;s plan overview: the goal, four sessions a week, and the week&#39;s workouts.&quot;],&quot;src&quot;:[0,&quot;/app/screen-plan-en.webp&quot;]}],[0,{&quot;tag&quot;:[0,&quot;Profile&quot;],&quot;title&quot;:[0,&quot;Steps and weight in one place&quot;],&quot;text&quot;:[0,&quot;Your weekly step average, the days you hit your step goal, and your weight against your target.&quot;],&quot;alt&quot;:[0,&quot;The Gymon profile: weekly step average, daily step goal and body weight against a goal.&quot;],&quot;src&quot;:[0,&quot;/app/screen-progress-en.webp&quot;]}],[0,{&quot;tag&quot;:[0,&quot;Workout summary&quot;],&quot;title&quot;:[0,&quot;Every workout, wrapped up&quot;],&quot;text&quot;:[0,&quot;When you finish: the time, the exercises completed, the total weight lifted and every set.&quot;],&quot;alt&quot;:[0,&quot;A Gymon workout summary: duration, exercises completed, total weight and sets.&quot;],&quot;src&quot;:[0,&quot;/app/screen-summary-en.webp&quot;]}]]]}" ssr client="visible" opts="{&quot;name&quot;:&quot;ZigzagShowcase&quot;,&quot;value&quot;:true}" await-children><section class="home-showcase mx-auto w-full max-w-[1280px] px-5 pb-10 md:px-12 md:pb-16 lg:px-20"><div class="showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 py-8 md:py-16"><div class="flex justify-center md:justify-start"><div style="perspective:1200px"><div style="transform-origin:50% 100%;transform:scale(0.92) rotateX(22deg)"><div class="relative mx-auto w-[13rem] sm:w-[15rem] md:w-[17rem]"><span aria-hidden="true" class="absolute -left-[2px] top-[16%] h-7 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -left-[2px] top-[24%] h-11 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -right-[2px] top-[22%] h-14 w-[3px] rounded-r-sm bg-muted-foreground/30"></span><div class="aspect-[9/19.5] rounded-[2.5rem] border border-border bg-muted p-[0.35rem] shadow-[0_10px_20px_rgba(0,0,0,0.18),0_40px_60px_-20px_rgba(0,0,0,0.35)]"><div class="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-background ring-1 ring-inset ring-border/70"><div aria-hidden="true" class="absolute left-1/2 top-2 z-10 h-[1.1rem] w-[4.25rem] -translate-x-1/2 rounded-full bg-black"></div><img src="/app/screen-logger-en.webp" alt="The workout log in Gymon: sets with weight and reps, three marked done." width="660" height="1434" loading="lazy" decoding="async" class="h-full w-full object-cover object-top"/></div></div></div></div></div></div><div class="w-full text-center md:max-w-[34rem] md:text-start md:justify-self-end"><p class="text-brand text-sm font-semibold">Workout log</p><h2 class="text-foreground mt-2 text-3xl leading-tight font-bold text-balance md:text-4xl">Log a set in seconds</h2><p class="text-muted-foreground mx-auto max-w-md leading-relaxed md:mx-0 md:max-w-none mt-3 text-lg">Weight and reps for each set, with last time&#x27;s numbers already filled in. Mark a set as done and the rest timer starts.</p></div></div><div class="showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 py-8 md:py-16"><div class="flex justify-center md:order-2 md:justify-end"><div style="perspective:1200px"><div style="transform-origin:50% 100%;transform:scale(0.92) rotateX(22deg)"><div class="relative mx-auto w-[13rem] sm:w-[15rem] md:w-[17rem]"><span aria-hidden="true" class="absolute -left-[2px] top-[16%] h-7 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -left-[2px] top-[24%] h-11 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -right-[2px] top-[22%] h-14 w-[3px] rounded-r-sm bg-muted-foreground/30"></span><div class="aspect-[9/19.5] rounded-[2.5rem] border border-border bg-muted p-[0.35rem] shadow-[0_10px_20px_rgba(0,0,0,0.18),0_40px_60px_-20px_rgba(0,0,0,0.35)]"><div class="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-background ring-1 ring-inset ring-border/70"><div aria-hidden="true" class="absolute left-1/2 top-2 z-10 h-[1.1rem] w-[4.25rem] -translate-x-1/2 rounded-full bg-black"></div><img src="/app/screen-chat-en.webp" alt="A chat with Gymon about a bench press that has stalled." width="660" height="1434" loading="lazy" decoding="async" class="h-full w-full object-cover object-top"/></div></div></div></div></div></div><div class="w-full text-center md:max-w-[34rem] md:text-start md:justify-self-start"><p class="text-brand text-sm font-semibold">Chat with Gymon</p><h2 class="text-foreground mt-2 text-3xl leading-tight font-bold text-balance md:text-4xl">Stuck? Ask Gymon</h2><p class="text-muted-foreground mx-auto max-w-md leading-relaxed md:mx-0 md:max-w-none mt-3 text-lg">Ask about a lift that won&#x27;t budge and get practical ideas for the next workout.</p></div></div><div class="showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 py-8 md:py-16"><div class="flex justify-center md:justify-start"><div style="perspective:1200px"><div style="transform-origin:50% 100%;transform:scale(0.92) rotateX(22deg)"><div class="relative mx-auto w-[13rem] sm:w-[15rem] md:w-[17rem]"><span aria-hidden="true" class="absolute -left-[2px] top-[16%] h-7 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -left-[2px] top-[24%] h-11 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -right-[2px] top-[22%] h-14 w-[3px] rounded-r-sm bg-muted-foreground/30"></span><div class="aspect-[9/19.5] rounded-[2.5rem] border border-border bg-muted p-[0.35rem] shadow-[0_10px_20px_rgba(0,0,0,0.18),0_40px_60px_-20px_rgba(0,0,0,0.35)]"><div class="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-background ring-1 ring-inset ring-border/70"><div aria-hidden="true" class="absolute left-1/2 top-2 z-10 h-[1.1rem] w-[4.25rem] -translate-x-1/2 rounded-full bg-black"></div><img src="/app/screen-plan-en.webp" alt="Gymon&#x27;s plan overview: the goal, four sessions a week, and the week&#x27;s workouts." width="660" height="1434" loading="lazy" decoding="async" class="h-full w-full object-cover object-top"/></div></div></div></div></div></div><div class="w-full text-center md:max-w-[34rem] md:text-start md:justify-self-end"><p class="text-brand text-sm font-semibold">Your plan</p><h2 class="text-foreground mt-2 text-3xl leading-tight font-bold text-balance md:text-4xl">A week built around you</h2><p class="text-muted-foreground mx-auto max-w-md leading-relaxed md:mx-0 md:max-w-none mt-3 text-lg">Your goal, how often you train and where, turned into a typical week of workouts.</p></div></div><div class="showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 py-8 md:py-16"><div class="flex justify-center md:order-2 md:justify-end"><div style="perspective:1200px"><div style="transform-origin:50% 100%;transform:scale(0.92) rotateX(22deg)"><div class="relative mx-auto w-[13rem] sm:w-[15rem] md:w-[17rem]"><span aria-hidden="true" class="absolute -left-[2px] top-[16%] h-7 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -left-[2px] top-[24%] h-11 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -right-[2px] top-[22%] h-14 w-[3px] rounded-r-sm bg-muted-foreground/30"></span><div class="aspect-[9/19.5] rounded-[2.5rem] border border-border bg-muted p-[0.35rem] shadow-[0_10px_20px_rgba(0,0,0,0.18),0_40px_60px_-20px_rgba(0,0,0,0.35)]"><div class="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-background ring-1 ring-inset ring-border/70"><div aria-hidden="true" class="absolute left-1/2 top-2 z-10 h-[1.1rem] w-[4.25rem] -translate-x-1/2 rounded-full bg-black"></div><img src="/app/screen-progress-en.webp" alt="The Gymon profile: weekly step average, daily step goal and body weight against a goal." width="660" height="1434" loading="lazy" decoding="async" class="h-full w-full object-cover object-top"/></div></div></div></div></div></div><div class="w-full text-center md:max-w-[34rem] md:text-start md:justify-self-start"><p class="text-brand text-sm font-semibold">Profile</p><h2 class="text-foreground mt-2 text-3xl leading-tight font-bold text-balance md:text-4xl">Steps and weight in one place</h2><p class="text-muted-foreground mx-auto max-w-md leading-relaxed md:mx-0 md:max-w-none mt-3 text-lg">Your weekly step average, the days you hit your step goal, and your weight against your target.</p></div></div><div class="showcase-row grid items-center gap-6 md:grid-cols-2 md:gap-x-24 lg:gap-x-32 py-8 md:py-16"><div class="flex justify-center md:justify-start"><div style="perspective:1200px"><div style="transform-origin:50% 100%;transform:scale(0.92) rotateX(22deg)"><div class="relative mx-auto w-[13rem] sm:w-[15rem] md:w-[17rem]"><span aria-hidden="true" class="absolute -left-[2px] top-[16%] h-7 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -left-[2px] top-[24%] h-11 w-[3px] rounded-l-sm bg-muted-foreground/30"></span><span aria-hidden="true" class="absolute -right-[2px] top-[22%] h-14 w-[3px] rounded-r-sm bg-muted-foreground/30"></span><div class="aspect-[9/19.5] rounded-[2.5rem] border border-border bg-muted p-[0.35rem] shadow-[0_10px_20px_rgba(0,0,0,0.18),0_40px_60px_-20px_rgba(0,0,0,0.35)]"><div class="relative h-full w-full overflow-hidden rounded-[2.2rem] bg-background ring-1 ring-inset ring-border/70"><div aria-hidden="true" class="absolute left-1/2 top-2 z-10 h-[1.1rem] w-[4.25rem] -translate-x-1/2 rounded-full bg-black"></div><img src="/app/screen-summary-en.webp" alt="A Gymon workout summary: duration, exercises completed, total weight and sets." width="660" height="1434" loading="lazy" decoding="async" class="h-full w-full object-cover object-top"/></div></div></div></div></div></div><div class="w-full text-center md:max-w-[34rem] md:text-start md:justify-self-end"><p class="text-brand text-sm font-semibold">Workout summary</p><h2 class="text-foreground mt-2 text-3xl leading-tight font-bold text-balance md:text-4xl">Every workout, wrapped up</h2><p class="text-muted-foreground mx-auto max-w-md leading-relaxed md:mx-0 md:max-w-none mt-3 text-lg">When you finish: the time, the exercises completed, the total weight lifted and every set.</p></div></div></section><!--astro:end--></astro-island>
+    <ul class="home-links mx-auto w-full max-w-md px-4">
+      <li><a href="/privacy">Privacy Policy</a></li><li><a href="/terms">Terms of Use</a></li><li><a href="/support">Support</a></li><li><a href="/pricing">Pricing</a></li>
+    </ul>
+    <section class="home-features text-foreground py-12 sm:py-20" aria-labelledby="features-h">
+  <div class="max-w-container mx-auto flex flex-col items-center gap-4 text-center sm:gap-10">
+    <div class="flex flex-col items-center gap-3 px-4 sm:gap-6">
+      <h2 id="features-h" class="max-w-[720px] text-3xl leading-tight font-bold text-balance sm:text-5xl">What&#39;s inside Gymon</h2>
+      <p class="text-muted-foreground max-w-[600px] text-base sm:text-lg">A quick look at what the app does.</p>
+    </div>
+
+    <div class="marquee group relative flex w-full flex-row overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]">
+      <div class="marquee-run flex shrink-0 flex-row justify-around [gap:var(--gap)] group-hover:[animation-play-state:paused]">
+          <article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 14h.01M12 14h.01M16 14h.01"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A plan built for you</h3>
+      <p class="text-muted-foreground text-sm">Short questionnaire</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Answer a few questions about your goal, experience, equipment and training days, and get a weekly plan with sets, reps and rest.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Last time&#39;s numbers, right there</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every set shows the weight and reps from the last run of the same workout, so the next small step is clear.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A rest timer that starts itself</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Mark a set as done and the rest timer starts. Timed exercises like running get a stopwatch instead.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Build a workout in a chat</h3>
+      <p class="text-muted-foreground text-sm">Chat with Gymon</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Say what you want to train, how much time you have and what to avoid, and Gymon builds the workout with you.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Your best set, per exercise</h3>
+      <p class="text-muted-foreground text-sm">History</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">See past sessions of each exercise, the best set in each, and how your volume moves over time.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Fully in Hebrew, right to left</h3>
+      <p class="text-muted-foreground text-sm">Language</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every screen works in Hebrew from right to left, and in English.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">How-to for every exercise</h3>
+      <p class="text-muted-foreground text-sm">Exercise library</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Each exercise in the library comes with instructions on how to do it, in Hebrew too.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Steps from Apple Health</h3>
+      <p class="text-muted-foreground text-sm">Optional</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">With your permission, Gymon reads steps and workouts from Health. It never writes to Health, and the data stays on your phone.</p>
+</article>
+        </div><div class="marquee-run flex shrink-0 flex-row justify-around [gap:var(--gap)] group-hover:[animation-play-state:paused]" aria-hidden="true">
+          <article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 14h.01M12 14h.01M16 14h.01"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A plan built for you</h3>
+      <p class="text-muted-foreground text-sm">Short questionnaire</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Answer a few questions about your goal, experience, equipment and training days, and get a weekly plan with sets, reps and rest.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Last time&#39;s numbers, right there</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every set shows the weight and reps from the last run of the same workout, so the next small step is clear.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A rest timer that starts itself</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Mark a set as done and the rest timer starts. Timed exercises like running get a stopwatch instead.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Build a workout in a chat</h3>
+      <p class="text-muted-foreground text-sm">Chat with Gymon</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Say what you want to train, how much time you have and what to avoid, and Gymon builds the workout with you.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Your best set, per exercise</h3>
+      <p class="text-muted-foreground text-sm">History</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">See past sessions of each exercise, the best set in each, and how your volume moves over time.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Fully in Hebrew, right to left</h3>
+      <p class="text-muted-foreground text-sm">Language</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every screen works in Hebrew from right to left, and in English.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">How-to for every exercise</h3>
+      <p class="text-muted-foreground text-sm">Exercise library</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Each exercise in the library comes with instructions on how to do it, in Hebrew too.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Steps from Apple Health</h3>
+      <p class="text-muted-foreground text-sm">Optional</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">With your permission, Gymon reads steps and workouts from Health. It never writes to Health, and the data stays on your phone.</p>
+</article>
+        </div><div class="marquee-run flex shrink-0 flex-row justify-around [gap:var(--gap)] group-hover:[animation-play-state:paused]" aria-hidden="true">
+          <article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 14h.01M12 14h.01M16 14h.01"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A plan built for you</h3>
+      <p class="text-muted-foreground text-sm">Short questionnaire</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Answer a few questions about your goal, experience, equipment and training days, and get a weekly plan with sets, reps and rest.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Last time&#39;s numbers, right there</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every set shows the weight and reps from the last run of the same workout, so the next small step is clear.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A rest timer that starts itself</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Mark a set as done and the rest timer starts. Timed exercises like running get a stopwatch instead.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Build a workout in a chat</h3>
+      <p class="text-muted-foreground text-sm">Chat with Gymon</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Say what you want to train, how much time you have and what to avoid, and Gymon builds the workout with you.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Your best set, per exercise</h3>
+      <p class="text-muted-foreground text-sm">History</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">See past sessions of each exercise, the best set in each, and how your volume moves over time.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Fully in Hebrew, right to left</h3>
+      <p class="text-muted-foreground text-sm">Language</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every screen works in Hebrew from right to left, and in English.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">How-to for every exercise</h3>
+      <p class="text-muted-foreground text-sm">Exercise library</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Each exercise in the library comes with instructions on how to do it, in Hebrew too.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Steps from Apple Health</h3>
+      <p class="text-muted-foreground text-sm">Optional</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">With your permission, Gymon reads steps and workouts from Health. It never writes to Health, and the data stays on your phone.</p>
+</article>
+        </div><div class="marquee-run flex shrink-0 flex-row justify-around [gap:var(--gap)] group-hover:[animation-play-state:paused]" aria-hidden="true">
+          <article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM8 14h.01M12 14h.01M16 14h.01"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A plan built for you</h3>
+      <p class="text-muted-foreground text-sm">Short questionnaire</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Answer a few questions about your goal, experience, equipment and training days, and get a weekly plan with sets, reps and rest.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Last time&#39;s numbers, right there</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every set shows the weight and reps from the last run of the same workout, so the next small step is clear.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4M12 14l3-3M12 22a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">A rest timer that starts itself</h3>
+      <p class="text-muted-foreground text-sm">Workout log</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Mark a set as done and the rest timer starts. Timed exercises like running get a stopwatch instead.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Build a workout in a chat</h3>
+      <p class="text-muted-foreground text-sm">Chat with Gymon</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Say what you want to train, how much time you have and what to avoid, and Gymon builds the workout with you.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 15l4-4 3 3 6-6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Your best set, per exercise</h3>
+      <p class="text-muted-foreground text-sm">History</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">See past sessions of each exercise, the best set in each, and how your volume moves over time.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8l6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Fully in Hebrew, right to left</h3>
+      <p class="text-muted-foreground text-sm">Language</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Every screen works in Hebrew from right to left, and in English.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14zM4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">How-to for every exercise</h3>
+      <p class="text-muted-foreground text-sm">Exercise library</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">Each exercise in the library comes with instructions on how to do it, in Hebrew too.</p>
+</article><article class="from-muted/50 to-muted/10 flex w-[17rem] max-w-[320px] shrink-0 flex-col rounded-lg border-t bg-gradient-to-b p-4 text-start sm:w-[20rem] sm:p-6">
+  <div class="flex items-center gap-3">
+    <span class="bg-card text-brand flex size-11 shrink-0 items-center justify-center rounded-full border" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"></path></svg>
+    </span>
+    <div class="flex flex-col items-start">
+      <h3 class="text-base leading-tight font-semibold">Steps from Apple Health</h3>
+      <p class="text-muted-foreground text-sm">Optional</p>
+    </div>
+  </div>
+  <p class="text-muted-foreground mt-4 text-sm leading-relaxed sm:text-base">With your permission, Gymon reads steps and workouts from Health. It never writes to Health, and the data stays on your phone.</p>
+</article>
+        </div>
+      <div class="marquee-fade pointer-events-none absolute inset-y-0 start-0 hidden w-1/3 bg-gradient-to-r from-white sm:block rtl:bg-gradient-to-l"></div>
+      <div class="marquee-fade pointer-events-none absolute inset-y-0 end-0 hidden w-1/3 bg-gradient-to-l from-white sm:block rtl:bg-gradient-to-r"></div>
+    </div>
+  </div>
+</section>
+  </div>
+
 </main>
+
 <footer>
 <nav><a href="/privacy">Privacy Policy</a>
 <a href="/terms">Terms of Use</a>
-<a href="/support">Support</a></nav>
+<a href="/support">Support</a>
+</nav>
 <p><a href="mailto:gymon.official@gmail.com">gymon.official@gmail.com</a></p>
+<span class="play-soon play-soon--footer" aria-disabled="true" aria-label="Google Play · Coming soon"><span class="play-soon-name" aria-hidden="true">Google Play</span><span class="play-soon-note" aria-hidden="true">Coming soon</span></span>
 </footer>
 </body>
 </html>

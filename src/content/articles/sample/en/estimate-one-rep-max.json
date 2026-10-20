@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 3,
+  "lang": "en",
+  "slug": "estimate-one-rep-max",
+  "pillar": "tools",
+  "tags": [
+    "one-rep-max",
+    "strength"
+  ],
+  "intent": "do",
+  "ymylLevel": "low",
+  "image": "/blog/mock/progressive-overload.svg",
+  "imageAiGenerated": false,
+  "createdAt": "2026-10-07",
+  "reviewedAt": null,
+  "editor": "osher-alon",
+  "aiAssisted": true,
+  "sample": true,
+  "lengthBand": "short",
+  "title": "How do you estimate your 1RM without maxing out?",
+  "heroTitle": "What's your one-rep max?",
+  "description": "One hard set of a few reps can estimate your one-rep max, no max attempt needed. How to do it, where it misleads, and how to track it.",
+  "primaryQuery": "1rm calculator",
+  "imageAlt": "Abstract rising steps in Gymon's blue-grey, a placeholder image for this sample article",
+  "hook": "Ever wondered what you could lift for a single rep? Good news: you don't have to find out the hard way.",
+  "bottomLine": "One heavy set of a few reps can estimate your max, close enough to track your progress.",
+  "beats": [
+    {
+      "heading": "A heavy set already knows your max",
+      "text": "Put the weight and the reps into a simple formula, and out comes an estimate [[r2]]. No spotter, no drama, no testing day."
+    },
+    {
+      "heading": "Light, long sets can flatter you",
+      "text": "People used to long sets squeeze out more reps at the same weight [[r1]]. In one small study, runners did about twice as many reps as lifters at 70% of their max [[r1]]."
+    },
+    {
+      "heading": "Heavier sets give steadier numbers",
+      "text": "The gap between people shrank as the weight went up [[r1]]. So pick a set that feels genuinely heavy, but still clean."
+    },
+    {
+      "heading": "Watch the trend, not the number",
+      "text": "One estimate can wobble with a good or a bad day. The same lift, logged the same way each week, tells you if you are getting stronger."
+    }
+  ],
+  "pullQuote": {
+    "ref": "r1",
+    "lead": "And one of the best-known formulas started life as…",
+    "text": "A poundage chart, not based on scientific research.",
+    "attribution": "Richens & Cleather (2014), on where the Epley formula came from"
+  },
+  "tips": {
+    "heading": "Try it this week",
+    "items": [
+      "Pick a lift you already do, like a squat or a bench press.",
+      "Warm up, then do one heavy set of a few reps, and stop before your form slips.",
+      "Pop the weight and reps into the calculator below.",
+      "Repeat in a few weeks: same lift, same depth, same rest."
+    ]
+  },
+  "calculator": {
+    "calculator": "one-rep-max",
+    "defaults": {
+      "weightKg": 80,
+      "reps": 5
+    }
+  },
+  "references": [
+    {
+      "id": "r1",
+      "title": "The relationship between the number of repetitions performed at given intensities is different in endurance and strength trained athletes",
+      "authors": [
+        "Richens B",
+        "Cleather DJ"
+      ],
+      "year": 2014,
+      "venue": "Biology of Sport 31(2):157–161",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4042664/",
+      "doi": "10.5604/20831862.1099047",
+      "pmid": "24899782",
+      "tier": "PRIMARY",
+      "type": "cross-sectional",
+      "fullTextRead": true,
+      "quote": "Eight weightlifters and eight endurance runners each completed a one repetition maximum test on the leg press and completed repetitions to fatigue at 90, 80 and 70% of their one repetition maximum. The endurance runners completed significantly more repetitions than the weightlifters at 70% (39.9 ± 17.6 versus 17.9 ± 2.8; p < 0.05) and 80% (19.8 ± 6.4 versus 11.8 ± 2.7; p < 0.05) of their one repetition maximum but not at 90% (10.8 ± 3.9 versus 7.0 ± 2.1; p > 0.05) of one repetition maximum. … Epley [ 8 ] A poundage chart, not based on scientific research.",
+      "finding": "Eight weightlifters and eight endurance runners lifted to failure at 70%, 80% and 90% of their leg-press max. Runners did far more reps at 70% (39.9 vs 17.9) and at 80%, but not at 90%.",
+      "certainty": "limited"
+    },
+    {
+      "id": "r2",
+      "title": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue",
+      "authors": [
+        "Brzycki M"
+      ],
+      "year": 1993,
+      "venue": "Journal of Physical Education, Recreation & Dance 64(1):88–90",
+      "url": "https://doi.org/10.1080/07303084.1993.10606684",
+      "doi": "10.1080/07303084.1993.10606684",
+      "tier": "PRIMARY",
+      "type": "other",
+      "fullTextRead": false,
+      "quote": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue",
+      "finding": "The 1993 paper that introduced Brzycki's formula for predicting a one-rep max from reps to fatigue. Only the title and listing were read, not the full text.",
+      "certainty": "limited"
+    }
+  ],
+  "cta": {
+    "slot": "log-sets"
+  }
+}

@@ -1,0 +1,1269 @@
+/*
+ * Tailwind v4 + shadcn-style tokens for the Tailwind pages (the blog).
+ * The original pages (home, privacy, terms, support, 404) do NOT load this —
+ * they keep `/style.css` (public/style.css) so their look does not change.
+ *
+ * Token values: the APP's light palette, copied from the app's code
+ * (gymon/app/src/screens/…), shared with public/style.css — keep in sync:
+ *   ground #e4EDF2 (StatementScreen LIGHT_GROUND) · cards #ffffff (LOG.card)
+ *   ink #0B1115 · muted #4B5A64 (questionnaire light text) · line #C8D6DA
+ *   links #2F5865 (blue-grey, ProjectionChart) · strong #1E3A44 (PrimaryButton ink)
+ *   highlight #3fc6dc (ACCENT, decorative only — 1.7:1, never for text)
+ * No saturated blue: the app rejected its old saturated blue on 2026-08-23 (groundTheme.ts).
+ */
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  /* Home marquee (testimonials-with-marquee adaptation): Tailwind v4 theme tokens instead of a
+     tailwind.config.js. `max-w-container` = 1280px. The animate token is in the @theme inline
+     block below: its value uses var(--duration), which only exists on the marquee element. */
+  --container-container: 1280px;
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(-100% - var(--gap))); }
+  }
+  --color-background: #e4EDF2;
+  --color-foreground: #0B1115;
+  --color-card: #ffffff;
+  --color-card-foreground: #0B1115;
+  /* image boxes: the app's brightest blue-grey stop (PlanPreviewScreen) */
+  --color-muted: #E9EFF1;
+  --color-muted-foreground: #4B5A64;
+  /* shadcn's `accent` is a subtle hover surface: a white card, like the app's. */
+  --color-accent: #ffffff;
+  --color-accent-foreground: #0B1115;
+  /* the app's primary buttons are black pills ("Next exercise", "Done") */
+  --color-primary: #0B1115;
+  --color-primary-foreground: #ffffff;
+  --color-border: #C8D6DA;
+  --color-ring: #2F5865;
+  --color-brand: #2F5865;
+  --color-brand-strong: #1E3A44;
+  --color-highlight: #3fc6dc;
+
+  --font-sans: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
+}
+
+/* `inline`: the utility gets the value itself, so var(--duration) resolves on the element
+   (a :root custom property holding var(--duration) would compute to nothing). */
+@theme inline {
+  --animate-marquee: marquee var(--duration) infinite linear;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    line-height: 1.65;
+  }
+  /* Hebrew: Epilogue has no Hebrew glyphs and the blog heading uses
+     `font-mono`, whose stack has none either — keep Assistant first. */
+  :lang(he) {
+    font-family: 'Assistant', 'Epilogue', system-ui, sans-serif;
+  }
+}
+
+/*
+ * Page chrome — a verbatim copy of the header/footer rules in public/style.css,
+ * so the blog's header and footer match the other pages exactly. Keep in sync.
+ */
+@layer components {
+  .top,
+  .chrome-main,
+  footer {
+    max-width: 720px;
+    margin: 0 auto;
+    padding-inline: 16px;
+  }
+  :root {
+    --topbar-h: 72px;
+  }
+  html {
+    scroll-padding-top: var(--topbar-h);
+  }
+  body {
+    padding-top: var(--topbar-h);
+  }
+  .topbar {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    background: rgba(228, 237, 242, 0.85); /* the ground, translucent */
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+  /* Tailwind pages: a white bar whose content lines up with the home showcase (max 1280px,
+     side padding 20 / 48 / 80px). The LegacyLayout pages keep the 720px bar (public/style.css). */
+  .topbar--wide {
+    background: #ffffff;
+  }
+  .topbar--wide .top {
+    max-width: 1280px;
+    padding-inline: 20px;
+  }
+  @media (min-width: 768px) {
+    .topbar--wide .top {
+      padding-inline: 48px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .topbar--wide .top {
+      padding-inline: 80px;
+    }
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    height: var(--topbar-h);
+  }
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .top-link {
+    color: var(--color-foreground);
+    font-size: 15px;
+    text-decoration: none;
+  }
+  .top-link:hover {
+    color: var(--color-brand-strong);
+  }
+  .top-link[aria-current='page'] {
+    font-weight: 600;
+  }
+  .app-store-badge {
+    display: block;
+    flex: none;
+  }
+  .app-store-badge[aria-disabled='true'] {
+    cursor: default;
+  }
+  @media (max-width: 400px) {
+    .top {
+      gap: 8px;
+    }
+    .top .lang {
+      padding-inline: 10px;
+    }
+  }
+  .brand {
+    color: var(--color-foreground);
+    font-weight: 700;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .lang {
+    color: var(--color-brand-strong);
+    font-size: 15px;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+  footer {
+    padding-block: 20px 32px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+  }
+  footer nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 8px;
+  }
+  footer a {
+    color: var(--color-muted-foreground);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  footer a:hover {
+    color: var(--color-brand-strong);
+  }
+  footer a[aria-current='page'] {
+    color: var(--color-foreground);
+  }
+}
+
+/* Article body: Tailwind Typography, recoloured to Gymon's palette.
+   In the utilities layer so it wins over the plugin's own values. Light: plain
+   `prose`, so the `--tw-prose-*` (not `-invert-`) variables are the ones read. */
+@layer utilities {
+  .prose-gymon {
+    --tw-prose-body: #1c1c1e; /* logger LOG.text */
+    --tw-prose-headings: var(--color-foreground);
+    --tw-prose-lead: var(--color-muted-foreground);
+    --tw-prose-links: var(--color-brand);
+    --tw-prose-bold: var(--color-foreground);
+    --tw-prose-counters: var(--color-muted-foreground);
+    --tw-prose-bullets: var(--color-brand);
+    --tw-prose-hr: var(--color-border);
+    --tw-prose-quotes: var(--color-foreground);
+    --tw-prose-quote-borders: var(--color-highlight);
+    --tw-prose-captions: var(--color-muted-foreground);
+    --tw-prose-code: var(--color-brand-strong);
+    --tw-prose-th-borders: var(--color-border);
+    --tw-prose-td-borders: var(--color-border);
+  }
+}
+
+/*
+ * Article hero (src/components/ArticleHero.astro) — scroll-LINKED, never
+ * scroll-blocking. Default = the static END state (also what Firefox stable,
+ * Safari < 26 and prefers-reduced-motion get). The motion is layered on top only
+ * where `animation-timeline: scroll()` exists and motion is allowed. Animates
+ * transform, opacity and clip-path only: no layout, no CLS, no JavaScript.
+ * Values carried over from the 21st.dev ScrollExpandMedia it replaces:
+ * box 300×400 → min(1550px, 95vw) × min(800px, 85% of the area under the bar)
+ * (mobile: min(950px, 95vw) × min(600px, …)); title/date slide 150vw (mobile 180vw);
+ * shade black/70 × 0.85 → 0.2; background 1 → 0; text white + soft shadow.
+ */
+.ah {
+  --ah-w: min(1550px, 95vw);
+  --ah-h: min(800px, calc(0.85 * (100svh - var(--topbar-h))));
+  --ah-slide: 150vw;
+  --ah-run: 70svh; /* scroll distance the effect runs over */
+  position: relative;
+}
+@media (max-width: 767px) {
+  .ah {
+    --ah-w: min(950px, 95vw);
+    --ah-h: min(600px, calc(0.85 * (100svh - var(--topbar-h))));
+    --ah-slide: 180vw;
+    --ah-run: 40svh; /* shorter on mobile so the text arrives sooner */
+  }
+}
+.ah-stage {
+  position: relative;
+  overflow: clip;
+  padding-block: calc(var(--topbar-h) + 24px) 24px;
+}
+.ah-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0; /* end state: the site-wide background has faded out */
+}
+.ah-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.ah-bg-tint {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.1);
+}
+.ah-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: var(--ah-h);
+}
+.ah-box {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  width: var(--ah-w);
+  height: var(--ah-h);
+  translate: -50% -50%;
+  filter: drop-shadow(0 0 25px rgb(0 0 0 / 0.3));
+}
+[dir='rtl'] .ah-box {
+  translate: 50% -50%;
+}
+.ah-clip,
+.ah-box > .ah-img,
+.ah-box > .ah-shade {
+  position: absolute;
+  inset: 0;
+}
+.ah-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  clip-path: inset(0 round 1rem);
+}
+.ah-shade {
+  border-radius: 0.75rem;
+  background: rgb(0 0 0 / 0.7);
+  opacity: 0.2;
+  clip-path: inset(0 round 1rem);
+}
+.ah-title,
+.ah-meta {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 2px 14px rgb(0 0 0 / 0.5);
+}
+.ah-title {
+  gap: 1rem;
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 2.5rem;
+}
+@media (min-width: 768px) {
+  .ah-title { font-size: 3rem; line-height: 1; }
+}
+@media (min-width: 1024px) {
+  .ah-title { font-size: 3.75rem; line-height: 1; }
+}
+.ah-meta {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(50% + 200px + 1rem);
+}
+.ah-date { font-size: 1.5rem; line-height: 2rem; }
+.ah-scroll { font-weight: 500; }
+/* End state: the title and date have slid out of view. */
+.ah-slide-start { translate: calc(-1 * var(--ah-slide)) 0; }
+.ah-slide-end { translate: var(--ah-slide) 0; }
+
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ah {
+      height: calc(100svh + var(--ah-run));
+    }
+    .ah-stage {
+      position: sticky;
+      inset-block-start: 0;
+      height: 100svh;
+      display: grid;
+      align-content: center;
+      padding-block: var(--topbar-h) 0;
+    }
+    .ah-bg,
+    .ah-img,
+    .ah-shade,
+    .ah-slide-start,
+    .ah-slide-end {
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-duration: auto;
+      animation-timeline: scroll(root block);
+      animation-range: 0 var(--ah-run);
+    }
+    .ah-bg { animation-name: ah-bg; }
+    .ah-img { animation-name: ah-open; }
+    .ah-shade { animation-name: ah-open, ah-shade; }
+    .ah-slide-start { animation-name: ah-slide-start; }
+    .ah-slide-end { animation-name: ah-slide-end; }
+  }
+}
+@keyframes ah-bg {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+/* The box is laid out at its END size; the visible window opens from 300×400. */
+@keyframes ah-open {
+  from { clip-path: inset(calc(50% - 200px) calc(50% - 150px) round 1rem); }
+  to { clip-path: inset(0 round 1rem); }
+}
+@keyframes ah-shade {
+  from { opacity: 0.85; }
+  to { opacity: 0.2; }
+}
+@keyframes ah-slide-start {
+  from { translate: 0 0; }
+  to { translate: calc(-1 * var(--ah-slide)) 0; }
+}
+@keyframes ah-slide-end {
+  from { translate: 0 0; }
+  to { translate: var(--ah-slide) 0; }
+}
+
+/* Google Play "coming soon" pill — same rules as public/style.css. */
+@layer components {
+  .play-soon {
+    flex: none;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 40px;
+    padding-inline: 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-card);
+    color: var(--color-foreground);
+    line-height: 1.1;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .play-soon-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .play-soon-note {
+    font-size: 11px;
+    color: var(--color-muted-foreground);
+  }
+}
+/* Below 470px the pill moves from the bar to the footer (no room at 390px). */
+.play-soon--footer {
+  display: none;
+}
+@media (max-width: 469px) {
+  .play-soon--bar {
+    display: none;
+  }
+  .play-soon--footer {
+    display: inline-flex;
+    margin-top: 4px;
+  }
+}
+
+/* "Also in Hebrew" hint on English articles (ArticlePage.astro): fixed under the
+   header, so showing or dismissing it never moves the page. */
+@layer components {
+  .he-hint:not([hidden]) {
+    position: fixed;
+    inset-block-start: calc(var(--topbar-h) + 8px);
+    inset-inline: 16px;
+    z-index: 45;
+    max-width: 480px;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 6px 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-card);
+    box-shadow: 0 6px 20px -8px rgb(11 17 21 / 0.25);
+    font-family: 'Assistant', 'Epilogue', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--color-foreground);
+  }
+  .he-hint a {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    white-space: nowrap;
+  }
+  .he-hint button {
+    margin-inline-start: auto;
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 8px;
+    font-size: 20px;
+    line-height: 1;
+    color: var(--color-muted-foreground);
+  }
+  .he-hint button:hover {
+    background: var(--color-muted);
+    color: var(--color-foreground);
+  }
+}
+
+/*
+ * Doctrine article template (src/components/ArticleDoc.astro).
+ * Typography per ARTICLE_UX_DOCTRINE §2/§5: English body 17px, Hebrew body 18px / 1.75,
+ * no italics and no letter-spacing in Hebrew (emphasis by weight), Hebrew measure ≤ 42em,
+ * meta text ≥ 14px. Callout and quote borders use logical properties (mirror in RTL).
+ */
+@layer components {
+  .doc {
+    --doc-card: var(--color-card);
+  }
+  .doc:lang(he),
+  .doc:lang(he) * {
+    letter-spacing: normal;
+  }
+  .doc:lang(he) em,
+  .doc:lang(he) i {
+    font-style: normal;
+    font-weight: 600;
+  }
+  .doc-section,
+  .doc :target {
+    scroll-margin-top: calc(var(--topbar-h) + 16px);
+  }
+  .doc-sample {
+    margin-bottom: 20px;
+    padding: 10px 14px;
+    border: 1px dashed var(--color-brand);
+    border-radius: 10px;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .doc-trust {
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .doc-label {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--color-brand-strong);
+  }
+  .doc:lang(he) .doc-label {
+    text-transform: none;
+    font-size: 15px;
+  }
+  .doc-label--sub {
+    margin-top: 14px;
+  }
+  .doc-bottomline {
+    margin-top: 24px;
+    padding: 18px 20px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-brand);
+    border-radius: 12px;
+  }
+  .doc-tldr {
+    margin-top: 6px;
+    font-size: 19px;
+    line-height: 1.6;
+    font-weight: 600;
+  }
+  .doc:lang(he) .doc-tldr {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+  .doc-points {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: disc;
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .doc:lang(he) .doc-points {
+    font-size: 18px;
+    line-height: 1.7;
+  }
+  .doc-points li + li {
+    margin-top: 6px;
+  }
+  .doc-toc {
+    margin-top: 20px;
+    padding: 14px 20px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+  }
+  .doc-toc ol {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: decimal;
+    font-size: 16px;
+  }
+  .doc-toc li {
+    padding-block: 3px;
+  }
+  .doc-toc a,
+  .doc-related a,
+  .doc-sources a,
+  .doc-made a,
+  .doc-cta-inline a,
+  .doc-cta-end a {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .doc-body {
+    margin-top: 28px;
+  }
+  .doc-body .cite,
+  .doc .cite {
+    font-size: 0.72em;
+    margin-inline-start: 2px;
+    white-space: nowrap;
+  }
+  .cite-btn {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+    display: inline-block;
+    line-height: 1.2; /* preflight sets sup { line-height: 0 }, which collapsed the button to 0px */
+    padding: 2px 3px; /* inline target: exempt from WCAG 2.5.8's 24px minimum */
+  }
+  .doc-takeaway {
+    padding: 10px 14px;
+    background: var(--color-muted);
+    border-inline-start: 3px solid var(--color-highlight);
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .doc-claim,
+  .doc-callout,
+  .doc-gymon,
+  .doc-cta-inline {
+    margin-block: 1.5em;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: var(--doc-card);
+    border: 1px solid var(--color-border);
+  }
+  .doc-claim p,
+  .doc-callout p,
+  .doc-gymon p,
+  .doc-cta-inline p {
+    margin-top: 4px;
+  }
+  .doc-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+  }
+  .doc-badge--strong,
+  .doc-badge--moderate {
+    background: #d7e9ee;
+  }
+  .doc-callout {
+    border-inline-start: 4px solid var(--color-brand);
+  }
+  .doc-callout--safety {
+    border-inline-start-color: #8a5a00;
+  }
+  .doc-callout-label,
+  .doc-gymon-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-brand-strong);
+  }
+  .doc-gymon {
+    border-color: var(--color-brand);
+  }
+  .doc-gymon-caption,
+  .doc-gymon-heading {
+    font-weight: 600;
+  }
+  .doc-gymon ul {
+    margin-top: 6px;
+    padding-inline-start: 1.25em;
+    list-style: disc;
+  }
+  .doc-gymon-note {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-table {
+    margin-block: 1.5em;
+  }
+  .doc-table-scroll {
+    overflow-x: auto;
+    margin-top: 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--doc-card);
+  }
+  .doc-table table,
+  .doc-log {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  .doc-table caption {
+    caption-side: top;
+    padding: 10px 12px 4px;
+    text-align: start;
+    font-weight: 600;
+  }
+  .doc-table th,
+  .doc-table td,
+  .doc-log th,
+  .doc-log td {
+    padding: 8px 12px;
+    border-top: 1px solid var(--color-border);
+    text-align: start;
+    font-variant-numeric: tabular-nums;
+  }
+  .doc-log th[scope='col'] {
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+    font-weight: 700;
+  }
+  .doc-log-session th {
+    background: var(--color-muted);
+    font-weight: 700;
+  }
+  .doc-log-prev {
+    color: var(--color-muted-foreground);
+  }
+  .doc-quiz {
+    list-style: decimal;
+    padding-inline-start: 1.25em;
+  }
+  .doc-quiz > li + li {
+    margin-top: 18px;
+  }
+  .doc-quiz-q {
+    font-weight: 600;
+  }
+  .doc-quiz-options {
+    list-style: '○  ';
+    padding-inline-start: 1.25em;
+    margin-block: 6px;
+  }
+  .doc-quiz summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  .doc-cta-end {
+    margin-top: 36px;
+    padding: 20px;
+    border-radius: 14px;
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+  }
+  .doc-cta-end h2 {
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .doc-cta-end p {
+    margin-top: 6px;
+  }
+  .doc-cta-end a {
+    color: #fff;
+  }
+  .doc-cta-meta {
+    font-size: 15px;
+    opacity: 0.85;
+  }
+  /* v3 (user decision 2026-10-07, reference: Headspace articles): "feel like scrolling, not
+     reading". No boxes around the reading path: big plain headlines, short lines, a lot of air,
+     one calm accent. Body sizes keep the doctrine: English 18px, Hebrew 18px / 1.75. */
+  .doc3 {
+    --doc3-ink: #2a3338;
+    --doc3-soft: #5b6a73;
+    padding-bottom: 24px;
+  }
+  .doc3-head {
+    padding-top: 8px;
+  }
+  .doc3-h1 {
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .doc3:lang(he) .doc3-h1 {
+    font-size: 34px;
+    line-height: 1.25;
+    letter-spacing: normal;
+  }
+  .doc3-hook {
+    margin-top: 16px;
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--doc3-soft);
+  }
+  .doc3-takeaway {
+    margin-top: 22px;
+    font-size: 22px;
+    line-height: 1.45;
+    font-weight: 600;
+    color: var(--color-brand-strong);
+    text-wrap: pretty;
+  }
+  .doc3-takeaway-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-brand);
+  }
+  .doc3-meta {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+  .doc3-figure {
+    margin-top: 28px;
+  }
+  .doc3-figure img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 22px;
+    background: var(--color-muted);
+  }
+  .doc3-beat {
+    margin-top: 72px;
+  }
+  .doc3-beat-h {
+    font-size: 27px;
+    line-height: 1.22;
+    font-weight: 700;
+    color: var(--color-foreground);
+    text-wrap: balance;
+  }
+  .doc3-beat-p,
+  .doc3-tips li {
+    margin-top: 12px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--doc3-ink);
+  }
+  .doc3:lang(he) .doc3-beat-h {
+    line-height: 1.3;
+  }
+  .doc3:lang(he) .doc3-beat-p,
+  .doc3:lang(he) .doc3-tips li,
+  .doc3:lang(he) .doc3-hook {
+    font-size: 18px;
+    line-height: 1.75;
+  }
+  .doc3-quote {
+    margin-top: 72px;
+    padding-inline-start: 18px;
+    border-inline-start: 3px solid var(--color-highlight);
+  }
+  .doc3-quote-lead {
+    font-size: 17px;
+    color: var(--doc3-soft);
+  }
+  .doc3 .cite {
+    font-size: 0.62em;
+    margin-inline-start: 1px;
+  }
+  .doc3 .cite-btn {
+    text-decoration: none;
+    color: var(--doc3-soft);
+    padding: 2px 2px;
+  }
+  .doc3-quote blockquote p {
+    margin-top: 8px;
+    font-size: 25px;
+    line-height: 1.35;
+    font-weight: 600;
+    color: var(--color-brand-strong);
+  }
+  .doc3-quote figcaption {
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--doc3-soft);
+  }
+  .doc3-tips {
+    margin-top: 72px;
+  }
+  .doc3-tips ol {
+    margin-top: 6px;
+    counter-reset: tip;
+  }
+  .doc3-tips li {
+    position: relative;
+    padding-inline-start: 40px;
+    counter-increment: tip;
+  }
+  .doc3-tips li + li {
+    margin-top: 14px;
+  }
+  .doc3-tips li::before {
+    content: counter(tip);
+    position: absolute;
+    inset-inline-start: 0;
+    top: 1px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--color-muted);
+    color: var(--color-brand-strong);
+    font-size: 14px;
+    font-weight: 700;
+  }
+  /* Effortful things: low, and visually quiet. */
+  .doc3-extras {
+    margin-top: 56px;
+  }
+  .doc3 .calc,
+  .doc3 .doc-gymon {
+    border: 0;
+    box-shadow: none;
+    background: var(--color-muted); /* solid: a 70% tint vanished on the white article page */
+    border-radius: 20px;
+  }
+  .doc3 .doc-cta-end {
+    margin-top: 56px;
+    padding: 0;
+    background: none;
+    color: var(--color-foreground);
+    border-radius: 0;
+  }
+  .doc3 .doc-cta-end h2 {
+    font-size: 22px;
+  }
+  .doc3 .doc-cta-end p {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--doc3-ink);
+  }
+  .doc3 .doc-cta-end a {
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  .doc3 .doc-cta-meta {
+    opacity: 1;
+    color: var(--doc3-soft);
+  }
+  .doc3-sources {
+    margin-top: 48px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .doc3-sources summary {
+    position: relative;
+    cursor: pointer;
+    min-height: 44px;
+    padding-inline-end: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 6px;
+    list-style: none;
+    color: var(--doc3-soft);
+    font-size: 15px;
+  }
+  .doc3-sources summary::-webkit-details-marker {
+    display: none;
+  }
+  .doc3-sources summary::after {
+    content: '+';
+    position: absolute;
+    inset-inline-end: 4px;
+    top: 0;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--color-brand);
+  }
+  .doc3-sources[open] summary::after {
+    content: '−';
+  }
+  .doc3-sources-h {
+    font-weight: 700;
+    color: var(--color-foreground);
+  }
+  .doc3-sources .doc-sources-note {
+    margin: 0;
+    flex-basis: 100%;
+    font-size: 13px;
+  }
+  .doc3 .doc-editor {
+    margin-top: 28px;
+    padding: 0;
+    border: 0;
+    font-size: 15px;
+    color: var(--doc3-soft);
+  }
+  .doc-sources-note {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-ref-finding {
+    margin-top: 4px;
+  }
+  .doc-sources {
+    margin-top: 36px;
+  }
+  .doc-sources h2 {
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .doc-refs {
+    margin-top: 10px;
+    padding-inline-start: 1.5em;
+    list-style: decimal;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .doc-refs li + li {
+    margin-top: 10px;
+  }
+  .doc-ref-text {
+    unicode-bidi: isolate;
+  }
+  .doc-ref-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--color-muted-foreground);
+  }
+  .doc-ref-tags span {
+    padding: 1px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+  }
+  .doc-editor {
+    margin-top: 28px;
+    padding: 14px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    font-size: 16px;
+  }
+  .doc-editor p {
+    margin-top: 4px;
+  }
+  .doc-made {
+    margin-top: 24px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+    color: var(--color-muted-foreground);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .doc-made p + p {
+    margin-top: 8px;
+  }
+  .doc-related {
+    margin-top: 24px;
+  }
+  .doc-related li + li {
+    margin-top: 6px;
+  }
+  .doc-pop {
+    max-width: min(92vw, 520px);
+    margin: auto;
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 14px;
+    background: var(--color-card);
+    color: var(--color-foreground);
+    box-shadow: 0 20px 50px -20px rgb(11 17 21 / 0.45);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .doc-pop::backdrop {
+    background: rgb(11 17 21 / 0.25);
+  }
+  .doc-pop-head {
+    font-weight: 700;
+    color: var(--color-brand-strong);
+  }
+  .doc-pop blockquote {
+    margin: 10px 0;
+    padding-inline-start: 12px;
+    border-inline-start: 3px solid var(--color-highlight);
+    color: var(--color-muted-foreground);
+  }
+  .doc-pop-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .doc-pop-links a,
+  .doc-pop-links button {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+  }
+  /* 1RM calculator */
+  .calc {
+    margin-block: 1.5em;
+    padding: 16px;
+    border: 1px solid var(--color-brand);
+    border-radius: 14px;
+    background: var(--color-card);
+  }
+  .calc-title {
+    font-weight: 700;
+    font-size: 17px;
+  }
+  .calc-inputs {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  @media (min-width: 520px) {
+    .calc-inputs {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-flow: column;
+      grid-template-rows: auto auto;
+    }
+  }
+  .calc-inputs label {
+    font-size: 15px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-inputs input {
+    font-size: 17px; /* ≥16px: no iOS focus zoom */
+    min-height: 44px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-background);
+    width: 100%;
+  }
+  .calc-result {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--color-muted);
+  }
+  .calc-label {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc-sub,
+  .calc-note {
+    font-size: 14px;
+    color: var(--color-muted-foreground);
+  }
+  .calc-note {
+    margin-top: 8px;
+  }
+}
+
+/* Article body size: unlayered on purpose, so it wins over Tailwind Typography's `.prose`
+   font-size (which sits in the utilities layer). EN 17px; HE 18px / 1.75 (UX doctrine §5). */
+.doc .doc-body {
+  font-size: 17px;
+  line-height: 1.7;
+}
+.doc:lang(he) .doc-body {
+  font-size: 18px;
+  line-height: 1.75;
+  max-width: 42em;
+}
+.doc:lang(he) .doc-body :where(p, li) {
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+/* JSON article pages: plain white ground behind the article (user decision 2026-10-07: the
+   bluish site ground read as "ugly" there). Scoped by the template's .doc3 class, so the rest of
+   the site, the topbar and the hero itself are unchanged. */
+body:has(.doc3) {
+  background: #ffffff;
+}
+.doc3 .calc-inputs input {
+  background: #ffffff;
+}
+
+/* Home (/ and /he/): white ground and the four links, in the look of the original list
+   (white rows, thin border, 12px radius, bold). User decision 2026-10-07. */
+body:has(.home-v2),
+body:has(.pricing-page) {
+  background: #ffffff;
+}
+.home-links {
+  list-style: none;
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+.home-links li + li {
+  margin-top: 10px;
+}
+.home-links a {
+  display: block;
+  padding: 14px 16px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  color: var(--color-foreground);
+  font-weight: 600;
+  text-decoration: none;
+}
+.home-links a:hover {
+  border-color: var(--color-brand);
+}
+
+/* Home marquee: LTR moves left; in RTL the copies sit to the LEFT of the first one, so the loop
+   moves right instead (same distance, no jump at the seam). */
+.marquee-run {
+  animation: marquee var(--duration) infinite linear;
+}
+[dir='rtl'] .marquee-run {
+  animation-name: marquee-rtl;
+}
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100% + var(--gap))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-run,
+  [dir='rtl'] .marquee-run {
+    animation: none;
+  }
+  .marquee-run[aria-hidden='true'],
+  .marquee-fade {
+    display: none;
+  }
+  .marquee {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+  .marquee article {
+    scroll-snap-align: start;
+  }
+}
+
+/* Wave text (src/components/ui/wave-text.tsx): CSS version of the user-supplied Text_03.
+   cubic-bezier(.34,1.56,.64,1) overshoots like the source's spring (300/15). */
+.wave-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.wave-char {
+  display: inline-block;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wave-char {
+    transition: transform 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition-delay: calc(var(--i, 0) * 30ms);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .wave-text:hover .wave-char {
+      transform: translateY(-4px) scale(1.2);
+    }
+  }
+  .wave-text.wave-play .wave-char {
+    animation: wave-hop 760ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 30ms) both;
+  }
+}
+@keyframes wave-hop {
+  0% { transform: none; }
+  45% { transform: translateY(-4px) scale(1.2); }
+  100% { transform: none; }
+}

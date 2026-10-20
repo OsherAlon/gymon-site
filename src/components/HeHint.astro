@@ -1,0 +1,18 @@
+---
+/**
+ * "Also in Hebrew" bar on English articles that have a Hebrew version — instead of the
+ * device-language redirect the App Store pages use (Google: never redirect by guessed
+ * language). Fixed under the header (no layout shift); hidden unless the device is Hebrew.
+ */
+interface Props {
+  href: string;
+}
+const { href } = Astro.props;
+const script = `(function(){var el=document.getElementById('he-hint');if(!el)return;try{if(localStorage.getItem('heHintDismissed')==='1')return}catch(e){}if(!/^(he|iw)\\b/i.test(navigator.language||''))return;el.hidden=false;el.querySelector('button').addEventListener('click',function(){el.hidden=true;try{localStorage.setItem('heHintDismissed','1')}catch(e){}})})();`;
+---
+<div id="he-hint" class="he-hint" lang="he" dir="rtl" hidden>
+  <span>המאמר קיים גם בעברית</span>
+  <a href={href} hreflang="he">לקריאה בעברית</a>
+  <button type="button" aria-label="סגירה">×</button>
+</div>
+<script is:inline set:html={script}></script>

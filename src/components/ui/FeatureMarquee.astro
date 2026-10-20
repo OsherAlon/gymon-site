@@ -1,0 +1,43 @@
+---
+/**
+ * Home "what's inside" marquee — adapted from the user-supplied testimonials-with-marquee.tsx
+ * as static HTML + CSS (no hydration, no JS): title + description, a row of cards repeated 4×
+ * with `animate-marquee` (--duration 40s, --gap 1rem), paused on hover, edge fades.
+ *
+ * RTL: the row flows right-to-left, so the loop must move the other way (`.marquee-run`, with a
+ * [dir=rtl] keyframe in global.css). Fades use logical start/end and the page's white ground.
+ * Reduced motion: no animation, the first copy scrolls sideways by hand, the copies are hidden.
+ */
+import FeatureCard from '@/components/ui/FeatureCard.astro';
+
+interface Item {
+  icon: string;
+  title: string;
+  tag: string;
+  text: string;
+}
+interface Props {
+  title: string;
+  description: string;
+  items: Item[];
+}
+const { title, description, items } = Astro.props;
+---
+<section class="home-features text-foreground py-12 sm:py-20" aria-labelledby="features-h">
+  <div class="max-w-container mx-auto flex flex-col items-center gap-4 text-center sm:gap-10">
+    <div class="flex flex-col items-center gap-3 px-4 sm:gap-6">
+      <h2 id="features-h" class="max-w-[720px] text-3xl leading-tight font-bold text-balance sm:text-5xl">{title}</h2>
+      <p class="text-muted-foreground max-w-[600px] text-base sm:text-lg">{description}</p>
+    </div>
+
+    <div class="marquee group relative flex w-full flex-row overflow-hidden p-2 [--duration:40s] [--gap:1rem] [gap:var(--gap)]">
+      {[0, 1, 2, 3].map((copy) => (
+        <div class="marquee-run flex shrink-0 flex-row justify-around [gap:var(--gap)] group-hover:[animation-play-state:paused]" aria-hidden={copy > 0 ? 'true' : undefined}>
+          {items.map((it) => <FeatureCard {...it} />)}
+        </div>
+      ))}
+      <div class="marquee-fade pointer-events-none absolute inset-y-0 start-0 hidden w-1/3 bg-gradient-to-r from-white sm:block rtl:bg-gradient-to-l"></div>
+      <div class="marquee-fade pointer-events-none absolute inset-y-0 end-0 hidden w-1/3 bg-gradient-to-l from-white sm:block rtl:bg-gradient-to-r"></div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,108 @@
+{
+  "schemaVersion": 3,
+  "lang": "he",
+  "slug": "estimate-one-rep-max",
+  "pillar": "tools",
+  "tags": [
+    "one-rep-max",
+    "strength"
+  ],
+  "intent": "do",
+  "ymylLevel": "low",
+  "image": "/blog/mock/progressive-overload.svg",
+  "imageAiGenerated": false,
+  "createdAt": "2026-10-07",
+  "reviewedAt": null,
+  "editor": "osher-alon",
+  "aiAssisted": true,
+  "sample": true,
+  "lengthBand": "short",
+  "title": "איך מעריכים 1RM בלי לנסות להרים מקסימום?",
+  "heroTitle": "כמה מרימים בחזרה אחת?",
+  "description": "סט קשה אחד של כמה חזרות מספיק כדי להעריך חזרה מקסימלית בלי ניסיון מקסימום. למה ההערכה טובה, איפה היא מטעה ואיך מתעדים אותה.",
+  "primaryQuery": "מחשבון 1RM",
+  "imageAlt": "מדרגות עולות מופשטות בכחול-אפור של Gymon, תמונה זמנית למאמר הדוגמה",
+  "hook": "תהיתם פעם כמה הייתם מצליחים להרים בחזרה אחת? החדשות הטובות: לא צריך לגלות את זה בדרך הקשה.",
+  "bottomLine": "סט כבד אחד של כמה חזרות נותן הערכה של המקסימום, מספיק טובה כדי לעקוב אחרי ההתקדמות.",
+  "beats": [
+    {
+      "heading": "סט כבד כבר יודע מה המקסימום",
+      "text": "מכניסים משקל וחזרות לנוסחה פשוטה, ויוצאת הערכה [[r2]]. בלי שומר, בלי דרמה, בלי יום מבחן."
+    },
+    {
+      "heading": "סטים קלים וארוכים עלולים להחמיא",
+      "text": "מי שרגילים לסטים ארוכים מצליחים לבצע יותר חזרות באותו משקל [[r1]]. במחקר קטן אחד, רצים ביצעו בערך פי שניים חזרות ממרימי משקולות ב־70% מהמקסימום [[r1]]."
+    },
+    {
+      "heading": "סטים כבדים נותנים מספר יציב יותר",
+      "text": "הפער בין האנשים הצטמצם ככל שהמשקל עלה [[r1]]. לכן כדאי לבחור סט שמרגיש כבד באמת, אבל עדיין נקי."
+    },
+    {
+      "heading": "המגמה חשובה יותר מהמספר",
+      "text": "הערכה אחת יכולה לקפוץ בגלל יום טוב או רע. אותו תרגיל, שנרשם באותה צורה כל שבוע, מראה אם מתחזקים."
+    }
+  ],
+  "pullQuote": {
+    "ref": "r1",
+    "lead": "ואחת הנוסחאות המוכרות בכלל התחילה את דרכה בתור…",
+    "text": "טבלת משקלים, שלא מבוססת על מחקר מדעי.",
+    "attribution": "Richens ו־Cleather (2014), על המקור של נוסחת אפלי"
+  },
+  "tips": {
+    "heading": "לנסות השבוע",
+    "items": [
+      "בוחרים תרגיל מוכר, כמו סקוואט או לחיצת חזה.",
+      "מתחממים, עושים סט כבד אחד של כמה חזרות, ועוצרים לפני שהטכניקה נשברת.",
+      "מכניסים את המשקל והחזרות למחשבון למטה.",
+      "חוזרים על זה בעוד כמה שבועות: אותו תרגיל, אותו עומק, אותה מנוחה."
+    ]
+  },
+  "calculator": {
+    "calculator": "one-rep-max",
+    "defaults": {
+      "weightKg": 80,
+      "reps": 5
+    }
+  },
+  "references": [
+    {
+      "id": "r1",
+      "title": "The relationship between the number of repetitions performed at given intensities is different in endurance and strength trained athletes",
+      "authors": [
+        "Richens B",
+        "Cleather DJ"
+      ],
+      "year": 2014,
+      "venue": "Biology of Sport 31(2):157–161",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4042664/",
+      "doi": "10.5604/20831862.1099047",
+      "pmid": "24899782",
+      "tier": "PRIMARY",
+      "type": "cross-sectional",
+      "fullTextRead": true,
+      "quote": "Eight weightlifters and eight endurance runners each completed a one repetition maximum test on the leg press and completed repetitions to fatigue at 90, 80 and 70% of their one repetition maximum. The endurance runners completed significantly more repetitions than the weightlifters at 70% (39.9 ± 17.6 versus 17.9 ± 2.8; p < 0.05) and 80% (19.8 ± 6.4 versus 11.8 ± 2.7; p < 0.05) of their one repetition maximum but not at 90% (10.8 ± 3.9 versus 7.0 ± 2.1; p > 0.05) of one repetition maximum. … Epley [ 8 ] A poundage chart, not based on scientific research.",
+      "finding": "שמונה מרימי משקולות ושמונה רצי סיבולת ביצעו חזרות עד כשל ב־70%, 80% ו־90% מהמקסימום שלהם בלחיצת רגליים. הרצים ביצעו הרבה יותר חזרות ב־70% (39.9 לעומת 17.9) וב־80%, אבל לא ב־90%.",
+      "certainty": "limited"
+    },
+    {
+      "id": "r2",
+      "title": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue",
+      "authors": [
+        "Brzycki M"
+      ],
+      "year": 1993,
+      "venue": "Journal of Physical Education, Recreation & Dance 64(1):88–90",
+      "url": "https://doi.org/10.1080/07303084.1993.10606684",
+      "doi": "10.1080/07303084.1993.10606684",
+      "tier": "PRIMARY",
+      "type": "other",
+      "fullTextRead": false,
+      "quote": "Strength Testing—Predicting a One-Rep Max from Reps-to-Fatigue",
+      "finding": "המאמר משנת 1993 שהציג את הנוסחה של Brzycki לחיזוי מקסימום מחזרות עד עייפות. נקראו רק הכותרת ופרטי הפרסום, לא הטקסט המלא.",
+      "certainty": "limited"
+    }
+  ],
+  "cta": {
+    "slot": "log-sets"
+  }
+}

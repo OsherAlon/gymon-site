@@ -1,0 +1,23 @@
+---
+/**
+ * One page per article. JSON (doctrine) articles render with ArticleDoc; the remaining
+ * Markdown placeholders (mock articles) keep the older ArticlePage. A JSON article wins
+ * when both exist for a slug.
+ */
+import ArticleDoc from '@/components/ArticleDoc.astro';
+import ArticlePage from '@/components/ArticlePage.astro';
+import { articles, docArticles } from '@/lib/blog';
+import { BLOG_PUBLIC } from '../../copy.mjs';
+
+export async function getStaticPaths() {
+  if (!BLOG_PUBLIC) return []; // blog off: no article pages (src/copy.mjs)
+  const docs = await docArticles('en');
+  const md = (await articles('en')).filter((a) => !docs.some((d) => d.data.slug === a.data.slug));
+  return [
+    ...docs.map((doc) => ({ params: { slug: doc.data.slug }, props: { doc, md: undefined } })),
+    ...md.map((article) => ({ params: { slug: article.data.slug }, props: { doc: undefined, md: article } })),
+  ];
+}
+const { doc, md } = Astro.props;
+---
+{doc ? <ArticleDoc article={doc} /> : md && <ArticlePage article={md} />}

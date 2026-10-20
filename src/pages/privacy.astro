@@ -1,0 +1,6 @@
+---
+import LegacyLayout from '@/layouts/LegacyLayout.astro';
+import { legalPage } from '@/lib/legal';
+const { title, main } = legalPage('en', 'privacyPolicy');
+---
+<LegacyLayout lang="en" page="privacy" title={title} main={main} />

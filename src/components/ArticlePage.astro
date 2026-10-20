@@ -1,0 +1,73 @@
+---
+import { render } from 'astro:content';
+import BlogLayout from '@/layouts/BlogLayout.astro';
+import { articleUrl, blogCopy, BLOG_HERO_BG, formatDate, languagesOf, type Article } from '@/lib/blog';
+import { urlFor } from '@/lib/legal';
+import ArticleHero from '@/components/ArticleHero.astro';
+import HeHint from '@/components/HeHint.astro';
+import type { Lang } from '@/lib/source';
+
+interface Props {
+  article: Article;
+}
+
+const { article } = Astro.props;
+const { data } = article;
+const lang = data.lang as Lang;
+const t = blogCopy(lang);
+const { Content } = await render(article);
+// The hero shows a short title (2–4 words); the full title is the page's h1 below.
+const heroTitle = data.heroTitle ?? data.title.split(/\s+/).slice(0, 3).join(' ');
+const langs = await languagesOf(data.slug);
+const other: Lang = lang === 'en' ? 'he' : 'en';
+// The language switch goes to the translation if there is one, else to that language's blog index.
+const otherHref = langs.includes(other) ? articleUrl(other, data.slug) : urlFor(other, 'blog');
+// English article with a Hebrew version: a dismissible hint for Hebrew-language
+// devices, instead of the redirect the App Store pages use.
+const heHint = lang === 'en' && langs.includes('he') ? articleUrl('he', data.slug) : null;
+import WaveText from '@/components/ui/wave-text';
+import WaveObserver from '@/components/WaveObserver.astro';
+---
+<BlogLayout
+  lang={lang}
+  page={`blog/${data.slug}`}
+  title={`${data.title} · Gymon`}
+  description={data.description}
+  langs={langs}
+  otherHref={otherHref}
+  noindex={data.mock}
+  mainClass="-mt-(--topbar-h)"
+>
+  {heHint && <HeHint href={heHint} />}
+  {/* Scroll-linked hero (CSS only, never blocks scrolling); the article follows it, always visible. */}
+  <ArticleHero
+    image={data.image}
+    imageAlt={data.imageAlt}
+    bgImage={BLOG_HERO_BG}
+    heroTitle={heroTitle}
+    date={`${formatDate(lang, data.createdAt)} · ${t.readTime(data.readTime)}`}
+    scrollLabel={t.scrollToRead}
+  />
+  <article class="mx-auto w-full max-w-3xl px-8 pt-10 md:px-16">
+    {/* Answer first: the full title (the page's only h1), then the description. */}
+    <header class="space-y-3">
+      <WaveText as="h1" headingClassName="text-3xl leading-tight font-bold tracking-tight text-balance sm:text-4xl" text={data.title} />
+      <WaveObserver />
+      <p class="text-muted-foreground text-lg">{data.description}</p>
+      <div class="text-muted-foreground flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+        <span>{t.by} {data.author}</span>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <time datetime={data.createdAt.toISOString().slice(0, 10)}>{formatDate(lang, data.createdAt)}</time>
+        <span class="bg-muted-foreground size-1 rounded-full" aria-hidden="true"></span>
+        <span>{t.readTime(data.readTime)}</span>
+      </div>
+    </header>
+    <div class="prose prose-gymon mt-8 max-w-none">
+      <Content />
+    </div>
+    <p class="text-muted-foreground mt-10 border-t pt-4 text-sm">{t.disclaimer}</p>
+    <a href={urlFor(lang, 'blog')} class="text-muted-foreground hover:text-foreground mt-6 inline-flex min-h-11 items-center gap-1 text-sm">
+      <span aria-hidden="true" class="rtl:-scale-x-100">←</span>{t.back}
+    </a>
+  </article>
+</BlogLayout>

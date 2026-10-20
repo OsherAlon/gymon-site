@@ -1,0 +1,55 @@
+---
+/**
+ * Header + footer, identical markup on every page. Styled by `/style.css` on
+ * the original pages and by the copy of those rules in `src/styles/global.css`
+ * on the blog pages.
+ *
+ * The header is a fixed top bar: logo · Blog · language switch · App Store badge ·
+ * Google Play "coming soon" (inline-end, so the order flips in Hebrew).
+ *
+ * Google Play: NOT Google's badge. Google's guidelines say the badges "can be used
+ * in marketing campaigns to promote content on Google Play" — "Get it on" to drive
+ * downloads, "Pre-register" to drive pre-registration — and "Don't remove or
+ * rearrange badge elements, or otherwise adjust the badge in any way". Gymon has no
+ * Play listing, so a neutral text pill (no Google logo, not a link) stands in.
+ */
+import { copy, SUPPORT_EMAIL, APP_STORE_URL, BLOG_PUBLIC } from '../copy.mjs';
+import { urlFor, type Page } from '@/lib/legal';
+import type { Lang } from '@/lib/source';
+import { AppStoreButton } from '@/components/ui/app-store-button';
+import PlaySoon from '@/components/PlaySoon.astro';
+
+interface Props {
+  lang: Lang;
+  page: Page;
+  /** Where the language switch points (an article may lack a translation). */
+  otherHref?: string;
+  /** Tailwind pages (home, blog, articles, pricing): white bar, 1280px content width like the
+   *  home showcase. The LegacyLayout pages Apple reviews (privacy/terms/support) leave it off. */
+  wide?: boolean;
+}
+
+const { lang, page, otherHref, wide = false } = Astro.props;
+const t = (copy as any)[lang];
+const other: Lang = lang === 'en' ? 'he' : 'en';
+const navPages = ['privacy', 'terms', 'support'] as const;
+const setLang = `try{localStorage.setItem('lang','${other}')}catch(e){}`;
+const inBlog = page === 'blog' || page.startsWith('blog/');
+---
+<div class:list={["topbar", wide && "topbar--wide"]}>
+<header class="top">
+<a class="brand" href={urlFor(lang, 'index')}>Gymon</a>
+<div class="top-actions">
+{BLOG_PUBLIC && <a class="top-link" href={urlFor(lang, 'blog')} aria-current={inBlog ? 'page' : undefined}>{t.nav.blog}</a>}{wide && <a class="top-link" href={urlFor(lang, 'pricing')} aria-current={page === 'pricing' ? 'page' : undefined}>{t.nav.pricing}</a>}
+<a class="lang" href={otherHref ?? urlFor(other, page)} hreflang={other} lang={other} onclick={setLang}>{t.switchTo}</a>
+<AppStoreButton lang={lang} href={APP_STORE_URL} />
+<PlaySoon lang={lang} where="bar" />
+</div>
+</header>
+</div>
+<slot />
+<footer>
+<nav>{navPages.map((p) => <Fragment><a href={urlFor(lang, p)} aria-current={p === page ? 'page' : undefined}>{t.nav[p]}</a>{'\n'}</Fragment>)}</nav>
+<p><a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a></p>
+<PlaySoon lang={lang} where="footer" />
+</footer>

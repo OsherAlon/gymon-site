@@ -1,14 +1,18 @@
-/* Gymon brand, from app/tailwind.config.js (`brand-*`) and the app's dark
-   ground. Fonts: the app's stack — Epilogue for Latin, Assistant for Hebrew
+/* The APP's light palette (2026-10-03), values copied from the app's code
+   (gymon/app/src/screens/…), not picked by eye. Same tokens as the blog's
+   src/styles/global.css — keep the two in sync. No saturated blue: the app
+   rejected its old saturated blue on 2026-08-23 ("read as a component from a different app").
+   Fonts: the app's stack — Epilogue for Latin, Assistant for Hebrew
    (Epilogue has no Hebrew glyphs, so the browser falls through per character). */
 :root {
-  --bg: #0b0f14;
-  --surface: #111a24;
-  --line: #1d2a38;
-  --text: #e9f3fb;        /* brand-50 */
-  --muted: #a9bccb;
-  --accent: #4ba2e1;      /* brand-300 */
-  --accent-strong: #9bcaed; /* brand-200 */
+  --bg: #e4EDF2;            /* questionnaire/StatementScreen LIGHT_GROUND */
+  --surface: #ffffff;       /* logger/theme LOG.card */
+  --line: #C8D6DA;          /* questionnaire/ChapterScreen gradient stop */
+  --text: #0B1115;          /* questionnaire light ink — 16.0:1 on ground */
+  --muted: #4B5A64;         /* questionnaire light body text — 6.0:1 on ground */
+  --accent: #2F5865;        /* links: the app's blue-grey (ProjectionChart) — 6.5:1 on ground */
+  --accent-strong: #1E3A44; /* h3, language pill, link hover: PrimaryButton ink on light — 10.2:1 */
+  --topbar-bg: rgba(228, 237, 242, 0.85); /* the ground, translucent */
   --font: 'Epilogue', 'Assistant', system-ui, -apple-system, sans-serif;
 }
 
@@ -31,13 +35,42 @@ body {
   padding-inline: 16px;
 }
 
+/* ---- fixed top bar — the same rules are copied into src/styles/global.css ---- */
+:root { --topbar-h: 72px; }
+html { scroll-padding-top: var(--topbar-h); }
+body { padding-top: var(--topbar-h); }
+
+.topbar {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 50;
+  background: var(--topbar-bg);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
 .top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-block: 16px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  height: var(--topbar-h);
 }
+
+.top-actions { display: flex; align-items: center; gap: 10px; }
+
+.top-link {
+  color: var(--text);
+  font-size: 15px;
+  text-decoration: none;
+}
+.top-link[aria-current="page"] { font-weight: 600; }
+
+/* Official Apple badge: never resized below 40px; 10px gaps = ¼ of its height clear space. */
+.app-store-badge { display: block; flex: none; }
+.app-store-badge[aria-disabled="true"] { cursor: default; }
 
 .brand {
   color: var(--text);
@@ -53,6 +86,12 @@ body {
   padding: 6px 12px;
   border: 1px solid var(--line);
   border-radius: 999px;
+}
+
+@media (max-width: 400px) {
+  .top { gap: 8px; }
+  .top-actions { gap: 10px; }
+  .lang { padding-inline: 10px; }
 }
 
 main { padding-block: 24px 40px; }
@@ -108,3 +147,31 @@ footer {
 footer nav { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-bottom: 8px; }
 footer a { color: var(--muted); }
 footer a[aria-current="page"] { color: var(--text); }
+
+/* Google Play "coming soon": a neutral text pill in the App Store badge's footprint
+   (40px high). Not Google's badge, no Google logo, not a link — see SiteChrome.astro.
+   Same rules in src/styles/global.css. */
+.play-soon {
+  flex: none;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 40px;
+  padding-inline: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  line-height: 1.1;
+  cursor: default;
+  white-space: nowrap;
+}
+.play-soon-name { font-size: 14px; font-weight: 600; }
+.play-soon-note { font-size: 11px; color: var(--muted); }
+/* At 390px the bar is ~44px too narrow for the pill (measured), so below 470px it
+   moves to the footer (user decision 2026-10-03). */
+.play-soon--footer { display: none; }
+@media (max-width: 469px) {
+  .play-soon--bar { display: none; }
+  .play-soon--footer { display: inline-flex; margin-top: 4px; }
+}
