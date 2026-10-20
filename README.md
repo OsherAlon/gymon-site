@@ -48,10 +48,13 @@ guidelines allow only the official badges. The files are in `public/badges/`:
 - `app-store-en-us.svg`, from `https://toolbox.marketingtools.apple.com/api/v2/badges/download-on-the-app-store/black/en-us`
 - `app-store-he-il.svg`, from the same URL ending in `/he-il`
 
-🔴 **`APP_STORE_URL` in `src/copy.mjs` is `null` until the app is live.** While it's null, the badge
-is shown but leads nowhere (no `href`, `aria-disabled="true"`, default cursor). **Once the app is
-live, set it to the listing URL and rebuild.** The badge then becomes a normal link. Never point it
-at a listing that doesn't exist.
+🟢 **The app is live (2026-10-20). `APP_STORE_URL` in `src/copy.mjs` holds the listing URL**, so the
+badge (header, home hero), the pricing CTA and the article end CTA are normal links, and articles carry
+the Smart App Banner (`apple-itunes-app`). The storefront-neutral form
+`https://apps.apple.com/app/id6817270194` returned 404 when checked, so the URL is the `/us/` listing
+as given. If the listing is ever pulled, set it back to `null` and rebuild: the badge is then shown
+but leads nowhere (no `href`, `aria-disabled="true"`, default cursor). Never point it at a listing
+that doesn't exist.
 
 **Google Play** shows as a neutral text pill, "Google Play · Coming soon" / "Google Play · בקרוב",
 with no Google logo and no link. Google's official badges may only be used "to promote content on

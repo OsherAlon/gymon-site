@@ -13,11 +13,12 @@ export const SUPPORT_EMAIL = 'gymon.official@gmail.com';
 export const APPLE_SUBSCRIPTIONS_URL = 'https://apps.apple.com/account/subscriptions';
 
 /**
- * Gymon's App Store listing. null while the app is not live: the header still
- * shows the official badge, but it leads nowhere. Set it once the app is live,
- * e.g. 'https://apps.apple.com/app/id0000000000', and rebuild.
+ * Gymon's App Store listing (live since 2026-10-20). Set to null only if the
+ * listing is ever pulled: the badges then render but lead nowhere.
+ * The storefront-neutral form 'https://apps.apple.com/app/id6817270194' returned
+ * 404 on 2026-10-20, so this is the listing URL as given (/us/ storefront).
  */
-export const APP_STORE_URL = null;
+export const APP_STORE_URL = 'https://apps.apple.com/us/app/gymon-%D7%9E%D7%A2%D7%A7%D7%91-%D7%90%D7%99%D7%9E%D7%95%D7%A0%D7%99%D7%9D/id6817270194';
 
 /**
  * App Store Connect "provider token" (`pt`) for campaign links. null until the app is live.
